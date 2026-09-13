@@ -1,9 +1,12 @@
 """
-Mock port data for testing the berth allocation optimizer.
+Mock port data for testing optimization services.
 
-Provides 8 sample vessels and 5 sample berths with realistic dimensions,
-types, priorities, and timing spread over a 24-hour window.
+Provides:
+  - 8 sample vessels and 5 sample berths (for berth allocation)
+  - 12 sample cranes across 5 berths (for crane allocation)
+  - Vessel workload data in TEU (for crane allocation)
 
+All data uses realistic dimensions, types, priorities, and timing.
 This file is used when Shalvi's app/data/loader.py is not yet available.
 Replace with real data loader calls once the data layer is integrated.
 """
@@ -12,7 +15,15 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 
-from .models import BerthModel, BerthStatus, Priority, VesselModel, VesselStatus
+from .models import (
+    BerthModel,
+    BerthStatus,
+    CraneModel,
+    CraneStatus,
+    Priority,
+    VesselModel,
+    VesselStatus,
+)
 
 # ---------------------------------------------------------------------------
 # Reference time: "now" for the mock scenario
@@ -198,3 +209,129 @@ def get_sample_berths(reference_time: datetime | None = None) -> list[BerthModel
             availability_end=t0 + timedelta(hours=48),
         ),
     ]
+
+
+# ---------------------------------------------------------------------------
+# Sample Cranes (matching shared Crane interface)
+# ---------------------------------------------------------------------------
+
+def get_sample_cranes() -> list[CraneModel]:
+    """
+    Return 12 sample cranes distributed across the 5 berths.
+
+    Distribution:
+      B01 (Container Terminal Alpha):  3 STS gantry cranes
+      B02 (Container Terminal Bravo):  2 STS gantry cranes
+      B03 (Liquid Bulk Terminal):      2 loading arms
+      B04 (Dry Bulk Terminal):         3 grab cranes
+      B05 (Multi-Purpose Quay):        2 mobile harbour cranes
+    """
+    return [
+        # --- B01: Container Terminal Alpha (3 cranes) ---
+        CraneModel(
+            id="CR01",
+            name="STS Gantry Alpha-1",
+            berth_id="B01",
+            status=CraneStatus.OPERATIONAL,
+            capacity_teu_per_hour=30,
+        ),
+        CraneModel(
+            id="CR02",
+            name="STS Gantry Alpha-2",
+            berth_id="B01",
+            status=CraneStatus.OPERATIONAL,
+            capacity_teu_per_hour=28,
+        ),
+        CraneModel(
+            id="CR03",
+            name="STS Gantry Alpha-3",
+            berth_id="B01",
+            status=CraneStatus.MAINTENANCE,
+            capacity_teu_per_hour=30,
+        ),
+        # --- B02: Container Terminal Bravo (2 cranes) ---
+        CraneModel(
+            id="CR04",
+            name="STS Gantry Bravo-1",
+            berth_id="B02",
+            status=CraneStatus.OPERATIONAL,
+            capacity_teu_per_hour=25,
+        ),
+        CraneModel(
+            id="CR05",
+            name="STS Gantry Bravo-2",
+            berth_id="B02",
+            status=CraneStatus.OPERATIONAL,
+            capacity_teu_per_hour=25,
+        ),
+        # --- B03: Liquid Bulk Terminal (2 cranes / loading arms) ---
+        CraneModel(
+            id="CR06",
+            name="Loading Arm LB-1A",
+            berth_id="B03",
+            status=CraneStatus.OPERATIONAL,
+            capacity_teu_per_hour=15,
+        ),
+        CraneModel(
+            id="CR07",
+            name="Loading Arm LB-1B",
+            berth_id="B03",
+            status=CraneStatus.OPERATIONAL,
+            capacity_teu_per_hour=15,
+        ),
+        # --- B04: Dry Bulk Terminal (3 cranes) ---
+        CraneModel(
+            id="CR08",
+            name="Grab Crane DB-1A",
+            berth_id="B04",
+            status=CraneStatus.OPERATIONAL,
+            capacity_teu_per_hour=20,
+        ),
+        CraneModel(
+            id="CR09",
+            name="Grab Crane DB-1B",
+            berth_id="B04",
+            status=CraneStatus.OPERATIONAL,
+            capacity_teu_per_hour=18,
+        ),
+        CraneModel(
+            id="CR10",
+            name="Grab Crane DB-1C",
+            berth_id="B04",
+            status=CraneStatus.IDLE,
+            capacity_teu_per_hour=20,
+        ),
+        # --- B05: Multi-Purpose Quay (2 cranes) ---
+        CraneModel(
+            id="CR11",
+            name="Mobile Harbour Crane MP-1A",
+            berth_id="B05",
+            status=CraneStatus.OPERATIONAL,
+            capacity_teu_per_hour=18,
+        ),
+        CraneModel(
+            id="CR12",
+            name="Mobile Harbour Crane MP-1B",
+            berth_id="B05",
+            status=CraneStatus.OPERATIONAL,
+            capacity_teu_per_hour=18,
+        ),
+    ]
+
+
+# ---------------------------------------------------------------------------
+# Vessel workload data (TEU containers to handle)
+# ---------------------------------------------------------------------------
+
+# Maps vessel_id -> number of TEU containers to load/unload.
+# Used by the crane allocation optimizer.
+VESSEL_WORKLOADS_TEU: dict[str, float] = {
+    "V001": 450,   # MSC Flaminia (CONTAINER, HIGH priority)
+    "V002": 120,   # Stena Impala (TANKER — smaller TEU equivalent)
+    "V003": 350,   # Cape Kassos (BULK)
+    "V004": 800,   # Ever Given (CONTAINER, HIGH priority, mega-vessel)
+    "V005": 100,   # Minerva Helen (TANKER)
+    "V006": 200,   # Pacific Venture (RORO)
+    "V007": 650,   # CMA CGM Marco Polo (CONTAINER, HIGH priority)
+    "V008": 280,   # Nordic Hawk (BULK)
+}

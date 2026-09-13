@@ -1,5 +1,5 @@
 """
-Pydantic models for the berth allocation optimization service.
+Pydantic models for the optimization services (berth + crane allocation).
 
 Mirrors the shared TypeScript schemas from src/shared/types/index.ts
 with Python-native naming conventions and additional optimization fields.
@@ -144,4 +144,93 @@ class OptimizationResult(BaseModel):
     solver_status: str = Field(
         default="UNKNOWN",
         description="OR-Tools solver status string",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Crane-related Enumerations
+# ---------------------------------------------------------------------------
+
+class CraneStatus(str, Enum):
+    """Matches shared Crane.status: 'OPERATIONAL' | 'IDLE' | 'MAINTENANCE'."""
+    OPERATIONAL = "OPERATIONAL"
+    IDLE = "IDLE"
+    MAINTENANCE = "MAINTENANCE"
+
+
+# ---------------------------------------------------------------------------
+# Crane Input Model
+# ---------------------------------------------------------------------------
+
+class CraneModel(BaseModel):
+    """
+    Crane available at a berth.
+
+    Matches the shared Crane interface:
+      id, name, berthId, status, capacityTEUPerHour
+    """
+
+    id: str
+    name: str
+    berth_id: str
+    status: CraneStatus
+    capacity_teu_per_hour: float = Field(
+        gt=0,
+        description="Crane throughput in TEU per hour",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Crane Output Models
+# ---------------------------------------------------------------------------
+
+class CraneAssignment(BaseModel):
+    """A single crane assignment for a vessel at a berth."""
+
+    vessel_id: str
+    vessel_name: str
+    berth_id: str
+    berth_name: str
+    crane_ids: list[str]
+    crane_names: list[str]
+    num_cranes: int = Field(ge=0)
+    combined_throughput_teu_per_hour: float = Field(ge=0)
+    workload_teu: float = Field(ge=0)
+    service_duration_hours: float = Field(ge=0)
+
+
+class CraneMetricsSnapshot(BaseModel):
+    """
+    Crane-specific operational metrics — used for before/after comparison.
+    """
+
+    total_cranes: int = Field(ge=0)
+    cranes_assigned: int = Field(ge=0)
+    avg_service_duration_hours: float = Field(ge=0)
+    crane_utilization_pct: float = Field(ge=0, le=100)
+
+
+class CraneOptimizationResult(BaseModel):
+    """
+    Complete crane optimization output.
+
+    Aligns with the shared OptimisationResult interface:
+      id, timestamp, efficiencyGainPercentage, estimatedWaitTimeReductionHours
+    and extends it with crane-specific assignments and before/after metrics.
+    """
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    assignments: list[CraneAssignment]
+    before_metrics: CraneMetricsSnapshot
+    after_metrics: CraneMetricsSnapshot
+    efficiency_gain_percentage: float = Field(
+        description="Percentage improvement in crane utilization",
+    )
+    estimated_wait_time_reduction_hours: float = Field(
+        description="Reduction in average service duration (hours)",
+    )
+    solver_status: str = Field(
+        default="UNKNOWN",
+        description="Algorithm status string",
     )
