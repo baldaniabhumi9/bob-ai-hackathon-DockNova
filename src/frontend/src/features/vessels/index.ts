@@ -1,0 +1,2 @@
+// Vessels feature module
+export {};

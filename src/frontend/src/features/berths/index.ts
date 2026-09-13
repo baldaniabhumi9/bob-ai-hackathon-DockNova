@@ -1,0 +1,2 @@
+// Berths feature module
+export {};

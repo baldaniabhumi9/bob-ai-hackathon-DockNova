@@ -1,0 +1,2 @@
+// Frontend state store
+export {};

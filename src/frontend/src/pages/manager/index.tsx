@@ -1,0 +1,56 @@
+import React, { useState } from 'react';
+import { ManagerLayout } from '@/layouts/ManagerLayout';
+import { ManagerDashboard } from './ManagerDashboard';
+import { CongestionPage } from './CongestionPage';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { colors } from '@/design-system';
+
+export const ManagerPage: React.FC = () => {
+  const [activeNav, setActiveNav] = useState<string>('overview');
+
+  const getNavTitle = (id: string) => {
+    switch (id) {
+      case 'overview': return 'Port Control Tower Overview';
+      case 'congestion': return '72-Hour Congestion Prediction Engine';
+      case 'vessels': return 'Vessel Schedule & Traffic Control';
+      case 'berths': return 'Berth Allocation & Utilisation';
+      case 'cranes': return 'Crane & Quay Equipment Operations';
+      case 'optimisation': return 'AI 72-Hour Operations Planner';
+      case 'simulation': return 'What-If Disruption Simulator';
+      case 'plan72h': return 'Automated Shift Supervisor Plan';
+      case 'copilot': return 'IBM Bob AI Port Copilot';
+      case 'settings': return 'Manager Control Settings';
+      default: return 'Port Control Tower';
+    }
+  };
+
+  return (
+    <ManagerLayout
+      activeNavItemId={activeNav}
+      onNavItemSelect={(id) => setActiveNav(id)}
+      pageTitle={getNavTitle(activeNav)}
+    >
+      {activeNav === 'overview' && <ManagerDashboard />}
+      {activeNav === 'congestion' && <CongestionPage />}
+      {activeNav !== 'overview' && activeNav !== 'congestion' && (
+        <Card title={getNavTitle(activeNav)} subtitle="Module Under Active Development">
+          <div style={{ padding: '32px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+            <div style={{ fontSize: '3rem' }}>⚓</div>
+            <h3 style={{ margin: 0, color: colors.primaryText }}>
+              {getNavTitle(activeNav)}
+            </h3>
+            <p style={{ margin: 0, color: colors.secondaryText, maxWidth: '480px' }}>
+              This module is scheduled for implementation in the next phase. Return to the Control Tower Overview to monitor live port congestion and AI recommendations.
+            </p>
+            <Button variant="primary" onClick={() => setActiveNav('overview')}>
+              Return to Overview Dashboard
+            </Button>
+          </div>
+        </Card>
+      )}
+    </ManagerLayout>
+  );
+};
+
+export default ManagerPage;
