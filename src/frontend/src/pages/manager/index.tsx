@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ManagerLayout } from '@/layouts/ManagerLayout';
 import { ManagerDashboard } from './ManagerDashboard';
 import { CongestionPage } from './CongestionPage';
+import { VesselsPage } from './VesselsPage';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { colors } from '@/design-system';
@@ -33,7 +34,8 @@ export const ManagerPage: React.FC = () => {
     >
       {activeNav === 'overview' && <ManagerDashboard />}
       {activeNav === 'congestion' && <CongestionPage />}
-      {activeNav !== 'overview' && activeNav !== 'congestion' && (
+      {activeNav === 'vessels' && <VesselsPage />}
+      {activeNav !== 'overview' && activeNav !== 'congestion' && activeNav !== 'vessels' && (
         <Card title={getNavTitle(activeNav)} subtitle="Module Under Active Development">
           <div style={{ padding: '32px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
             <div style={{ fontSize: '3rem' }}>⚓</div>

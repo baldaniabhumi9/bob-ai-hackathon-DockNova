@@ -11,6 +11,17 @@ export interface WhatIfSimulatorModalProps {
   onClose: () => void;
 }
 
+const VESSEL_OPTIONS = [
+  { value: 'mv_ocean_star', label: 'MV Ocean Star (+4h Delay)' },
+  { value: 'mv_atlas', label: 'MV Atlas (At Risk)' },
+];
+
+const BERTH_OPTIONS = [
+  { value: 'b5', label: 'Berth B5 (45% Utilisation - Recommended)' },
+  { value: 'b1', label: 'Berth B1 (65% Utilisation)' },
+  { value: 'b6', label: 'Berth B6 (50% Standby)' },
+];
+
 export const WhatIfSimulatorModal: React.FC<WhatIfSimulatorModalProps> = ({
   isOpen,
   onClose,
@@ -23,6 +34,22 @@ export const WhatIfSimulatorModal: React.FC<WhatIfSimulatorModalProps> = ({
     setIsSimulated(true);
   };
 
+  const handleVesselChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTargetVessel(e.target.value);
+    setIsSimulated(false);
+  };
+
+  const handleBerthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTargetBerth(e.target.value);
+    setIsSimulated(false);
+  };
+
+  // Derive display labels from current selections
+  const vesselLabel = VESSEL_OPTIONS.find((v) => v.value === targetVessel)?.label ?? targetVessel;
+  const berthLabel = BERTH_OPTIONS.find((b) => b.value === targetBerth)?.label ?? targetBerth;
+  const berthDisplay = berthLabel.split(' ')[1]; // e.g. "B5", "B1", "B6"
+  const vesselName = vesselLabel.split(' ').slice(0, 3).join(' '); // e.g. "MV Ocean Star"
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="What-If Scenario Simulator">
       <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.md }}>
@@ -34,22 +61,15 @@ export const WhatIfSimulatorModal: React.FC<WhatIfSimulatorModalProps> = ({
           <Select
             label="Select Vessel to Reassign"
             value={targetVessel}
-            onChange={(e) => setTargetVessel(e.target.value)}
-            options={[
-              { value: 'mv_ocean_star', label: 'MV Ocean Star (+4h Delay)' },
-              { value: 'mv_atlas', label: 'MV Atlas (At Risk)' },
-            ]}
+            onChange={handleVesselChange}
+            options={VESSEL_OPTIONS}
           />
 
           <Select
             label="Reassign Target Berth"
             value={targetBerth}
-            onChange={(e) => setTargetBerth(e.target.value)}
-            options={[
-              { value: 'b5', label: 'Berth B5 (45% Utilisation - Recommended)' },
-              { value: 'b1', label: 'Berth B1 (65% Utilisation)' },
-              { value: 'b6', label: 'Berth B6 (50% Standby)' },
-            ]}
+            onChange={handleBerthChange}
+            options={BERTH_OPTIONS}
           />
         </div>
 
@@ -66,10 +86,10 @@ export const WhatIfSimulatorModal: React.FC<WhatIfSimulatorModalProps> = ({
               <Badge variant="success">RISK REDUCED BY 50%</Badge>
             </div>
 
-            <ProgressBar value={42} label="New B4 Predicted Congestion Risk" variant="success" />
+            <ProgressBar value={42} label={`New ${berthDisplay} Predicted Congestion Risk`} variant="success" />
 
             <div style={{ fontSize: '0.8125rem', color: colors.primaryText, marginTop: spacing.xs }}>
-              ✅ <strong>Outcome:</strong> Reassigning MV Ocean Star to B5 resolves the 18h bottleneck at B4, saving <strong>3.2 hours</strong> of waiting time across 3 arriving vessels.
+              ✅ <strong>Outcome:</strong> Reassigning {vesselName} to {berthDisplay} resolves the 18h bottleneck, saving <strong>3.2 hours</strong> of waiting time across 3 arriving vessels.
             </div>
 
             <Button variant="secondary" size="sm" onClick={() => setIsSimulated(false)}>

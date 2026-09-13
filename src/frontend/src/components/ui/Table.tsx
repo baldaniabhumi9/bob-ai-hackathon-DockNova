@@ -11,12 +11,14 @@ export interface TableProps<T> {
   columns: Column<T>[];
   data: T[];
   emptyMessage?: string;
+  onRowClick?: (row: T) => void;
 }
 
 export function Table<T extends { id?: string | number }>({
   columns,
   data,
   emptyMessage = 'No data available',
+  onRowClick,
 }: TableProps<T>) {
   const tableStyle: React.CSSProperties = {
     width: '100%',
@@ -63,7 +65,20 @@ export function Table<T extends { id?: string | number }>({
             </tr>
           ) : (
             data.map((row, idx) => (
-              <tr key={row.id || idx}>
+              <tr
+                key={row.id || idx}
+                onClick={() => onRowClick && onRowClick(row)}
+                style={{
+                  cursor: onRowClick ? 'pointer' : 'default',
+                  transition: 'background-color 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  if (onRowClick) e.currentTarget.style.backgroundColor = colors.surfaceHover;
+                }}
+                onMouseLeave={(e) => {
+                  if (onRowClick) e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
                 {columns.map((col) => (
                   <td key={col.key} style={tdStyle}>
                     {col.render ? col.render(row) : (row as Record<string, unknown>)[col.key] as React.ReactNode}
