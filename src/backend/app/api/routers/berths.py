@@ -13,10 +13,10 @@ from typing import Optional
 from fastapi import APIRouter, status
 
 from app.services.optimization.berth_allocation import optimize_berth_allocation
-from app.services.optimization.mock_data import (
+from app.data.loader import (
     REFERENCE_TIME,
-    get_sample_berths,
-    get_sample_vessels,
+    get_berth_models,
+    get_vessel_models,
 )
 from app.services.optimization.models import (
     ApiErrorDetail,
@@ -44,8 +44,8 @@ def optimize_berths(
     Run berth allocation optimization.
     Optionally filters by vessel_ids; defaults to all waiting/scheduled vessels.
     """
-    all_vessels = get_sample_vessels(reference_time=REFERENCE_TIME)
-    all_berths = get_sample_berths(reference_time=REFERENCE_TIME)
+    all_vessels = get_vessel_models()
+    all_berths = get_berth_models()
 
     vessels_to_optimize = all_vessels
     if request and request.vessel_ids:

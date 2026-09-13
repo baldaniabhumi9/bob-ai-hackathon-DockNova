@@ -29,7 +29,7 @@ from .models import (
     Recommendation,
     RouteRecommendation,
 )
-from .mock_data import (
+from app.data.loader import (
     CURRENT_PORT_CONGESTION,
     CURRENT_PORT_NAME,
     CURRENT_PORT_WAIT_TIME_HOURS,

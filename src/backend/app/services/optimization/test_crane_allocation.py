@@ -19,13 +19,13 @@ from __future__ import annotations
 import json
 import sys
 
-from .crane_allocation import optimize_crane_allocation
-from .mock_data import (
-    VESSEL_WORKLOADS_TEU,
-    get_sample_berths,
-    get_sample_cranes,
-    get_sample_vessels,
+from app.data.loader import (
+    get_berth_models,
+    get_crane_models,
+    get_vessel_models,
+    get_vessel_workloads,
 )
+from .crane_allocation import optimize_crane_allocation
 from .models import CraneModel, CraneStatus
 
 
@@ -35,28 +35,28 @@ def main() -> None:
     print("=" * 70)
     print()
 
-    vessels = get_sample_vessels()
-    berths = get_sample_berths()
-    cranes = get_sample_cranes()
+    vessels = get_vessel_models()
+    berths = get_berth_models()
+    cranes = get_crane_models()
+    workloads = get_vessel_workloads()
     vessel_map = {v.id: v for v in vessels}
     berth_map = {b.id: b for b in berths}
 
     all_passed = True
 
     # --- Test assignments for representative vessels at their berths ---
-    # Using berth assignments from the berth optimizer's OPTIMAL result:
     test_cases = [
-        ("V001", "B02", "MSC Flaminia", "Container Terminal Bravo"),
-        ("V004", "B01", "Ever Given", "Container Terminal Alpha"),
-        ("V003", "B04", "Cape Kassos", "Dry Bulk Terminal"),
-        ("V005", "B03", "Minerva Helen", "Liquid Bulk Terminal"),
-        ("V006", "B04", "Pacific Venture", "Dry Bulk Terminal"),
+        ("V001", "B02", vessel_map["V001"].name, berth_map["B02"].name),
+        ("V004", "B01", vessel_map["V004"].name, berth_map["B01"].name),
+        ("V003", "B03", vessel_map["V003"].name, berth_map["B03"].name),
+        ("V002", "B07", vessel_map["V002"].name, berth_map["B07"].name),
+        ("V006", "B05", vessel_map["V006"].name, berth_map["B05"].name),
     ]
 
     results = []
 
     for vessel_id, berth_id, vessel_name, berth_name in test_cases:
-        workload = VESSEL_WORKLOADS_TEU.get(vessel_id, 200)
+        workload = workloads.get(vessel_id, 200)
         berth_cranes = [c for c in cranes if c.berth_id == berth_id]
 
         print(f"─── {vessel_name} @ {berth_name} ───")

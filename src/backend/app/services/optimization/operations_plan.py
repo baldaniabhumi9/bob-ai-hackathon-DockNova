@@ -19,9 +19,9 @@ import logging
 from datetime import datetime, timedelta
 from typing import Optional
 
+from app.data.loader import get_vessel_workloads
 from .berth_allocation import optimize_berth_allocation
 from .crane_allocation import optimize_crane_allocation
-from .mock_data import VESSEL_WORKLOADS_TEU
 from .models import (
     BerthModel,
     CraneModel,
@@ -99,7 +99,7 @@ def generate_operations_plan(
         "Now" reference.  Defaults to datetime.utcnow().
     workloads : dict[str, float], optional
         vessel_id → TEU workload mapping.  Falls back to
-        VESSEL_WORKLOADS_TEU from mock_data.
+        get_vessel_workloads() from loader.
 
     Returns
     -------
@@ -109,7 +109,7 @@ def generate_operations_plan(
         reference_time = datetime.utcnow()
 
     if workloads is None:
-        workloads = VESSEL_WORKLOADS_TEU
+        workloads = get_vessel_workloads()
 
     horizon_end = reference_time + timedelta(hours=PLANNING_HORIZON_HOURS)
 

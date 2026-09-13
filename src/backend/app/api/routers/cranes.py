@@ -11,13 +11,13 @@ import logging
 
 from fastapi import APIRouter, status
 
-from app.services.optimization.crane_allocation import optimize_crane_allocation
-from app.services.optimization.mock_data import (
-    VESSEL_WORKLOADS_TEU,
-    get_sample_berths,
-    get_sample_cranes,
-    get_sample_vessels,
+from app.data.loader import (
+    get_berth_models,
+    get_crane_models,
+    get_vessel_models,
+    get_vessel_workloads,
 )
+from app.services.optimization.crane_allocation import optimize_crane_allocation
 from app.services.optimization.models import (
     ApiErrorDetail,
     ApiResponseEnvelope,
@@ -31,11 +31,11 @@ router = APIRouter(prefix="/api/optimization", tags=["Crane Optimization"])
 
 # Default mapping of berths to their scheduled primary vessel
 BERTH_DEFAULT_VESSELS: dict[str, str] = {
-    "B01": "V004",  # Ever Given (800 TEU)
-    "B02": "V001",  # MSC Flaminia (450 TEU)
-    "B03": "V002",  # Stena Impala (120 TEU)
-    "B04": "V003",  # Cape Kassos (350 TEU)
-    "B05": "V006",  # Pacific Venture (200 TEU)
+    "B01": "V004",  # Maersk Mc-Kinney Moller
+    "B02": "V001",  # Hyundai Loyalty
+    "B03": "V002",  # Asian Spirit
+    "B04": "V003",  # Pacific Trader
+    "B05": "V006",
 }
 
 
@@ -52,7 +52,7 @@ def optimize_cranes(
     """
     Run crane allocation optimization for a given berth_id.
     """
-    berths = {b.id: b for b in get_sample_berths()}
+    berths = {b.id: b for b in get_berth_models()}
     if request.berth_id not in berths:
         return ApiResponseEnvelope[CraneOptimizationResult](
             success=False,
@@ -65,7 +65,7 @@ def optimize_cranes(
         )
 
     berth = berths[request.berth_id]
-    cranes_at_berth = [c for c in get_sample_cranes() if c.berth_id == request.berth_id]
+    cranes_at_berth = [c for c in get_crane_models() if c.berth_id == request.berth_id]
 
     if not cranes_at_berth:
         return ApiResponseEnvelope[CraneOptimizationResult](
@@ -79,10 +79,11 @@ def optimize_cranes(
         )
 
     # Determine vessel and workload for this berth
-    vessels = {v.id: v for v in get_sample_vessels()}
+    vessels = {v.id: v for v in get_vessel_models()}
     vessel_id = BERTH_DEFAULT_VESSELS.get(request.berth_id, "V001")
     vessel = vessels.get(vessel_id, list(vessels.values())[0])
-    workload_teu = VESSEL_WORKLOADS_TEU.get(vessel.id, 450.0)
+    workloads = get_vessel_workloads()
+    workload_teu = workloads.get(vessel.id, 450.0)
 
     result = optimize_crane_allocation(
         berth_id=berth.id,

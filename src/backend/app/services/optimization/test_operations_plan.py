@@ -19,11 +19,12 @@ from __future__ import annotations
 import sys
 from datetime import datetime, timedelta
 
-from .mock_data import (
+from app.data.loader import (
     REFERENCE_TIME,
-    get_sample_berths,
-    get_sample_cranes,
-    get_sample_vessels,
+    get_berth_models,
+    get_crane_models,
+    get_vessel_models,
+    get_vessel_workloads,
 )
 from .models import PlanEntryStatus
 from .operations_plan import generate_operations_plan
@@ -35,9 +36,10 @@ def main() -> None:
     print("=" * 70)
     print()
 
-    vessels = get_sample_vessels(REFERENCE_TIME)
-    berths = get_sample_berths(REFERENCE_TIME)
-    cranes = get_sample_cranes()
+    vessels = get_vessel_models()
+    berths = get_berth_models()
+    cranes = get_crane_models()
+    workloads = get_vessel_workloads()
     all_passed = True
 
     # --- Generate plan ---
@@ -47,6 +49,7 @@ def main() -> None:
         berths=berths,
         cranes=cranes,
         reference_time=REFERENCE_TIME,
+        workloads=workloads,
     )
     print(f"Plan generated: {plan.total_vessels} vessels, "
           f"{plan.scheduled_count} scheduled, "

@@ -11,7 +11,7 @@ import logging
 
 from fastapi import APIRouter, status
 
-from app.services.optimization.mock_data import get_sample_vessels
+from app.data.loader import get_vessel_models
 from app.services.optimization.models import (
     ApiErrorDetail,
     ApiResponseEnvelope,
@@ -38,7 +38,7 @@ def get_route_recommendation(
     """
     Produce a STAY or REROUTE recommendation for the specified vessel_id.
     """
-    vessels = {v.id: v for v in get_sample_vessels()}
+    vessels = {v.id: v for v in get_vessel_models()}
 
     if request.vessel_id not in vessels:
         return ApiResponseEnvelope[RouteRecommendation](

@@ -11,12 +11,12 @@ import logging
 
 from fastapi import APIRouter, status
 
-from app.services.optimization.mock_data import (
+from app.data.loader import (
     REFERENCE_TIME,
-    VESSEL_WORKLOADS_TEU,
-    get_sample_berths,
-    get_sample_cranes,
-    get_sample_vessels,
+    get_berth_models,
+    get_crane_models,
+    get_vessel_models,
+    get_vessel_workloads,
 )
 from app.services.optimization.models import (
     ApiResponseEnvelope,
@@ -40,16 +40,16 @@ def get_72_hour_operations_plan() -> ApiResponseEnvelope[list[OperationsPlanEntr
     """
     Generate and return the 72-hour operations plan entries.
     """
-    vessels = get_sample_vessels(reference_time=REFERENCE_TIME)
-    berths = get_sample_berths(reference_time=REFERENCE_TIME)
-    cranes = get_sample_cranes()
+    vessels = get_vessel_models()
+    berths = get_berth_models()
+    cranes = get_crane_models()
 
     plan = generate_operations_plan(
         vessels=vessels,
         berths=berths,
         cranes=cranes,
         reference_time=REFERENCE_TIME,
-        workloads=VESSEL_WORKLOADS_TEU,
+        workloads=get_vessel_workloads(),
     )
 
     return ApiResponseEnvelope[list[OperationsPlanEntry]](

@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import sys
 
-from .mock_data import get_sample_vessels, get_alternative_ports
+from app.data.loader import get_alternative_ports, get_vessel_models
 from .models import AlternativePort, Recommendation
 from .route_recommendation import recommend_route
 
@@ -28,14 +28,14 @@ def main() -> None:
     print("=" * 70)
     print()
 
-    vessels = get_sample_vessels()
+    vessels = get_vessel_models()
     all_passed = True
 
-    # --- Test 1: Default mock data (HIGH congestion, 8.5h wait) ---
+    # --- Test 1: Default scenario (HIGH congestion, 8.5h wait) ---
     print("Test 1: Default scenario (HIGH congestion, 8.5h wait)")
     rec = recommend_route(
-        vessel_id="V001",
-        vessel_name="MSC Flaminia",
+        vessel_id=vessels[0].id,
+        vessel_name=vessels[0].name,
     )
     print(f"  Recommendation: {rec.recommendation.value}")
     print(f"  Time saved:     {rec.time_saved_hours:.2f}h")

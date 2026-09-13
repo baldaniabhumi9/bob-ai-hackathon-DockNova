@@ -21,8 +21,8 @@ import json
 import sys
 from datetime import datetime
 
+from app.data.loader import REFERENCE_TIME, get_berth_models, get_vessel_models
 from .berth_allocation import optimize_berth_allocation, _is_compatible
-from .mock_data import REFERENCE_TIME, get_sample_berths, get_sample_vessels
 from .models import BerthAssignment
 
 
@@ -51,10 +51,10 @@ def main() -> None:
     print("=" * 70)
     print()
 
-    # ----- Load mock data -----
-    vessels = get_sample_vessels(REFERENCE_TIME)
-    berths = get_sample_berths(REFERENCE_TIME)
-    print(f"Loaded {len(vessels)} vessels and {len(berths)} berths (mock data)")
+    # ----- Load synthetic data -----
+    vessels = get_vessel_models()
+    berths = get_berth_models()
+    print(f"Loaded {len(vessels)} vessels and {len(berths)} berths (real synthetic data)")
     print(f"Reference time: {REFERENCE_TIME.isoformat()}")
     print()
 
