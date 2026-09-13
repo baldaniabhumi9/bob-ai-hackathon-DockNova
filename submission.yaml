@@ -9,43 +9,71 @@
 # =============================================================================
 
 team:
-  name: ""                             # REQUIRED — e.g., "Orion Squad"
-  track: ""                            # REQUIRED — one of: AI | DevOps | Sustainability | Open
+  name: "DockNova"
+  track: "AI"
+
   lead:
-    name: ""                           # REQUIRED — e.g., "Alice Chen"
-    email: ""                          # REQUIRED — e.g., "alice.chen@ibm.com"
+    name: "Bhumi Baldania"
+    email: "24dcs003@charusat.edu.in"
+
   members:
-    - name: ""                         # REQUIRED — Team member 1
-      email: ""
-    - name: ""                         # Add more members by copying the two lines above
-      email: ""
-    - name: ""
-      email: ""
+    - name: "Rishi Ramani"
+      email: "24dit058@charusat.edu.in"
+
+    - name: "Shalvi Patel"
+      email: "24dit050@charusat.edu.in"
+
+    - name: "Krina Patel"
+      email: "24dit041@charusat.edu.in"
 
 submission:
-  title: ""                            # REQUIRED — Project display name, e.g., "SmartOps Dashboard"
+  title: "DockNova — AI-Powered Port Congestion Predictor & Operations Optimiser"
 
-  problem_statement: >                 # REQUIRED — 1-3 sentences. What problem? Who has it?
-    Replace this text with a concise description of the real-world problem
-    your project addresses and who experiences it.
+  problem_statement: >
+    Port operators often manage vessel arrivals, berth allocation, crane
+    availability, and yard capacity using fragmented schedules and manual
+    planning. This makes congestion difficult to identify before vessels begin
+    queuing and causes operational decisions such as berth reassignment,
+    resource allocation, and alternate routing to happen too late.
 
-  solution_summary: >                  # REQUIRED — 1-3 sentences. What did you build?
-    Replace this text with a clear description of your solution
-    and how it addresses the problem above.
+  solution_summary: >
+    DockNova is an AI-powered port operations control tower that predicts
+    congestion hotspots up to 72 hours in advance using vessel schedules,
+    berth capacity, crane availability, and operational data. It explains the
+    causes of predicted congestion, recommends optimised berth and crane
+    assignments and alternate routing strategies, enables what-if simulation
+    of operational decisions, and generates an actionable 72-hour plan for
+    shift supervisors through an IBM Bob-powered conversational interface.
 
-  key_features:                        # REQUIRED — List 3 to 5 specific features you implemented
-    - ""                               # e.g., "Real-time pipeline anomaly detection using watsonx.ai"
-    - ""
-    - ""
-    - ""                               # optional 4th
-    - ""                               # optional 5th
+  key_features:
+    - "72-hour vessel and port congestion prediction with risk levels"
+    - "Explainable AI showing the factors driving each congestion prediction"
+    - "AI-optimised berth and crane assignment recommendations"
+    - "What-if simulation for vessel delays, early arrivals, and resource changes"
+    - "Alternate routing recommendations and congestion impact analysis"
+    - "Automated 72-hour port operations plan for shift supervisors"
+    - "Interactive port control tower with vessel, berth, crane, and congestion views"
+    - "IBM Bob-powered AI Port Copilot for natural-language operational queries"
 
   tech_stack:
-    languages: []                      # REQUIRED — e.g., ["Python", "TypeScript"]
-    frameworks: []                     # e.g., ["FastAPI", "React"]
-    ibm_technologies: []               # e.g., ["watsonx.ai", "IBM Bob", "IBM Cloud Functions"]
-    databases: []                      # e.g., ["PostgreSQL", "Redis"]
-    other: []                          # e.g., ["Docker", "GitHub Actions", "Slack API"]
+    languages:
+      - "Python"
+      - "TypeScript"
+
+    frameworks:
+      - "FastAPI"
+      - "React"
+
+    ibm_technologies:
+      - "IBM Bob"
+      - "watsonx.ai"
+
+    databases:
+      - "PostgreSQL"
+
+    other:
+      - "Docker"
+      - "GitHub Actions"
 
   what_we_are_most_proud_of: >         # Optional but recommended — guides judges to your best work
     Replace with what aspect of the submission you consider strongest
