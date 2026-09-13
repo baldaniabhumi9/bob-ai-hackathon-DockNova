@@ -335,3 +335,55 @@ VESSEL_WORKLOADS_TEU: dict[str, float] = {
     "V007": 650,   # CMA CGM Marco Polo (CONTAINER, HIGH priority)
     "V008": 280,   # Nordic Hawk (BULK)
 }
+
+
+# ---------------------------------------------------------------------------
+# Alternative Ports for Route Recommendation
+# ---------------------------------------------------------------------------
+
+from .models import AlternativePort  # noqa: E402 (appended import)
+
+# Current port identity & mock congestion
+CURRENT_PORT_ID = "PORT-DKN"
+CURRENT_PORT_NAME = "DockNova Terminal"
+CURRENT_PORT_CONGESTION = "HIGH"  # Mock: our port is congested
+CURRENT_PORT_WAIT_TIME_HOURS = 8.5  # Avg wait for incoming vessels
+
+
+def get_alternative_ports() -> list[AlternativePort]:
+    """
+    Return 3 alternative ports with mock congestion/capacity/cost data.
+
+    These represent nearby ports a vessel could be rerouted to when
+    the current port is congested.
+    """
+    return [
+        AlternativePort(
+            port_id="PORT-MUN",
+            port_name="Mumbai Port (JNPT)",
+            congestion_level="MEDIUM",
+            predicted_wait_time_hours=3.5,
+            travel_time_hours=6.0,
+            travel_cost_usd=45000,
+            available_berths=3,
+        ),
+        AlternativePort(
+            port_id="PORT-KAN",
+            port_name="Kandla Port",
+            congestion_level="LOW",
+            predicted_wait_time_hours=1.0,
+            travel_time_hours=12.0,
+            travel_cost_usd=72000,
+            available_berths=5,
+        ),
+        AlternativePort(
+            port_id="PORT-HAZ",
+            port_name="Hazira Port",
+            congestion_level="LOW",
+            predicted_wait_time_hours=2.0,
+            travel_time_hours=4.0,
+            travel_cost_usd=30000,
+            available_berths=2,
+        ),
+    ]
+

@@ -234,3 +234,110 @@ class CraneOptimizationResult(BaseModel):
         default="UNKNOWN",
         description="Algorithm status string",
     )
+
+
+# ---------------------------------------------------------------------------
+# Route Recommendation Models
+# ---------------------------------------------------------------------------
+
+class Recommendation(str, Enum):
+    """Whether the vessel should stay at the current port or reroute."""
+    STAY = "STAY"
+    REROUTE = "REROUTE"
+
+
+class AlternativePort(BaseModel):
+    """An alternative port for route recommendation comparison."""
+
+    port_id: str
+    port_name: str
+    congestion_level: str  # LOW / MEDIUM / HIGH / CRITICAL
+    predicted_wait_time_hours: float = Field(ge=0)
+    travel_time_hours: float = Field(ge=0)
+    travel_cost_usd: float = Field(ge=0)
+    available_berths: int = Field(ge=0)
+
+
+class RouteRecommendation(BaseModel):
+    """
+    Route recommendation output for a specific vessel.
+
+    No direct equivalent in shared/types/index.ts — this is a backend-
+    only model for the optimization service. The frontend can consume it
+    via the API as JSON.
+    """
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    vessel_id: str
+    vessel_name: str
+    current_port: str
+    current_congestion: str  # LOW / MEDIUM / HIGH / CRITICAL
+    current_wait_time_hours: float = Field(ge=0)
+    alternatives: list[AlternativePort]
+    best_alternative: Optional[AlternativePort] = None
+    time_saved_hours: float = Field(
+        description="Net time saved by rerouting (negative = rerouting is worse)",
+    )
+    recommendation: Recommendation
+    reasoning: str
+
+
+# ---------------------------------------------------------------------------
+# Operations Plan Models
+# ---------------------------------------------------------------------------
+
+class PlanEntryStatus(str, Enum):
+    """Status of a single entry in the 72-hour operations plan."""
+    SCHEDULED = "SCHEDULED"
+    IN_PROGRESS = "IN_PROGRESS"
+    DELAYED = "DELAYED"
+    COMPLETED = "COMPLETED"
+
+
+class OperationsPlanEntry(BaseModel):
+    """
+    A single entry in the 72-hour operations plan.
+
+    Combines berth allocation and crane allocation outputs into
+    an actionable per-vessel plan item.
+    """
+
+    vessel_id: str
+    vessel_name: str
+    vessel_type: str
+    priority: Priority
+    eta: datetime
+    etd: datetime
+    berth_id: str
+    berth_name: str
+    start_time: datetime
+    end_time: datetime
+    crane_count: int = Field(ge=0)
+    crane_ids: list[str] = Field(default_factory=list)
+    service_duration_hours: float = Field(ge=0)
+    workload_teu: float = Field(ge=0)
+    status: PlanEntryStatus
+    recommended_action: str
+
+
+class OperationsPlanResult(BaseModel):
+    """
+    Complete 72-hour operations plan.
+
+    Aligns with the shared OperationsPlan interface:
+      id, generatedAt, validForHours, recommendationsCount, status
+    and extends it with detailed per-vessel plan entries.
+    """
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    generated_at: datetime = Field(default_factory=datetime.utcnow)
+    valid_for_hours: int = 72
+    entries: list[OperationsPlanEntry]
+    recommendations_count: int = Field(ge=0)
+    status: str = "DRAFT"  # DRAFT | APPROVED | ACTIVE
+    total_vessels: int = Field(ge=0)
+    scheduled_count: int = Field(ge=0)
+    in_progress_count: int = Field(ge=0)
+    delayed_count: int = Field(ge=0)
+
