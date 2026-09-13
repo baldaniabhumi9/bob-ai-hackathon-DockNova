@@ -2,7 +2,7 @@
 Pydantic models for the optimization services (berth + crane allocation).
 
 Mirrors the shared TypeScript schemas from src/shared/types/index.ts
-with Python-native naming conventions and additional optimization fields.
+with Python-native naming conventions internally and camelCase serialization externally.
 """
 
 from __future__ import annotations
@@ -10,9 +10,42 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Any, Generic, Optional, TypeVar
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+
+# ---------------------------------------------------------------------------
+# CamelCase Alias Generator & Base Model
+# ---------------------------------------------------------------------------
+
+def to_camel_case(string: str) -> str:
+    """
+    Convert snake_case field names to camelCase for JSON serialization.
+    Preserves exact casing for shared TypeScript interfaces (e.g. capacityTEUPerHour).
+    """
+    custom_map = {
+        "capacity_teu_per_hour": "capacityTEUPerHour",
+        "workload_teu": "workloadTEU",
+        "combined_throughput_teu_per_hour": "combinedThroughputTEUPerHour",
+    }
+    if string in custom_map:
+        return custom_map[string]
+    components = string.split("_")
+    return components[0] + "".join(x.capitalize() for x in components[1:])
+
+
+class CamelModel(BaseModel):
+    """
+    Base model that serializes to camelCase while accepting both
+    snake_case and camelCase during input/instantiation.
+    """
+
+    model_config = ConfigDict(
+        alias_generator=to_camel_case,
+        populate_by_name=True,
+        from_attributes=True,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -42,7 +75,7 @@ class Priority(str, Enum):
 # Input Models
 # ---------------------------------------------------------------------------
 
-class VesselModel(BaseModel):
+class VesselModel(CamelModel):
     """
     Vessel waiting for or scheduled at the port.
 
@@ -70,7 +103,7 @@ class VesselModel(BaseModel):
     )
 
 
-class BerthModel(BaseModel):
+class BerthModel(CamelModel):
     """
     Berth available for vessel assignment.
 
@@ -100,7 +133,7 @@ class BerthModel(BaseModel):
 # Output Models
 # ---------------------------------------------------------------------------
 
-class BerthAssignment(BaseModel):
+class BerthAssignment(CamelModel):
     """A single vessel-to-berth assignment produced by the optimizer."""
 
     vessel_id: str
@@ -111,7 +144,7 @@ class BerthAssignment(BaseModel):
     end_time: datetime
 
 
-class MetricsSnapshot(BaseModel):
+class MetricsSnapshot(CamelModel):
     """
     Operational metrics snapshot — used for before/after comparison.
     """
@@ -121,7 +154,7 @@ class MetricsSnapshot(BaseModel):
     berth_utilization_pct: float = Field(ge=0, le=100)
 
 
-class OptimizationResult(BaseModel):
+class OptimizationResult(CamelModel):
     """
     Complete optimization output.
 
@@ -162,7 +195,7 @@ class CraneStatus(str, Enum):
 # Crane Input Model
 # ---------------------------------------------------------------------------
 
-class CraneModel(BaseModel):
+class CraneModel(CamelModel):
     """
     Crane available at a berth.
 
@@ -184,7 +217,7 @@ class CraneModel(BaseModel):
 # Crane Output Models
 # ---------------------------------------------------------------------------
 
-class CraneAssignment(BaseModel):
+class CraneAssignment(CamelModel):
     """A single crane assignment for a vessel at a berth."""
 
     vessel_id: str
@@ -199,7 +232,7 @@ class CraneAssignment(BaseModel):
     service_duration_hours: float = Field(ge=0)
 
 
-class CraneMetricsSnapshot(BaseModel):
+class CraneMetricsSnapshot(CamelModel):
     """
     Crane-specific operational metrics — used for before/after comparison.
     """
@@ -210,7 +243,7 @@ class CraneMetricsSnapshot(BaseModel):
     crane_utilization_pct: float = Field(ge=0, le=100)
 
 
-class CraneOptimizationResult(BaseModel):
+class CraneOptimizationResult(CamelModel):
     """
     Complete crane optimization output.
 
@@ -246,7 +279,7 @@ class Recommendation(str, Enum):
     REROUTE = "REROUTE"
 
 
-class AlternativePort(BaseModel):
+class AlternativePort(CamelModel):
     """An alternative port for route recommendation comparison."""
 
     port_id: str
@@ -258,7 +291,7 @@ class AlternativePort(BaseModel):
     available_berths: int = Field(ge=0)
 
 
-class RouteRecommendation(BaseModel):
+class RouteRecommendation(CamelModel):
     """
     Route recommendation output for a specific vessel.
 
@@ -295,7 +328,7 @@ class PlanEntryStatus(str, Enum):
     COMPLETED = "COMPLETED"
 
 
-class OperationsPlanEntry(BaseModel):
+class OperationsPlanEntry(CamelModel):
     """
     A single entry in the 72-hour operations plan.
 
@@ -321,7 +354,7 @@ class OperationsPlanEntry(BaseModel):
     recommended_action: str
 
 
-class OperationsPlanResult(BaseModel):
+class OperationsPlanResult(CamelModel):
     """
     Complete 72-hour operations plan.
 
@@ -341,3 +374,54 @@ class OperationsPlanResult(BaseModel):
     in_progress_count: int = Field(ge=0)
     delayed_count: int = Field(ge=0)
 
+
+# ---------------------------------------------------------------------------
+# API Envelope & Request Models
+# ---------------------------------------------------------------------------
+
+T = TypeVar("T")
+
+
+class ApiErrorDetail(CamelModel):
+    """Error detail block in the API response envelope."""
+    code: str
+    message: str
+    details: Optional[dict[str, Any]] = None
+
+
+class ApiMetadata(CamelModel):
+    """Metadata block in the API response envelope."""
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    request_id: Optional[str] = None
+
+
+class ApiResponseEnvelope(CamelModel, Generic[T]):
+    """
+    Standard API response envelope conforming to docs/PROJECT_CONTRACT.md §4.
+    """
+    success: bool = True
+    data: Optional[T] = None
+    error: Optional[ApiErrorDetail] = None
+    metadata: ApiMetadata = Field(default_factory=ApiMetadata)
+
+
+class BerthOptimizationRequest(CamelModel):
+    """Request payload for POST /api/optimization/berths."""
+    vessel_ids: Optional[list[str]] = Field(
+        default=None,
+        description="Optional list of vessel IDs to filter/optimize; defaults to all waiting/scheduled vessels",
+    )
+
+
+class CraneOptimizationRequest(CamelModel):
+    """Request payload for POST /api/optimization/cranes."""
+    berth_id: str = Field(
+        description="ID of the berth to optimize crane allocation for",
+    )
+
+
+class RouteRecommendationRequest(CamelModel):
+    """Request payload for POST /api/routes/recommend."""
+    vessel_id: str = Field(
+        description="ID of the vessel to compute route recommendation for",
+    )

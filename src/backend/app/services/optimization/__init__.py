@@ -13,17 +13,23 @@ from .operations_plan import generate_operations_plan
 from .route_recommendation import recommend_route
 from .models import (
     AlternativePort,
+    ApiErrorDetail,
+    ApiMetadata,
+    ApiResponseEnvelope,
     BerthAssignment,
     BerthModel,
+    BerthOptimizationRequest,
     CraneAssignment,
     CraneMetricsSnapshot,
     CraneModel,
+    CraneOptimizationRequest,
     CraneOptimizationResult,
     MetricsSnapshot,
     OperationsPlanEntry,
     OperationsPlanResult,
     OptimizationResult,
     RouteRecommendation,
+    RouteRecommendationRequest,
     VesselModel,
 )
 
@@ -45,4 +51,10 @@ __all__ = [
     "RouteRecommendation",
     "OperationsPlanEntry",
     "OperationsPlanResult",
+    "ApiResponseEnvelope",
+    "ApiErrorDetail",
+    "ApiMetadata",
+    "BerthOptimizationRequest",
+    "CraneOptimizationRequest",
+    "RouteRecommendationRequest",
 ]

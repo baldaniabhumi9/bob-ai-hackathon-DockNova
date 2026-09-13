@@ -1,6 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.routers import (
+    berths_router,
+    cranes_router,
+    operations_router,
+    routes_router,
+)
+
 app = FastAPI(
     title="DockNova API",
     description="Port Operations Control Tower & Congestion Predictor API Foundation",
@@ -28,3 +35,10 @@ def read_root():
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
+
+
+# Register Optimization & Operations Routers
+app.include_router(berths_router)
+app.include_router(cranes_router)
+app.include_router(routes_router)
+app.include_router(operations_router)
