@@ -116,8 +116,18 @@ def main() -> None:
             print(f"  ✓ {label}: '{r.reasoning[:60]}...'")
     print()
 
-    # --- Test 6: Schema — dump JSON ---
-    print("Test 6: Sample RouteRecommendation JSON")
+    # --- Test 6: best_alternative is populated when alternatives is non-empty ---
+    print("Test 6: best_alternative is non-null when alternatives are provided")
+    for label, r in [("default", rec), ("high", rec_high), ("low", rec_low), ("bad", rec_bad)]:
+        if len(r.alternatives) > 0 and r.best_alternative is None:
+            print(f"  ✗ FAIL: {label} has non-empty alternatives but best_alternative is null")
+            all_passed = False
+        else:
+            print(f"  ✓ {label}: best_alternative = {r.best_alternative.port_name if r.best_alternative else None}")
+    print()
+
+    # --- Test 7: Schema — dump JSON ---
+    print("Test 7: Sample RouteRecommendation JSON")
     print(rec.model_dump_json(indent=2))
     print()
 

@@ -162,7 +162,7 @@ def recommend_route(
         current_congestion=congestion,
         current_wait_time_hours=wait_hours,
         alternatives=alts,
-        best_alternative=best_alt if best_saved > 0 else None,
+        best_alternative=best_alt,
         time_saved_hours=round(best_saved, 2),
         recommendation=recommendation,
         reasoning=reasoning,
