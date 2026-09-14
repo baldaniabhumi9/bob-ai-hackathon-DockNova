@@ -15,6 +15,7 @@ import { ModelAccuracyPoint } from '../mockAdminData';
 
 interface ModelAccuracyChartProps {
   data: ModelAccuracyPoint[];
+  simulated?: boolean;
 }
 
 interface CustomTooltipProps {
@@ -63,8 +64,8 @@ const CustomAccuracyTooltip: React.FC<CustomTooltipProps> = ({ active, payload }
   );
 };
 
-export const ModelAccuracyChart: React.FC<ModelAccuracyChartProps> = ({ data }) => {
-  const currentAccuracy = data[data.length - 1]?.accuracy || 96.4;
+export const ModelAccuracyChart: React.FC<ModelAccuracyChartProps> = ({ data, simulated }) => {
+  const currentAccuracy = data[data.length - 1]?.accuracy || 86.4;
   const lowestAccuracy = Math.min(...data.map((d) => d.accuracy));
 
   return (
@@ -79,8 +80,15 @@ export const ModelAccuracyChart: React.FC<ModelAccuracyChartProps> = ({ data }) 
             </h3>
           </div>
           <p className="text-xs text-text-secondary mt-0.5">
-            watsonx Granite-13B Maritime predictor inference accuracy (Last 30 Days)
+            {simulated
+              ? 'Simulated history — live accuracy is 86.4% from train.py (no endpoint)'
+              : 'Maritime predictor inference accuracy (Last 30 Days)'}
           </p>
+          {simulated && (
+            <span className="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-mono bg-warning/15 text-warning border border-warning/30">
+              Simulated / No live data
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-3 text-xs font-mono">

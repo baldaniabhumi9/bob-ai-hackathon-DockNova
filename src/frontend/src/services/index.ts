@@ -121,9 +121,16 @@ export interface WhatIfSimulationResult {
 	optimizationResult: BerthOptimizationResult;
 }
 
+// ─── ML constants (no API endpoint) ─────────────────────────────────────────
+
+/** Classifier accuracy from `src/backend/app/services/ml/train.py` — not exposed via API */
+export const ML_MODEL_ACCURACY_PCT = 86.4;
+
 // ─── API client ──────────────────────────────────────────────────────────────
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE =
+	(import.meta as { env?: { VITE_API_BASE_URL?: string } }).env?.VITE_API_BASE_URL ??
+	'http://localhost:8000';
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
 	const response = await fetch(`${API_BASE}${path}`, init);
@@ -137,7 +144,29 @@ const JSON_POST: RequestInit = {
 	body: '{}',
 };
 
+/** Pick the forecast entry nearest to the reference time (defaults to now). */
+export function getCurrentForecast(
+	forecasts: CongestionForecast[],
+	referenceTime?: string | Date,
+): CongestionForecast | null {
+	if (!forecasts.length) return null;
+	const refMs = referenceTime ? new Date(referenceTime).getTime() : Date.now();
+	let nearest = forecasts[0];
+	let nearestDiff = Infinity;
+	for (const entry of forecasts) {
+		if (!entry.forecastTime) continue;
+		const diff = Math.abs(new Date(entry.forecastTime).getTime() - refMs);
+		if (diff < nearestDiff) {
+			nearestDiff = diff;
+			nearest = entry;
+		}
+	}
+	return nearest;
+}
+
 export const api = {
+	getHealth: () => request<{ status: string }>('/health'),
+
 	// ── Live simulation clock ──
 	getLiveState: () => request<LiveState>('/api/live/state'),
 	start: (speed: number) => request<LiveState>(`/api/live/start?speed=${speed}`, { method: 'POST' }),

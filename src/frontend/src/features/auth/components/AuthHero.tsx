@@ -118,6 +118,7 @@ export const AuthHero: React.FC = () => {
               <div className="font-mono text-xl font-semibold text-text-primary">
                 42 <span className="text-xs font-sans text-success font-normal">Active Quays</span>
               </div>
+              <div className="text-[10px] text-text-muted font-mono mt-0.5">(demo)</div>
             </div>
 
             <div className="p-3.5 rounded-xl bg-surface-1/90 border border-border backdrop-blur-sm">
@@ -128,6 +129,7 @@ export const AuthHero: React.FC = () => {
               <div className="font-mono text-xl font-semibold text-text-primary">
                 99.4% <span className="text-xs font-sans text-primary font-normal">AI Forecast</span>
               </div>
+              <div className="text-[10px] text-text-muted font-mono mt-0.5">(demo)</div>
             </div>
           </div>
         </motion.div>

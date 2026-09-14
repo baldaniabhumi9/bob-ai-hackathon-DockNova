@@ -48,17 +48,25 @@ export const ManagerDashboard: React.FC = () => {
       {/* 3 Simple KPI Cards */}
       <KPIGrid liveValues={{
         congestion_risk: congestion ? { value: `${Math.round(congestion.congestionProbability * 100)}%`, status: congestion.riskLevel, variant: congestion.riskLevel === 'LOW' ? 'success' : congestion.riskLevel === 'CRITICAL' ? 'critical' : 'warning' } : undefined,
-        berth_utilisation: portStatus ? { value: `${Math.round((portStatus.totalVessels - portStatus.availableBerths) / Math.max(1, portStatus.totalVessels) * 100)}%`, status: 'Live', variant: 'warning' } : undefined,
+        berth_utilisation: state && state.berths.length > 0 ? { value: `${Math.round((state.occupiedBerths / state.berths.length) * 100)}%`, status: `${state.occupiedBerths}/${state.berths.length} occupied`, variant: 'warning' } : undefined,
         vessels_in_port: portStatus ? { value: String(portStatus.totalVessels), status: `${portStatus.waitingVessels} waiting`, variant: 'cyan' } : undefined,
       }} />
 
       {/* Two-Column Main Content */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: spacing.lg, alignItems: 'stretch' }}>
         {/* Left: Simplified Port Map */}
-        <PortMap onSelectBerth={(berth) => setSelectedBerth(berth)} />
+        <PortMap
+          berths={state?.berths ?? []}
+          cranes={state?.cranes ?? []}
+          vessels={state?.vessels ?? []}
+          congestion={congestion}
+          onSelectBerth={(berth) => setSelectedBerth(berth)}
+        />
 
         {/* Right: Focused AI Insight */}
         <AIAlertCard
+          congestion={congestion}
+          portStatus={portStatus}
           onViewPrediction={() => setIsPredictionOpen(true)}
           onRunWhatIf={() => setIsWhatIfOpen(true)}
         />

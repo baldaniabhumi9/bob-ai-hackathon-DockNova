@@ -14,6 +14,7 @@ import { HourlyPredictionVolume } from '../mockAdminData';
 
 interface PredictionVolumeChartProps {
   data: HourlyPredictionVolume[];
+  simulated?: boolean;
 }
 
 interface CustomTooltipProps {
@@ -54,7 +55,7 @@ const CustomBarTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => 
   );
 };
 
-export const PredictionVolumeChart: React.FC<PredictionVolumeChartProps> = ({ data }) => {
+export const PredictionVolumeChart: React.FC<PredictionVolumeChartProps> = ({ data, simulated }) => {
   const totalVolume = data.reduce((acc, curr) => acc + curr.predictions, 0);
   const peakVolume = Math.max(...data.map((d) => d.predictions));
 

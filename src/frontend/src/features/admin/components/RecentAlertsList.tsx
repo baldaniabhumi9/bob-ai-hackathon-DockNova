@@ -5,6 +5,7 @@ import { SystemAlertItem } from '../mockAdminData';
 
 interface RecentAlertsListProps {
   alerts: SystemAlertItem[];
+  simulated?: boolean;
 }
 
 export const RecentAlertsList: React.FC<RecentAlertsListProps> = ({ alerts }) => {

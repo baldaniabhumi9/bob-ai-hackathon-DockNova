@@ -14,6 +14,7 @@ import { TerminalPerformanceRecord } from '../mockAdminData';
 
 interface TopTerminalsTableProps {
   terminals: TerminalPerformanceRecord[];
+  simulated?: boolean;
 }
 
 type SortField =

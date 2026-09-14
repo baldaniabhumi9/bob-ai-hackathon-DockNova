@@ -5,6 +5,7 @@ import { TerminalUtilizationSlice } from '../mockAdminData';
 
 interface TerminalUtilizationDonutProps {
   data: TerminalUtilizationSlice[];
+  liveData?: boolean;
 }
 
 const CustomDonutTooltip = ({ active, payload }: any) => {

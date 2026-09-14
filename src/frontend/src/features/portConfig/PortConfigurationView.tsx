@@ -27,6 +27,7 @@ import {
   INITIAL_CRANES,
   STORAGE_KEYS,
 } from './mockPortConfig';
+import { fetchPortConfigFromApi } from './apiPortConfig';
 import { TerminalsTab } from './components/TerminalsTab';
 import { BerthsTab } from './components/BerthsTab';
 import { CranesTab } from './components/CranesTab';
@@ -106,6 +107,26 @@ export const PortConfigurationView: React.FC = () => {
       localStorage.setItem(STORAGE_KEYS.CRANES, JSON.stringify(cranes));
     } catch {}
   }, [cranes]);
+
+  // 2b. On mount: seed from live API (replaces stale localStorage mock data)
+  useEffect(() => {
+    fetchPortConfigFromApi()
+      .then(({ terminals: apiTerminals, berths: apiBerths, cranes: apiCranes }) => {
+        setTerminals(apiTerminals);
+        setBerths(apiBerths);
+        setCranes(apiCranes);
+        // Clear stale localStorage so the next page load also gets fresh API data
+        try {
+          localStorage.removeItem(STORAGE_KEYS.TERMINALS);
+          localStorage.removeItem(STORAGE_KEYS.BERTHS);
+          localStorage.removeItem(STORAGE_KEYS.CRANES);
+        } catch {}
+      })
+      .catch(() => {
+        // Backend unavailable — keep whichever data was loaded from localStorage/mock
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 3. Modal State
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -257,7 +278,8 @@ export const PortConfigurationView: React.FC = () => {
             </span>
           </div>
           <p className="text-xs text-text-secondary mt-1 max-w-2xl">
-            Configure quayside terminal sectors, monitor berth draft geometries, dispatch crane assets, and maintain physical port capabilities.
+            Configure quayside terminal sectors, monitor berth draft geometries, dispatch crane assets, and maintain physical port capabilities.{' '}
+            <span className="font-mono text-success text-[10px]">KPI strip seeded from live API on load.</span>
           </p>
         </div>
 

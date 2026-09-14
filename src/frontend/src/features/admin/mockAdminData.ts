@@ -3,10 +3,9 @@ export interface AdminKpiData {
   totalUsersGrowth: string; // e.g. "+12% this week"
   activePredictions24h: number;
   activePredictionsTrend: string;
-  modelAccuracy: number; // e.g. 96.4
+  modelAccuracy: number; // from train.py constant when wired
   modelAccuracyTrend: string; // e.g. "+0.8% vs last week"
   systemHealth: 'Operational' | 'Degraded' | 'Maintenance';
-  uptimePercent: number; // e.g. 99.98
 }
 
 export interface ModelAccuracyPoint {
@@ -59,13 +58,12 @@ export interface TerminalPerformanceRecord {
 
 export const MOCK_ADMIN_KPIS: AdminKpiData = {
   totalUsers: 1428,
-  totalUsersGrowth: '+12% this week',
+  totalUsersGrowth: 'Simulated — no user telemetry API',
   activePredictions24h: 48290,
-  activePredictionsTrend: '+5.4k vs yesterday',
-  modelAccuracy: 96.4,
-  modelAccuracyTrend: '+0.8% trend',
+  activePredictionsTrend: 'Simulated — no prediction volume API',
+  modelAccuracy: 86.4,
+  modelAccuracyTrend: 'From train.py (no live endpoint)',
   systemHealth: 'Operational',
-  uptimePercent: 99.98,
 };
 
 // 30 Days of model accuracy data with dips and threshold at 85%

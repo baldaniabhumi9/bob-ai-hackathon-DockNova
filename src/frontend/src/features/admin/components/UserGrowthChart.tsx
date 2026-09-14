@@ -13,6 +13,7 @@ import { UserGrowthPoint } from '../mockAdminData';
 
 interface UserGrowthChartProps {
   data: UserGrowthPoint[];
+  simulated?: boolean;
 }
 
 const CustomGrowthTooltip = ({ active, payload, label }: any) => {
