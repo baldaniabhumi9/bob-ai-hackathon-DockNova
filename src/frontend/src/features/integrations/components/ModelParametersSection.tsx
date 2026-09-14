@@ -113,7 +113,7 @@ export const ModelParametersSection: React.FC<ModelParametersSectionProps> = ({
                 onChange={(e) => handleUpdate('congestionThreshold', parseInt(e.target.value, 10))}
                 className="w-full h-2.5 bg-surface-3 rounded-lg appearance-none cursor-pointer accent-primary"
                 style={{
-                  background: `linear-gradient(to right, #38BDF8 0%, #38BDF8 ${thresholdPercentage}%, #1C2840 ${thresholdPercentage}%, #1C2840 100%)`,
+                  background: `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) ${thresholdPercentage}%, var(--color-surface-3) ${thresholdPercentage}%, var(--color-surface-3) 100%)`,
                   transform: isSliderDragging ? 'scaleY(1.2)' : 'scaleY(1)',
                   transition: 'transform 0.15s ease',
                 }}

@@ -45,9 +45,9 @@ logger = logging.getLogger(__name__)
 # Minimum net hours saved before we recommend rerouting.
 REROUTE_THRESHOLD_HOURS = 1.0
 
-# Cost-to-time conversion: how many USD per hour of vessel operating cost.
-# Large container ships cost ~$5,000–$8,000/hour to operate.
-# At COST_PER_HOUR = 5000, a $30,000 travel cost = 6h penalty.
+# Cost-to-time conversion: how many ₹ per hour of vessel operating cost.
+# Large container ships cost ~₹5,000–₹8,000/hour to operate.
+# At COST_PER_HOUR = 5000, a ₹30,000 travel cost = 6h penalty.
 COST_PER_HOUR_USD = 5000.0
 
 

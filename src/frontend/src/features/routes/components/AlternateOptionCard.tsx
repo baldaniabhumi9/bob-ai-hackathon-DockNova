@@ -141,26 +141,26 @@ export const AlternateOptionCard: React.FC<AlternateOptionCardProps> = ({
               <Fuel className="w-3 h-3 text-warning" />
               <span>Fuel:</span>
             </span>
-            <span className="text-text-secondary">${option.costBreakdown.fuel.toLocaleString()}</span>
+            <span className="text-text-secondary">₹{option.costBreakdown.fuel.toLocaleString('en-IN')}</span>
           </div>
           <div className="flex items-center justify-between text-[11px] font-mono text-text-muted">
             <span className="flex items-center gap-1">
               <Receipt className="w-3 h-3 text-primary" />
               <span>Port Fee:</span>
             </span>
-            <span className="text-text-secondary">${option.costBreakdown.portFee.toLocaleString()}</span>
+            <span className="text-text-secondary">₹{option.costBreakdown.portFee.toLocaleString('en-IN')}</span>
           </div>
           <div className="flex items-center justify-between text-[11px] font-mono text-text-muted">
             <span className="flex items-center gap-1">
               <Navigation className="w-3 h-3 text-secondary" />
               <span>Deviation Cost:</span>
             </span>
-            <span className="text-text-secondary">${option.costBreakdown.deviation.toLocaleString()}</span>
+            <span className="text-text-secondary">₹{option.costBreakdown.deviation.toLocaleString('en-IN')}</span>
           </div>
           <div className="flex items-center justify-between text-xs font-mono font-semibold pt-1 border-t border-border/40">
             <span className="text-text-primary">Estimated Total:</span>
             <span className="text-text-primary font-bold">
-              ${option.costBreakdown.total.toLocaleString()}
+              ₹{option.costBreakdown.total.toLocaleString('en-IN')}
             </span>
           </div>
         </div>

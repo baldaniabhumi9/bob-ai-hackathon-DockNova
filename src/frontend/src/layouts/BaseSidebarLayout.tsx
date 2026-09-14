@@ -6,6 +6,7 @@ import {
   Search,
   Bell,
   Moon,
+  Sun,
   LogOut,
   ChevronRight,
   Menu,
@@ -15,6 +16,9 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
+import { useNotifications } from '@/context/NotificationContext';
+import { NotificationDropdown } from '@/features/notifications/components/NotificationDropdown';
 
 export interface SidebarNavItem {
   id: string;
@@ -52,23 +56,34 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
   onItemSelect,
   pageTitle: propPageTitle,
   breadcrumbs: propBreadcrumbs,
-  unreadNotificationCount = 3,
+  unreadNotificationCount: propUnreadCount,
   children,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
+  const { unreadCount } = useNotifications();
+
+  const effectiveUnreadCount = propUnreadCount !== undefined ? propUnreadCount : unreadCount;
 
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState<boolean>(false);
+  const [notificationDropdownOpen, setNotificationDropdownOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close profile dropdown when clicked outside
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns when clicked outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      if (dropdownRef.current && !dropdownRef.current.contains(target)) {
         setProfileDropdownOpen(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(target)) {
+        setNotificationDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -248,6 +263,13 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
               <div className="space-y-1">
                 {section.items.map((item) => {
                   const isActive = currentActiveItem?.id === item.id;
+                  const itemBadge =
+                    item.id === 'notifications'
+                      ? effectiveUnreadCount > 0
+                        ? effectiveUnreadCount
+                        : undefined
+                      : item.badge;
+
                   return (
                     <button
                       key={item.id}
@@ -280,11 +302,11 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
                       </span>
 
                       {/* Badge / Unread notification dot */}
-                      {(item.hasUnread || item.badge !== undefined) && (
+                      {(item.hasUnread || itemBadge !== undefined) && (
                         <span className="relative z-10 ml-auto hidden lg:flex items-center">
-                          {item.badge !== undefined ? (
-                            <span className="px-1.5 py-0.5 text-[10px] font-mono rounded-full bg-surface-3 text-text-secondary border border-border">
-                              {item.badge}
+                          {itemBadge !== undefined ? (
+                            <span className="px-1.5 py-0.5 text-[10px] font-mono rounded-full bg-primary/20 text-primary border border-primary/40 font-bold">
+                              {itemBadge}
                             </span>
                           ) : (
                             <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
@@ -321,7 +343,7 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
               type="button"
               onClick={handleLogout}
               title="Logout session"
-              className="p-1.5 rounded-lg text-danger hover:bg-danger/10 transition-colors flex-shrink-0"
+              className="p-1.5 rounded-lg text-danger hover:bg-danger/10 transition-colors flex-shrink-0 cursor-pointer"
               aria-label="Logout"
             >
               <LogOut className="w-4 h-4" />
@@ -392,30 +414,53 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
 
           {/* Topbar Right: Notification + Theme Toggle + User Avatar Dropdown */}
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-            {/* Notification Bell with Ping Dot */}
-            <button
-              type="button"
-              title="Operational notifications"
-              className="relative p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-colors"
-              aria-label="Notifications"
-            >
-              <Bell className="w-4 h-4" />
-              {unreadNotificationCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
-                </span>
-              )}
-            </button>
+            {/* Notification Bell with Ping Dot + Popover Dropdown */}
+            <div className="relative" ref={notifRef}>
+              <button
+                type="button"
+                onClick={() => setNotificationDropdownOpen((prev) => !prev)}
+                title="Operational notifications"
+                className={`relative p-2 rounded-lg transition-colors cursor-pointer ${
+                  notificationDropdownOpen
+                    ? 'bg-surface-2 text-primary border border-primary/30'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-2'
+                }`}
+                aria-label="Notifications"
+                aria-expanded={notificationDropdownOpen}
+              >
+                <Bell className="w-4 h-4" />
+                {effectiveUnreadCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                  </span>
+                )}
+              </button>
 
-            {/* Theme Toggle Placeholder */}
+              {/* Notification Interactive Dropdown */}
+              <AnimatePresence>
+                {notificationDropdownOpen && (
+                  <NotificationDropdown
+                    isOpen={notificationDropdownOpen}
+                    onClose={() => setNotificationDropdownOpen(false)}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Theme Toggle (Dark / Light Mode) */}
             <button
               type="button"
-              title="Maritime Dark Theme (Forced)"
-              className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-colors hidden sm:inline-flex"
-              aria-label="Theme mode"
+              onClick={toggleTheme}
+              title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-all cursor-pointer inline-flex items-center justify-center border border-border/40 hover:border-border"
+              aria-label={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
             >
-              <Moon className="w-4 h-4" />
+              {isDark ? (
+                <Sun className="w-4 h-4 text-amber-400 hover:rotate-45 transition-transform duration-300" />
+              ) : (
+                <Moon className="w-4 h-4 text-sky-500 hover:-rotate-12 transition-transform duration-300" />
+              )}
             </button>
 
             {/* User Avatar Dropdown */}
@@ -423,7 +468,7 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
               <button
                 type="button"
                 onClick={() => setProfileDropdownOpen((prev) => !prev)}
-                className="flex items-center gap-2 p-1 pl-1.5 rounded-full hover:bg-surface-2 transition-colors border border-border/60"
+                className="flex items-center gap-2 p-1 pl-1.5 rounded-full hover:bg-surface-2 transition-colors border border-border/60 cursor-pointer"
                 aria-expanded={profileDropdownOpen}
                 aria-haspopup="true"
               >
@@ -451,7 +496,9 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
                         {userEmail}
                       </div>
                       <div className="mt-1">
-                        <span className={`inline-block text-[10px] font-mono px-2 py-0.5 rounded-full border ${accentStyles.badge}`}>
+                        <span
+                          className={`inline-block text-[10px] font-mono px-2 py-0.5 rounded-full border ${accentStyles.badge}`}
+                        >
                           {roleBadge}
                         </span>
                       </div>
@@ -463,7 +510,7 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
                         setProfileDropdownOpen(false);
                         navigate('/select-role');
                       }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-colors text-left"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-colors text-left cursor-pointer"
                     >
                       <UserIcon className="w-3.5 h-3.5" />
                       <span>Switch Console Role</span>
@@ -471,11 +518,14 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
 
                     <button
                       type="button"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-colors text-left"
+                      onClick={() => {
+                        setProfileDropdownOpen(false);
+                        toggleTheme();
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-colors text-left cursor-pointer"
                     >
-                      <Settings className="w-3.5 h-3.5" />
-                      <span>Console Preferences</span>
+                      {isDark ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-sky-500" />}
+                      <span>{isDark ? 'Light Theme Mode' : 'Dark Theme Mode'}</span>
                     </button>
 
                     <div className="my-1 border-t border-border/60" />
@@ -486,7 +536,7 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
                         setProfileDropdownOpen(false);
                         handleLogout();
                       }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-danger hover:bg-danger/10 transition-colors text-left font-medium"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-danger hover:bg-danger/10 transition-colors text-left font-medium cursor-pointer"
                     >
                       <LogOut className="w-3.5 h-3.5" />
                       <span>Exit / Sign Out</span>

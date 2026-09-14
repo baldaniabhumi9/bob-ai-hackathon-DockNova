@@ -233,7 +233,7 @@ export const IbmBobSection: React.FC<IbmBobSectionProps> = ({
                 onChange={(e) => handleInputChange('temperature', parseFloat(e.target.value))}
                 className="w-full h-2.5 bg-surface-3 rounded-lg appearance-none cursor-pointer accent-primary"
                 style={{
-                  background: `linear-gradient(to right, #38BDF8 0%, #38BDF8 ${formData.temperature * 100}%, #1C2840 ${formData.temperature * 100}%, #1C2840 100%)`,
+                  background: `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) ${formData.temperature * 100}%, var(--color-surface-3) ${formData.temperature * 100}%, var(--color-surface-3) 100%)`,
                   transform: isSliderActive ? 'scaleY(1.2)' : 'scaleY(1)',
                   transition: 'transform 0.15s ease',
                 }}

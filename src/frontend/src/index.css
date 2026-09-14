@@ -5,13 +5,15 @@
 /* ==========================================================================
    DockNova Maritime Control Room - Design System CSS Custom Properties
    ========================================================================== */
-:root {
+:root, html.dark, [data-theme="dark"] {
   --color-background-base: #050B14;
   --color-base: #050B14;
   --color-surface-1: #0E1525;
   --color-surface-2: #141D2E;
   --color-surface-3: #1C2840;
   --color-border: #243447;
+  --color-border-subtle: rgba(36, 52, 71, 0.7);
+  --color-border-focused: rgba(34, 211, 238, 0.40);
   --color-primary: #38BDF8;
   --color-secondary: #818CF8;
   --color-accent: #F472B6;
@@ -21,8 +23,32 @@
   --color-text-primary: #F0F4F8;
   --color-text-secondary: #94A3B8;
   --color-text-muted: #64748B;
+  --color-inverse-text: #050B14;
 
   color-scheme: dark;
+}
+
+html.light, [data-theme="light"] {
+  --color-background-base: #F8FAFC;
+  --color-base: #F1F5F9;
+  --color-surface-1: #FFFFFF;
+  --color-surface-2: #F8FAFC;
+  --color-surface-3: #E2E8F0;
+  --color-border: #CBD5E1;
+  --color-border-subtle: rgba(2, 132, 199, 0.20);
+  --color-border-focused: rgba(2, 132, 199, 0.45);
+  --color-primary: #0284C7;
+  --color-secondary: #6366F1;
+  --color-accent: #EC4899;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748B;
+  --color-inverse-text: #F8FAFC;
+
+  color-scheme: light;
 }
 
 /* ==========================================================================
@@ -30,30 +56,30 @@
    ========================================================================== */
 html {
   scroll-behavior: smooth;
-  color-scheme: dark;
-  background-color: #050B14;
+  background-color: var(--color-background-base);
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* ==========================================================================
-   Selection Styling: Primary with 30% Opacity
+   Selection Styling
    ========================================================================== */
 ::selection {
   background-color: rgba(56, 189, 248, 0.3);
-  color: #F0F4F8;
+  color: var(--color-text-primary);
 }
 
 ::-moz-selection {
   background-color: rgba(56, 189, 248, 0.3);
-  color: #F0F4F8;
+  color: var(--color-text-primary);
 }
 
 /* ==========================================================================
-   Dark Scrollbar Styling (thin, dark track, primary thumb)
+   Scrollbar Styling
    ========================================================================== */
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #38BDF8 #050B14;
+  scrollbar-color: var(--color-primary) var(--color-base);
 }
 
 /* WebKit / Chromium / Safari */
@@ -63,11 +89,11 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #050B14;
+  background: var(--color-base);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #38BDF8;
+  background: var(--color-primary);
   border-radius: 9999px;
   transition: background-color 0.2s ease;
 }
@@ -77,7 +103,7 @@ html {
 }
 
 ::-webkit-scrollbar-corner {
-  background: #050B14;
+  background: var(--color-base);
 }
 
 /* ==========================================================================
@@ -114,35 +140,35 @@ html {
 }
 
 /* ==========================================================================
-   Custom Utility Classes
+   Custom Utility Classes (Dynamic variable mapping)
    ========================================================================== */
 @layer utilities {
   .bg-base {
-    background-color: #050B14;
+    background-color: var(--color-base);
   }
   .bg-surface-1 {
-    background-color: #0E1525;
+    background-color: var(--color-surface-1);
   }
   .bg-surface-2 {
-    background-color: #141D2E;
+    background-color: var(--color-surface-2);
   }
   .bg-surface-3 {
-    background-color: #1C2840;
+    background-color: var(--color-surface-3);
   }
   .text-primary {
-    color: #38BDF8;
+    color: var(--color-primary);
   }
   .text-text-primary {
-    color: #F0F4F8;
+    color: var(--color-text-primary);
   }
   .text-text-secondary {
-    color: #94A3B8;
+    color: var(--color-text-secondary);
   }
   .text-text-muted {
-    color: #64748B;
+    color: var(--color-text-muted);
   }
   .border-subtle {
-    border-color: rgba(36, 52, 71, 0.7);
+    border-color: var(--color-border-subtle);
   }
 }
 
@@ -180,4 +206,3 @@ html {
 .animate-radar-sweep {
   animation: radar-sweep 12s linear infinite;
 }
-
