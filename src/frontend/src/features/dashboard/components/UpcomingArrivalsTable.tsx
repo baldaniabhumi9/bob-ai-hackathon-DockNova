@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
   Ship,
@@ -69,14 +70,14 @@ export const UpcomingArrivalsTable: React.FC = () => {
 
     // Sort by field (default eta)
     list.sort((a, b) => {
-      let aVal = a[sortField];
-      let bVal = b[sortField];
+      const aVal = (a as any)[sortField];
+      const bVal = (b as any)[sortField];
       if (typeof aVal === 'string') {
         return sortAsc
           ? (aVal as string).localeCompare(bVal as string)
           : (bVal as string).localeCompare(aVal as string);
       }
-      return sortAsc ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number);
+      return sortAsc ? Number(aVal) - Number(bVal) : Number(bVal) - Number(aVal);
     });
 
     return list;
@@ -310,14 +311,13 @@ export const UpcomingArrivalsTable: React.FC = () => {
 
                     {/* Action Button */}
                     <td className="py-3.5 px-4 text-right">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedVessel(vessel)}
+                      <Link
+                        to={`/user/vessel/${vessel.id}`}
                         className="px-3 py-1.5 rounded-lg text-xs font-medium text-text-secondary hover:text-primary hover:bg-primary/10 border border-transparent hover:border-primary/30 transition-all cursor-pointer inline-flex items-center gap-1.5"
                       >
                         <span>View</span>
                         <ExternalLink className="w-3 h-3" />
-                      </button>
+                      </Link>
                     </td>
                   </motion.tr>
                 );

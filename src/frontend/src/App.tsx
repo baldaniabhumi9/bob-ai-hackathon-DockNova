@@ -6,6 +6,7 @@ import { LoginPage, SignupPage, RoleSelectionPage, UnauthorizedPage } from './pa
 import { ManagerPage } from './pages/manager';
 import { AdminPage } from './pages/admin';
 import { UserPage } from './pages/user';
+import { VesselDetailPage } from './pages/user/VesselDetailPage';
 
 // Root redirect component based on authentication state
 const RootRedirect: React.FC = () => {
@@ -39,6 +40,24 @@ export const App: React.FC = () => {
             element={
               <ProtectedRoute allowedRoles={['manager', 'user', 'admin']}>
                 <RoleSelectionPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Vessel Passport Detail Routes (Specific routes before wildcards) */}
+          <Route
+            path="/user/vessel/:id"
+            element={
+              <ProtectedRoute allowedRoles={['user', 'manager', 'admin']}>
+                <VesselDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/vessels/:id"
+            element={
+              <ProtectedRoute allowedRoles={['user', 'manager', 'admin']}>
+                <VesselDetailPage />
               </ProtectedRoute>
             }
           />
