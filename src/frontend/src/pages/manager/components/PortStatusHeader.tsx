@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { colors, radius, spacing } from '@/design-system';
 import { Badge } from '@/components/ui/Badge';
 import { Select } from '@/components/ui/Select';
+import { Radio, RefreshCw, Anchor } from 'lucide-react';
 
 export interface PortStatusHeaderProps {
   onPortChange?: (portName: string) => void;
@@ -13,9 +13,9 @@ export const PortStatusHeader: React.FC<PortStatusHeaderProps> = ({
   const [selectedPort, setSelectedPort] = useState('singapore');
 
   const portOptions = [
-    { value: 'singapore', label: 'Singapore' },
+    { value: 'singapore', label: 'Singapore Port' },
     { value: 'nhava_sheva', label: 'Nhava Sheva' },
-    { value: 'mundra', label: 'Mundra' },
+    { value: 'mundra', label: 'Mundra Port' },
     { value: 'rotterdam', label: 'Rotterdam' },
   ];
 
@@ -25,29 +25,23 @@ export const PortStatusHeader: React.FC<PortStatusHeaderProps> = ({
     if (onPortChange) onPortChange(val);
   };
 
-  const headerStyle: React.CSSProperties = {
-    backgroundColor: colors.surface,
-    borderBottom: `1px solid ${colors.surfaceBorder}`,
-    padding: `${spacing.sm} ${spacing.lg}`,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  };
-
   return (
-    <div style={headerStyle}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md }}>
-        <h1 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 700, color: colors.primaryText }}>
-          DockNova
-        </h1>
-        <span style={{ color: colors.surfaceBorder }}>|</span>
-        <span style={{ fontSize: '0.9375rem', fontWeight: 500, color: colors.secondaryText }}>
-          Port Control Tower
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/40">
+      {/* Telemetry Status Strip */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-surface-2 border border-border text-xs font-mono text-text-secondary">
+          <Radio className="w-3.5 h-3.5 text-primary animate-pulse" />
+          <span>PORT CONTROL TOWER • HARBOR MASTER</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-success animate-ping" />
+        </div>
+        <span className="text-xs font-mono text-text-muted hidden md:inline">
+          LAT: 1°16'N LON: 103°50'E
         </span>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md }}>
-        <div style={{ width: '140px' }}>
+      {/* Controls & Status */}
+      <div className="flex items-center gap-3">
+        <div className="w-40">
           <Select
             options={portOptions}
             value={selectedPort}
@@ -55,14 +49,17 @@ export const PortStatusHeader: React.FC<PortStatusHeaderProps> = ({
           />
         </div>
 
-        <Badge variant="success">Normal</Badge>
+        <Badge variant="success">Normal Operations</Badge>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs, fontSize: '0.8125rem', color: colors.secondaryText, borderLeft: `1px solid ${colors.surfaceBorder}`, paddingLeft: spacing.md }}>
-          <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: colors.surfaceHover, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 600, color: colors.primaryText }}>
-            M
-          </div>
-          <span>Manager</span>
-        </div>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="hidden sm:flex items-center gap-1.5 text-xs font-mono text-primary hover:underline cursor-pointer"
+          title="Synchronize port operations"
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
+          <span>Sync AIS</span>
+        </button>
       </div>
     </div>
   );

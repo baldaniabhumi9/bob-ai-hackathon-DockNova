@@ -143,14 +143,30 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
   };
 
   // User initials for avatar
-  const userName = user?.name || (roleTitle === 'System Admin' ? 'Admin Controller' : 'Vessel Master');
-  const userEmail = user?.email || (roleTitle === 'System Admin' ? 'admin@docknova.com' : 'operator@docknova.com');
-  const initials = userName
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || 'DN';
+  const isAdm = roleTitle.toLowerCase().includes('admin');
+  const isMgr = roleTitle.toLowerCase().includes('manager');
+
+  const userName =
+    user?.name ||
+    (isAdm
+      ? 'Marcus Drake'
+      : isMgr
+      ? 'Capt. Vance Alexander'
+      : 'Elena Rostova');
+  const userEmail =
+    user?.email ||
+    (isAdm
+      ? 'admin@docknova.com'
+      : isMgr
+      ? 'captain@docknova.com'
+      : 'operator@docknova.com');
+
+  const nameParts = userName.split(' ').filter((part) => !part.includes('.'));
+  const initials =
+    (nameParts.length >= 2
+      ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
+      : nameParts[0]?.slice(0, 2) || 'DN'
+    ).toUpperCase();
 
   return (
     <div className="min-h-screen bg-base text-text-primary flex">

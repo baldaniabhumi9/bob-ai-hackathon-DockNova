@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { ManagerLayout } from '@/layouts/ManagerLayout';
 import { ManagerDashboard } from './ManagerDashboard';
 import { CongestionPage } from './CongestionPage';
@@ -16,7 +17,27 @@ import { Button } from '@/components/ui/Button';
 import { colors } from '@/design-system';
 
 export const ManagerPage: React.FC = () => {
-  const [activeNav, setActiveNav] = useState<string>('overview');
+  const location = useLocation();
+
+  const getInitialNav = () => {
+    if (location.pathname.includes('vessels')) return 'vessels';
+    if (location.pathname.includes('berths')) return 'berths';
+    if (location.pathname.includes('cranes')) return 'cranes';
+    if (location.pathname.includes('congestion')) return 'congestion';
+    if (location.pathname.includes('ripple')) return 'ripple';
+    if (location.pathname.includes('optimisation')) return 'optimisation';
+    if (location.pathname.includes('simulation')) return 'simulation';
+    if (location.pathname.includes('plan72h')) return 'plan72h';
+    if (location.pathname.includes('copilot')) return 'copilot';
+    if (location.pathname.includes('settings')) return 'settings';
+    return 'overview';
+  };
+
+  const [activeNav, setActiveNav] = useState<string>(getInitialNav());
+
+  useEffect(() => {
+    setActiveNav(getInitialNav());
+  }, [location.pathname]);
 
   const getNavTitle = (id: string) => {
     switch (id) {
@@ -40,6 +61,7 @@ export const ManagerPage: React.FC = () => {
       activeNavItemId={activeNav}
       onNavItemSelect={(id) => setActiveNav(id)}
       pageTitle={getNavTitle(activeNav)}
+      breadcrumbs={['DockNova', 'Port Operations Manager', getNavTitle(activeNav)]}
     >
       {activeNav === 'overview' && <ManagerDashboard />}
       {activeNav === 'congestion' && <CongestionPage />}
