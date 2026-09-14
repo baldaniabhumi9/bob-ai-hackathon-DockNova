@@ -7,6 +7,7 @@ import { ManagerPage } from './pages/manager';
 import { AdminPage } from './pages/admin';
 import { UserPage } from './pages/user';
 import { VesselDetailPage } from './pages/user/VesselDetailPage';
+import { AlternateRoutingPage } from './pages/user/AlternateRoutingPage';
 
 // Root redirect component based on authentication state
 const RootRedirect: React.FC = () => {
@@ -58,6 +59,24 @@ export const App: React.FC = () => {
             element={
               <ProtectedRoute allowedRoles={['user', 'manager', 'admin']}>
                 <VesselDetailPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Alternate Routing Advisor Routes */}
+          <Route
+            path="/user/routes"
+            element={
+              <ProtectedRoute allowedRoles={['user', 'manager', 'admin']}>
+                <AlternateRoutingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/routes"
+            element={
+              <ProtectedRoute allowedRoles={['user', 'manager', 'admin']}>
+                <AlternateRoutingPage />
               </ProtectedRoute>
             }
           />

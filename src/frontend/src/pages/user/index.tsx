@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { UserLayout } from '@/layouts/UserLayout';
 import { UserDashboard } from '@/features/dashboard';
+import { AlternateRoutingAdvisor } from '@/features/routes';
 import {
   Ship,
   Compass,
@@ -126,32 +127,7 @@ export const UserPage: React.FC = () => {
       )}
 
       {/* 3. ROUTE ADVISOR VIEW */}
-      {activeNav === 'routes' && (
-        <div className="p-6 rounded-xl bg-surface-1 border border-border space-y-4">
-          <div className="flex items-center gap-3 text-secondary">
-            <Route className="w-6 h-6" />
-            <h3 className="font-heading font-semibold text-lg text-text-primary">
-              AI Route Optimization & Fairway Guidance
-            </h3>
-          </div>
-          <p className="text-sm text-text-secondary leading-relaxed max-w-2xl">
-            Real-time tidal, meteorological, and traffic data analyzed by DockNova AI. Vessels adhering
-            to suggested speed corridors reduce port anchorage fuel consumption by up to 14.8%.
-          </p>
-          <div className="p-4 rounded-lg bg-surface-2 border border-border/80 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <CheckCircle2 className="w-5 h-5 text-success" />
-              <div className="text-xs">
-                <div className="font-semibold text-text-primary">Singapore Strait Sector 4 Re-routing Active</div>
-                <div className="text-text-muted">Recommendation: Maintain 14.2 knots for direct quay arrival</div>
-              </div>
-            </div>
-            <button className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-secondary text-base hover:opacity-90 transition-opacity">
-              Apply to Fleet
-            </button>
-          </div>
-        </div>
-      )}
+      {activeNav === 'routes' && <AlternateRoutingAdvisor />}
 
       {/* 4. COPILOT VIEW */}
       {activeNav === 'copilot' && (
