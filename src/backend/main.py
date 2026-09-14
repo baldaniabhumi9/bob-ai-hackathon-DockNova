@@ -6,7 +6,11 @@ from app.api.routers import (
     cranes_router,
     operations_router,
     routes_router,
+    simulation_router,
 )
+from app.routers.vessels import router as vessels_router
+from app.routers.port import router as port_router
+from app.routers.congestion import router as congestion_router
 
 app = FastAPI(
     title="DockNova API",
@@ -42,3 +46,9 @@ app.include_router(berths_router)
 app.include_router(cranes_router)
 app.include_router(routes_router)
 app.include_router(operations_router)
+app.include_router(simulation_router)
+
+# Register ML & Data Routers
+app.include_router(vessels_router)
+app.include_router(port_router)
+app.include_router(congestion_router)
