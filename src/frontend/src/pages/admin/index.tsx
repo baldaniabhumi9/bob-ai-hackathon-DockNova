@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { AdminDashboard } from '@/features/admin';
 import { UserManagementView } from '@/features/users';
+import { PortConfigurationView } from '@/features/portConfig';
 import {
   Users,
   Settings2,
@@ -30,6 +31,11 @@ export const AdminPage: React.FC = () => {
 
   const [activeNav, setActiveNav] = useState<string>(getInitialNav());
 
+  // Keep activeNav synced if pathname changes directly or via browser back/forward
+  useEffect(() => {
+    setActiveNav(getInitialNav());
+  }, [location.pathname]);
+
   return (
     <AdminLayout
       activeNavItemId={activeNav}
@@ -38,7 +44,7 @@ export const AdminPage: React.FC = () => {
         activeNav === 'users'
           ? 'User & Permission Management'
           : activeNav === 'config'
-          ? 'Port Terminal Infrastructure Config'
+          ? 'Port Infrastructure & Terminal Config'
           : activeNav === 'integrations'
           ? 'External Feeds & IBM Bob AI Integration'
           : activeNav === 'audit'
@@ -53,28 +59,7 @@ export const AdminPage: React.FC = () => {
       {activeNav === 'users' && <UserManagementView />}
 
       {/* 3. PORT CONFIGURATION VIEW */}
-      {activeNav === 'config' && (
-        <div className="p-6 rounded-xl bg-surface-1 border border-border space-y-4">
-          <div className="flex items-center gap-3">
-            <Settings2 className="w-6 h-6 text-accent" />
-            <h3 className="font-heading font-semibold text-lg text-text-primary">
-              Terminal Boundary & Berth Parameters
-            </h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-            <div className="p-4 rounded-lg bg-surface-2 border border-border/80 space-y-2">
-              <span className="text-xs font-mono text-text-muted">QUAY GEOMETRY</span>
-              <div className="text-sm font-semibold text-text-primary">42 Managed Berths • 4,800m Quay Line</div>
-              <p className="text-xs text-text-secondary">Default ship safety buffer: 25 meters bow-to-stern.</p>
-            </div>
-            <div className="p-4 rounded-lg bg-surface-2 border border-border/80 space-y-2">
-              <span className="text-xs font-mono text-text-muted">AIS BROADCAST FREQUENCIES</span>
-              <div className="text-sm font-semibold text-text-primary">161.975 MHz (CH 87B) / 162.025 MHz (CH 88B)</div>
-              <p className="text-xs text-text-secondary">Dual-redundant receiver towers connected at Raffles Lighthouse.</p>
-            </div>
-          </div>
-        </div>
-      )}
+      {activeNav === 'config' && <PortConfigurationView />}
 
       {/* 4. INTEGRATIONS VIEW */}
       {activeNav === 'integrations' && (
