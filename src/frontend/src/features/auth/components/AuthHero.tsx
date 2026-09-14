@@ -1,8 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Anchor, Cpu, Compass, Radio, ShieldCheck, Activity } from 'lucide-react';
+import { api, ML_MODEL_ACCURACY_PCT } from '@/services';
 
 export const AuthHero: React.FC = () => {
+  const [berthCount, setBerthCount] = useState<number>(8);
+
+  useEffect(() => {
+    let isMounted = true;
+    Promise.all([api.getPortStatus(), api.getLiveState()])
+      .then(([_status, state]) => {
+        if (isMounted && state?.berths) {
+          setBerthCount(state.berths.length);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch port status for AuthHero:', err);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <div className="relative w-full h-full min-h-[220px] md:min-h-full overflow-hidden bg-base flex flex-col justify-between p-6 sm:p-8 lg:p-12 select-none border-b md:border-b-0 md:border-r border-border/60">
       {/* 1. Animated Gradient Mesh (Primary #38BDF8 + Secondary #818CF8 with low opacity) */}
@@ -116,9 +135,8 @@ export const AuthHero: React.FC = () => {
                 <span>Berth Allocation</span>
               </div>
               <div className="font-mono text-xl font-semibold text-text-primary">
-                42 <span className="text-xs font-sans text-success font-normal">Active Quays</span>
+                {berthCount} <span className="text-xs font-sans text-success font-normal">Active Quays</span>
               </div>
-              <div className="text-[10px] text-text-muted font-mono mt-0.5">(demo)</div>
             </div>
 
             <div className="p-3.5 rounded-xl bg-surface-1/90 border border-border backdrop-blur-sm">
@@ -127,9 +145,8 @@ export const AuthHero: React.FC = () => {
                 <span>Turnaround Precision</span>
               </div>
               <div className="font-mono text-xl font-semibold text-text-primary">
-                99.4% <span className="text-xs font-sans text-primary font-normal">AI Forecast</span>
+                {ML_MODEL_ACCURACY_PCT}% <span className="text-xs font-sans text-primary font-normal">AI Forecast</span>
               </div>
-              <div className="text-[10px] text-text-muted font-mono mt-0.5">(demo)</div>
             </div>
           </div>
         </motion.div>
