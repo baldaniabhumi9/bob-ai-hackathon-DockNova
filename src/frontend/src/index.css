@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   DockNova Maritime Control Room - Design System CSS Custom Properties
+   ========================================================================== */
+:root {
+  --color-background-base: #050B14;
+  --color-base: #050B14;
+  --color-surface-1: #0E1525;
+  --color-surface-2: #141D2E;
+  --color-surface-3: #1C2840;
+  --color-border: #243447;
+  --color-primary: #38BDF8;
+  --color-secondary: #818CF8;
+  --color-accent: #F472B6;
+  --color-success: #34D399;
+  --color-warning: #FBBF24;
+  --color-danger: #F87171;
+  --color-text-primary: #F0F4F8;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted: #64748B;
+
+  color-scheme: dark;
+}
+
+/* ==========================================================================
+   Base Document & Smooth Scroll
+   ========================================================================== */
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+  background-color: #050B14;
+}
+
+/* ==========================================================================
+   Selection Styling: Primary with 30% Opacity
+   ========================================================================== */
+::selection {
+  background-color: rgba(56, 189, 248, 0.3);
+  color: #F0F4F8;
+}
+
+::-moz-selection {
+  background-color: rgba(56, 189, 248, 0.3);
+  color: #F0F4F8;
+}
+
+/* ==========================================================================
+   Dark Scrollbar Styling (thin, dark track, primary thumb)
+   ========================================================================== */
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #38BDF8 #050B14;
+}
+
+/* WebKit / Chromium / Safari */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050B14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #38BDF8;
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7DD3FC;
+}
+
+::-webkit-scrollbar-corner {
+  background: #050B14;
+}
+
+/* ==========================================================================
+   Base Layer & Typography
+   ========================================================================== */
+@layer base {
+  body {
+    @apply bg-base antialiased overflow-x-hidden;
+    color: var(--color-text-primary);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Headings use Space Grotesk */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  /* Numbers / Data use JetBrains Mono */
+  code,
+  kbd,
+  samp,
+  pre,
+  .font-mono,
+  .font-data,
+  .font-number,
+  [data-numeric='true'],
+  [data-mono='true'] {
+    font-family: 'JetBrains Mono', monospace;
+    font-feature-settings: 'tnum';
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ==========================================================================
+   Custom Utility Classes
+   ========================================================================== */
+@layer utilities {
+  .bg-base {
+    background-color: #050B14;
+  }
+  .bg-surface-1 {
+    background-color: #0E1525;
+  }
+  .bg-surface-2 {
+    background-color: #141D2E;
+  }
+  .bg-surface-3 {
+    background-color: #1C2840;
+  }
+  .text-primary {
+    color: #38BDF8;
+  }
+  .text-text-primary {
+    color: #F0F4F8;
+  }
+  .text-text-secondary {
+    color: #94A3B8;
+  }
+  .text-text-muted {
+    color: #64748B;
+  }
+}
+
+/* ==========================================================================
+   Hero Animated Mesh & Radar Utilities
+   ========================================================================== */
+@keyframes mesh-drift {
+  0% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate(25px, -35px) scale(1.06) rotate(1deg);
+  }
+  66% {
+    transform: translate(-30px, 25px) scale(0.96) rotate(-1deg);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
+}
+
+.animate-mesh-drift {
+  animation: mesh-drift 20s infinite ease-in-out;
+}
+
+@keyframes radar-sweep {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-radar-sweep {
+  animation: radar-sweep 12s linear infinite;
+}
+

@@ -1,2 +1,3 @@
 // Frontend helper utilities
-export {};
+export { cn } from '../lib/utils';
+export default {};
