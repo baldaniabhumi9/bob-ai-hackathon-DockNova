@@ -1,18 +1,26 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './features/auth/AuthContext';
-import { LoginPage, SignupPage, RoleSelectionPage } from './pages/auth';
+import { ProtectedRoute } from './features/auth/components/ProtectedRoute';
+import { LoginPage, SignupPage, RoleSelectionPage, UnauthorizedPage } from './pages/auth';
 import { ManagerPage } from './pages/manager';
 import { AdminPage } from './pages/admin';
 import { UserPage } from './pages/user';
 
 // Root redirect component based on authentication state
 const RootRedirect: React.FC = () => {
-  const { isAuthenticated, role } = useAuth();
+  const { isAuthenticated, role, isLoading } = useAuth();
+
+  if (isLoading) {
+    return null; // ProtectedRoute or AuthLoadingScreen handles loading
+  }
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-  return <Navigate to={`/${role || 'manager'}`} replace />;
+
+  const targetDashboard = role === 'admin' ? '/admin' : role === 'user' ? '/user' : '/manager';
+  return <Navigate to={targetDashboard} replace />;
 };
 
 export const App: React.FC = () => {
@@ -20,19 +28,55 @@ export const App: React.FC = () => {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Auth Flow Routes */}
+          {/* Public Auth Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
-          <Route path="/select-role" element={<RoleSelectionPage />} />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-          {/* Operational Consoles */}
-          <Route path="/manager" element={<ManagerPage />} />
-          <Route path="/user" element={<UserPage />} />
-          <Route path="/admin" element={<AdminPage />} />
+          {/* Role Selection (Requires any authenticated user) */}
+          <Route
+            path="/select-role"
+            element={
+              <ProtectedRoute allowedRoles={['manager', 'user', 'admin']}>
+                <RoleSelectionPage />
+              </ProtectedRoute>
+            }
+          />
 
-          {/* Default and Fallback Routes */}
+          {/* Protected Role-Based Routes */}
+          {/* 1. Port Manager Dashboard (allowedRoles: ['manager']) */}
+          <Route
+            path="/manager/*"
+            element={
+              <ProtectedRoute allowedRoles={['manager']}>
+                <ManagerPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 2. Vessel Operator Console (allowedRoles: ['user']) */}
+          <Route
+            path="/user/*"
+            element={
+              <ProtectedRoute allowedRoles={['user']}>
+                <UserPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 3. System Administrator Console (allowedRoles: ['admin']) */}
+          <Route
+            path="/admin/*"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Root & Fallback */}
           <Route path="/" element={<RootRedirect />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

@@ -72,15 +72,19 @@ export const LoginPage: React.FC = () => {
 
     try {
       const result = await login({ email, password, rememberMe });
-      if (result.success) {
+      if (result.success && result.user) {
+        const userRole = result.user.role;
+        const targetRoute =
+          userRole === 'admin' ? '/admin' : userRole === 'user' ? '/user' : '/manager';
+
         setToast({
           isVisible: true,
-          message: 'Authentication authorized. Initializing Control Center...',
+          message: `Authentication authorized as ${userRole.toUpperCase()}. Launching Console...`,
           type: 'success',
         });
         setTimeout(() => {
-          navigate('/select-role');
-        }, 800);
+          navigate(targetRoute, { replace: true });
+        }, 600);
       } else {
         triggerShake();
         setToast({
@@ -175,14 +179,14 @@ export const LoginPage: React.FC = () => {
             </button>
             <button
               type="button"
-              onClick={() => fillDemo('operator.maersk@docknova.com')}
+              onClick={() => fillDemo('operator@docknova.com')}
               className="text-xs px-2.5 py-1 rounded bg-surface-3 hover:bg-primary/20 hover:text-primary transition-colors text-text-secondary border border-border/60"
             >
               Vessel Operator
             </button>
             <button
               type="button"
-              onClick={() => fillDemo('admin.ops@docknova.com')}
+              onClick={() => fillDemo('admin@docknova.com')}
               className="text-xs px-2.5 py-1 rounded bg-surface-3 hover:bg-primary/20 hover:text-primary transition-colors text-text-secondary border border-border/60"
             >
               SysAdmin

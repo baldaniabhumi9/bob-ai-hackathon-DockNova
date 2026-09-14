@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, UserRole, LoginCredentials, SignupData, AuthContextType } from './types';
+import { authService, generateMockJWT } from '@/services/authService';
 
-const STORAGE_KEY_USER = 'docknova_auth_user';
-const STORAGE_KEY_ROLE = 'docknova_user_role';
+export const STORAGE_KEY_USER = 'docknova_auth_user';
+export const STORAGE_KEY_TOKEN = 'docknova_jwt_token';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -16,122 +17,123 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   });
 
-  const [role, setRoleState] = useState<UserRole>(() => {
+  const [token, setToken] = useState<string | null>(() => {
     try {
-      const storedRole = localStorage.getItem(STORAGE_KEY_ROLE) as UserRole | null;
-      if (storedRole && ['manager', 'user', 'admin'].includes(storedRole)) {
-        return storedRole;
-      }
-      return 'manager';
+      return localStorage.getItem(STORAGE_KEY_TOKEN);
     } catch {
-      return 'manager';
+      return null;
     }
   });
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Restore & verify session on mount
   useEffect(() => {
-    if (user) {
-      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
-      localStorage.setItem(STORAGE_KEY_ROLE, user.role);
-      setRoleState(user.role);
-    } else {
-      localStorage.removeItem(STORAGE_KEY_USER);
-    }
-  }, [user]);
+    const initAuth = async () => {
+      try {
+        const storedUser = localStorage.getItem(STORAGE_KEY_USER);
+        const storedToken = localStorage.getItem(STORAGE_KEY_TOKEN);
 
-  const setRole = (newRole: UserRole) => {
-    setRoleState(newRole);
-    localStorage.setItem(STORAGE_KEY_ROLE, newRole);
-    if (user) {
-      const updated = { ...user, role: newRole };
-      setUser(updated);
-      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(updated));
+        if (storedUser && storedToken) {
+          const parsedUser: User = JSON.parse(storedUser);
+          setUser(parsedUser);
+          setToken(storedToken);
+        } else {
+          setUser(null);
+          setToken(null);
+        }
+      } catch (err) {
+        console.error('Failed to restore auth session:', err);
+        localStorage.removeItem(STORAGE_KEY_USER);
+        localStorage.removeItem(STORAGE_KEY_TOKEN);
+        setUser(null);
+        setToken(null);
+      } finally {
+        // Small delay to prevent flash of content
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 150);
+      }
+    };
+
+    initAuth();
+  }, []);
+
+  const updateRole = (newRole: UserRole) => {
+    if (!user) return;
+    const updatedUser: User = { ...user, role: newRole };
+    const newToken = generateMockJWT(updatedUser);
+
+    setUser(updatedUser);
+    setToken(newToken);
+    localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(updatedUser));
+    localStorage.setItem(STORAGE_KEY_TOKEN, newToken);
+  };
+
+  const login = async (
+    credentials: LoginCredentials
+  ): Promise<{ success: boolean; user?: User; error?: string }> => {
+    setIsLoading(true);
+    try {
+      const { user: authedUser, token: authToken } = await authService.login(credentials);
+
+      setUser(authedUser);
+      setToken(authToken);
+
+      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(authedUser));
+      localStorage.setItem(STORAGE_KEY_TOKEN, authToken);
+
+      setIsLoading(false);
+      return { success: true, user: authedUser };
+    } catch (err: any) {
+      setIsLoading(false);
+      return { success: false, error: err.message || 'Authentication failed' };
     }
   };
 
-  const login = async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
+  const signup = async (
+    data: SignupData
+  ): Promise<{ success: boolean; user?: User; error?: string }> => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 600)); // Smooth UX transition
+    try {
+      const { user: registeredUser, token: authToken } = await authService.signup(data);
 
-    // Validation
-    if (!credentials.email || !credentials.password) {
+      setUser(registeredUser);
+      setToken(authToken);
+
+      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(registeredUser));
+      localStorage.setItem(STORAGE_KEY_TOKEN, authToken);
+
       setIsLoading(false);
-      return { success: false, error: 'Email and password are required.' };
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(credentials.email)) {
+      return { success: true, user: registeredUser };
+    } catch (err: any) {
       setIsLoading(false);
-      return { success: false, error: 'Invalid email address format.' };
+      return { success: false, error: err.message || 'Registration failed' };
     }
-
-    // Determine role based on email or default to 'manager'
-    let assignedRole: UserRole = 'manager';
-    if (credentials.email.includes('admin')) {
-      assignedRole = 'admin';
-    } else if (credentials.email.includes('vessel') || credentials.email.includes('user') || credentials.email.includes('operator')) {
-      assignedRole = 'user';
-    }
-
-    const authenticatedUser: User = {
-      id: `usr_${Date.now()}`,
-      name: credentials.email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
-      email: credentials.email,
-      role: assignedRole,
-      company: 'DockNova Maritime Systems',
-    };
-
-    setUser(authenticatedUser);
-    setRole(assignedRole);
-    setIsLoading(false);
-    return { success: true };
-  };
-
-  const signup = async (data: SignupData): Promise<{ success: boolean; error?: string }> => {
-    setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 700));
-
-    if (!data.fullName || !data.email || !data.password) {
-      setIsLoading(false);
-      return { success: false, error: 'Please fill in all required fields.' };
-    }
-
-    if (data.password !== data.confirmPassword) {
-      setIsLoading(false);
-      return { success: false, error: 'Passwords do not match.' };
-    }
-
-    const newUser: User = {
-      id: `usr_${Date.now()}`,
-      name: data.fullName,
-      email: data.email,
-      role: data.role,
-      company: data.company || 'DockNova Alliance',
-    };
-
-    setUser(newUser);
-    setRole(data.role);
-    setIsLoading(false);
-    return { success: true };
   };
 
   const logout = () => {
     setUser(null);
+    setToken(null);
     localStorage.removeItem(STORAGE_KEY_USER);
+    localStorage.removeItem(STORAGE_KEY_TOKEN);
   };
+
+  const currentRole: UserRole = user?.role || 'user';
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        role,
-        isAuthenticated: !!user,
+        role: currentRole,
+        token,
+        isAuthenticated: !!user && !!token,
         isLoading,
         login,
         signup,
         logout,
-        setRole,
+        updateRole,
+        setRole: updateRole, // Alias for backward compatibility
       }}
     >
       {children}
