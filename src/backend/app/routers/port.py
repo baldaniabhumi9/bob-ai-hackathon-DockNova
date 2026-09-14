@@ -3,6 +3,7 @@ Router for Port status and metrics endpoints.
 
 Exposes:
   GET /api/port/status
+  GET /api/port/berth-risk
 """
 
 from __future__ import annotations
@@ -25,6 +26,7 @@ from app.services.optimization.models import (
     CraneStatus,
     VesselStatus,
 )
+from app.services.optimization.berth_risk import BerthRisk, get_per_berth_risk
 from app.services.operational_state import live_state
 
 logger = logging.getLogger(__name__)
@@ -97,5 +99,39 @@ def get_port_status() -> ApiResponseEnvelope[PortStatus]:
     return ApiResponseEnvelope[PortStatus](
         success=True,
         data=port_status,
+        error=None,
+    )
+
+
+@router.get(
+    "/berth-risk",
+    response_model=ApiResponseEnvelope[list[BerthRisk]],
+    status_code=status.HTTP_200_OK,
+    summary="Per-Berth Risk Scores",
+    description=(
+        "Returns a formula-based risk score (0–100) and level (NORMAL/WARNING/CRITICAL) "
+        "for each berth, derived from occupancy status, assigned vessel priority, and "
+        "crane availability.  Does NOT invoke the ML model — port-level congestion "
+        "forecasting remains in GET /api/congestion/predict."
+    ),
+)
+def get_berth_risk() -> ApiResponseEnvelope[list[BerthRisk]]:
+    """
+    Compute per-berth risk scores from the live operational state.
+
+    Uses three inputs available per berth without any ML inference:
+      - occupancy status (AVAILABLE / OCCUPIED / MAINTENANCE)
+      - priority of the currently assigned vessel (HIGH / MEDIUM / LOW / none)
+      - crane availability ratio at this berth
+    """
+    snapshot = live_state.snapshot()
+    risks = get_per_berth_risk(
+        berths=snapshot["berths"],
+        cranes=snapshot["cranes"],
+        vessels=snapshot["vessels"],
+    )
+    return ApiResponseEnvelope[list[BerthRisk]](
+        success=True,
+        data=risks,
         error=None,
     )

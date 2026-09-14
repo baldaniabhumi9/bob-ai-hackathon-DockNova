@@ -54,6 +54,22 @@ export interface PortStatus {
 	yardOccupancyPct: number;
 }
 
+export type BerthRiskLevel = 'NORMAL' | 'WARNING' | 'CRITICAL';
+
+export interface BerthRisk {
+	berthId: string;
+	berthName: string;
+	riskScore: number;            // 0–100 formula-based score
+	riskLevel: BerthRiskLevel;
+	utilizationPct: number;       // 0 / 60 / 100
+	occupancyStatus: string;      // AVAILABLE / OCCUPIED / MAINTENANCE
+	vesselId?: string | null;
+	vesselName?: string | null;
+	vesselPriority?: string | null;
+	totalCranes: number;
+	operationalCranes: number;
+}
+
 export interface CongestionForecast {
 	forecastTime?: string;
 	congestionProbability: number;
@@ -177,6 +193,8 @@ export const api = {
 
 	// ── Port status & congestion ──
 	getPortStatus: async () => (await request<ApiEnvelope<PortStatus>>('/api/port/status')).data,
+	getBerthRisk: async (): Promise<BerthRisk[]> =>
+		(await request<ApiEnvelope<BerthRisk[]>>('/api/port/berth-risk')).data,
 	getCongestion: async () =>
 		(await request<ApiEnvelope<CongestionForecast>>('/api/congestion/predict', JSON_POST)).data,
 	getCongestionForecast: async (): Promise<CongestionForecast[]> =>
