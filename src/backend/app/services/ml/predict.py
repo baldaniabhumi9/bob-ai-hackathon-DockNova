@@ -163,6 +163,22 @@ def _identify_hotspot(berth_utilization_pct: float) -> Optional[HotspotInfo]:
     )
 
 
+def _fallback_forecast(current_state: dict[str, Any]) -> CongestionForecast:
+    """Deterministic operational fallback when trained artifacts are unavailable."""
+    waiting = max(0.0, float(current_state.get("waiting_vessels", 0.0)))
+    berth = max(0.0, float(current_state.get("berth_utilization_pct", 0.0)))
+    crane = max(0.0, float(current_state.get("crane_utilization_pct", 0.0)))
+    workload = max(0.0, float(current_state.get("avg_service_time_hours", 0.0)))
+    probability = min(1.0, max(0.0, waiting * 0.06 + berth * 0.004 + crane * 0.002 + workload * 0.01))
+    return CongestionForecast(
+        forecast_time=datetime.utcnow() + timedelta(hours=1),
+        congestion_probability=round(probability, 4),
+        predicted_wait_time_hours=round(waiting * 1.5 + max(0.0, berth - 60.0) * 0.08, 2),
+        risk_level=_risk_level(probability),
+        hotspot=_identify_hotspot(berth),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
@@ -186,7 +202,10 @@ def predict_congestion(current_state: dict[str, Any]) -> CongestionForecast:
         Pydantic model with congestion_probability, predicted_wait_time_hours,
         risk_level, hotspot, and forecast_time.
     """
-    _load_models()
+    try:
+        _load_models()
+    except FileNotFoundError:
+        return _fallback_forecast(current_state)
 
     # Build feature vector and scale
     X_raw = dict_to_feature_vector(current_state)

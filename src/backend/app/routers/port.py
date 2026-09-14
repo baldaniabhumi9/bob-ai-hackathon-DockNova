@@ -25,6 +25,7 @@ from app.services.optimization.models import (
     CraneStatus,
     VesselStatus,
 )
+from app.services.operational_state import live_state
 
 logger = logging.getLogger(__name__)
 
@@ -70,9 +71,10 @@ def get_port_status() -> ApiResponseEnvelope[PortStatus]:
     """
     Compute and return current port status metrics from loaded synthetic data.
     """
-    vessels = get_vessel_models()
-    berths = get_berth_models()
-    cranes = get_crane_models()
+    snapshot = live_state.snapshot()
+    vessels = snapshot["vessels"]
+    berths = snapshot["berths"]
+    cranes = snapshot["cranes"]
     df = get_historical_metrics()
 
     total_vessels = len(vessels)
@@ -81,7 +83,8 @@ def get_port_status() -> ApiResponseEnvelope[PortStatus]:
     available_cranes = sum(1 for c in cranes if c.status == CraneStatus.OPERATIONAL)
 
     # Latest yard occupancy percentage from historical metrics time series
-    latest_yard_occupancy = float(round(df["yard_occupancy_pct"].iloc[-1], 2)) if not df.empty else 65.0
+    berth_utilization = (snapshot["occupiedBerths"] / max(1, len(berths))) * 100
+    latest_yard_occupancy = min(100.0, float(round(60.0 + snapshot["waitingVessels"] * 3.0 + berth_utilization * 0.1, 2)))
 
     port_status = PortStatus(
         total_vessels=total_vessels,

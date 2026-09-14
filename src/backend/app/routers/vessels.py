@@ -18,6 +18,7 @@ from app.services.optimization.models import (
     VesselModel,
     VesselStatus,
 )
+from app.services.operational_state import live_state
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +47,7 @@ def get_vessels(
     """
     Retrieve vessel models from the data loader, optionally filtered by status.
     """
-    vessels = get_vessel_models()
+    vessels = live_state.snapshot()["vessels"]
     if status is not None:
         vessels = [v for v in vessels if v.status == status]
 

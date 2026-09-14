@@ -5,20 +5,43 @@ import { ProgressBar } from '@/components/ui/ProgressBar';
 import { MOCK_BERTHS, BerthData } from '@/features/berths/mockBerths';
 import { BerthDetailModal } from './components/BerthDetailModal';
 import { WhatIfSimulatorModal } from './components/WhatIfSimulatorModal';
+import { useLiveOperations } from '@/hooks/useLiveOperations';
 
 export const BerthsPage: React.FC = () => {
+  const { state } = useLiveOperations();
   const [selectedBerth, setSelectedBerth] = useState<BerthData | null>(null);
   const [isWhatIfOpen, setIsWhatIfOpen] = useState(false);
 
-  // Summary KPI metrics derived from the berth mock data
+  const berths = useMemo<BerthData[] | null>(() => {
+    if (!state) return null;
+    return state.berths.map((berth) => {
+      const occupied = berth.status === 'OCCUPIED';
+      const activeCranes = state.cranes.filter((crane) => crane.berthId === berth.id && crane.status === 'IDLE').length;
+      return {
+        id: berth.id,
+        name: berth.name,
+        code: berth.code,
+        status: berth.status === 'MAINTENANCE' ? 'Critical' : occupied ? 'Warning' : 'Normal',
+        statusVariant: berth.status === 'MAINTENANCE' ? 'critical' : occupied ? 'warning' : 'success',
+        utilisationPercentage: occupied ? 100 : 0,
+        assignedVessel: state.vessels.find((vessel) => vessel.id === berth.currentVesselId)?.name,
+        cranesActive: activeCranes,
+        maxDraftMeters: berth.maxDraftMeters,
+      };
+    });
+  }, [state]);
+
+  const displayedBerths = berths ?? MOCK_BERTHS;
+
+  // Summary KPI metrics derived from the live or fallback berth data
   const kpiData = useMemo(() => {
-    const total = MOCK_BERTHS.length;
-    const critical = MOCK_BERTHS.filter((b) => b.status === 'Critical').length;
-    const warning = MOCK_BERTHS.filter((b) => b.status === 'Warning').length;
+    const total = displayedBerths.length;
+    const critical = displayedBerths.filter((b) => b.status === 'Critical').length;
+    const warning = displayedBerths.filter((b) => b.status === 'Warning').length;
     const avgUtilisation = Math.round(
-      MOCK_BERTHS.reduce((sum, b) => sum + b.utilisationPercentage, 0) / total
+      displayedBerths.reduce((sum, b) => sum + b.utilisationPercentage, 0) / total
     );
-    const activeCranes = MOCK_BERTHS.reduce((sum, b) => sum + b.cranesActive, 0);
+    const activeCranes = displayedBerths.reduce((sum, b) => sum + b.cranesActive, 0);
 
     return [
       { title: 'Total Berths', value: String(total), badge: 'Monitored', variant: 'cyan' as const },
@@ -26,7 +49,7 @@ export const BerthsPage: React.FC = () => {
       { title: 'At Warning/Critical', value: String(warning + critical), badge: 'Needs Attention', variant: 'warning' as const },
       { title: 'Active Cranes', value: String(activeCranes), badge: 'Deployed', variant: 'success' as const },
     ];
-  }, []);
+  }, [displayedBerths]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.lg, width: '100%', maxWidth: '1400px', margin: '0 auto' }}>
@@ -111,7 +134,7 @@ export const BerthsPage: React.FC = () => {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: spacing.md }}>
-          {MOCK_BERTHS.map((berth) => {
+          {displayedBerths.map((berth) => {
             const borderColor =
               berth.statusVariant === 'critical'
                 ? colors.critical

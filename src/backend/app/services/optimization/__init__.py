@@ -7,10 +7,6 @@ DockNova Optimization Services.
 - Operations plan: 72-hour combined berth+crane plan generator
 """
 
-from .berth_allocation import optimize_berth_allocation
-from .crane_allocation import optimize_crane_allocation
-from .operations_plan import generate_operations_plan
-from .route_recommendation import recommend_route
 from .models import (
     AlternativePort,
     ApiErrorDetail,
@@ -58,3 +54,20 @@ __all__ = [
     "CraneOptimizationRequest",
     "RouteRecommendationRequest",
 ]
+
+
+def __getattr__(name: str):
+    """Load service functions lazily so the data layer can import seed data."""
+    if name == "optimize_berth_allocation":
+        from .berth_allocation import optimize_berth_allocation
+        return optimize_berth_allocation
+    if name == "optimize_crane_allocation":
+        from .crane_allocation import optimize_crane_allocation
+        return optimize_crane_allocation
+    if name == "generate_operations_plan":
+        from .operations_plan import generate_operations_plan
+        return generate_operations_plan
+    if name == "recommend_route":
+        from .route_recommendation import recommend_route
+        return recommend_route
+    raise AttributeError(name)

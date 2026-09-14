@@ -23,6 +23,7 @@ from app.services.optimization.models import (
     OperationsPlanEntry,
 )
 from app.services.optimization.operations_plan import generate_operations_plan
+from app.services.operational_state import live_state
 
 logger = logging.getLogger(__name__)
 
@@ -40,16 +41,17 @@ def get_72_hour_operations_plan() -> ApiResponseEnvelope[list[OperationsPlanEntr
     """
     Generate and return the 72-hour operations plan entries.
     """
-    vessels = get_vessel_models()
-    berths = get_berth_models()
-    cranes = get_crane_models()
+    snapshot = live_state.snapshot()
+    vessels = snapshot["vessels"]
+    berths = snapshot["berths"]
+    cranes = snapshot["cranes"]
 
     plan = generate_operations_plan(
         vessels=vessels,
         berths=berths,
         cranes=cranes,
         reference_time=REFERENCE_TIME,
-        workloads=get_vessel_workloads(),
+        workloads=snapshot["workloads"],
     )
 
     return ApiResponseEnvelope[list[OperationsPlanEntry]](

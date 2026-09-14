@@ -58,6 +58,8 @@ class VesselStatus(str, Enum):
     SCHEDULED = "SCHEDULED"
     WAITING = "WAITING"
     BERTHED = "BERTHED"
+    HANDLING = "HANDLING"
+    COMPLETED = "COMPLETED"
     DEPARTED = "DEPARTED"
 
 

@@ -24,6 +24,7 @@ from app.services.optimization.models import (
     CraneOptimizationRequest,
     CraneOptimizationResult,
 )
+from app.services.operational_state import live_state
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +53,8 @@ def optimize_cranes(
     """
     Run crane allocation optimization for a given berth_id.
     """
-    berths = {b.id: b for b in get_berth_models()}
+    snapshot = live_state.snapshot()
+    berths = {b.id: b for b in snapshot["berths"]}
     if request.berth_id not in berths:
         return ApiResponseEnvelope[CraneOptimizationResult](
             success=False,
@@ -65,7 +67,7 @@ def optimize_cranes(
         )
 
     berth = berths[request.berth_id]
-    cranes_at_berth = [c for c in get_crane_models() if c.berth_id == request.berth_id]
+    cranes_at_berth = [c for c in snapshot["cranes"] if c.berth_id == request.berth_id]
 
     if not cranes_at_berth:
         return ApiResponseEnvelope[CraneOptimizationResult](
@@ -79,10 +81,10 @@ def optimize_cranes(
         )
 
     # Determine vessel and workload for this berth
-    vessels = {v.id: v for v in get_vessel_models()}
+    vessels = {v.id: v for v in snapshot["vessels"]}
     vessel_id = BERTH_DEFAULT_VESSELS.get(request.berth_id, "V001")
     vessel = vessels.get(vessel_id, list(vessels.values())[0])
-    workloads = get_vessel_workloads()
+    workloads = snapshot["workloads"]
     workload_teu = workloads.get(vessel.id, 450.0)
 
     result = optimize_crane_allocation(

@@ -24,6 +24,7 @@ from app.services.optimization.models import (
     BerthOptimizationRequest,
     OptimizationResult,
 )
+from app.services.operational_state import live_state
 
 logger = logging.getLogger(__name__)
 
@@ -44,8 +45,9 @@ def optimize_berths(
     Run berth allocation optimization.
     Optionally filters by vessel_ids; defaults to all waiting/scheduled vessels.
     """
-    all_vessels = get_vessel_models()
-    all_berths = get_berth_models()
+    snapshot = live_state.snapshot()
+    all_vessels = snapshot["vessels"]
+    all_berths = snapshot["berths"]
 
     vessels_to_optimize = all_vessels
     if request and request.vessel_ids:

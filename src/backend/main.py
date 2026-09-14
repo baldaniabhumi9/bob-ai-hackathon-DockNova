@@ -8,6 +8,7 @@ from app.api.routers import (
     operations_router,
     routes_router,
     simulation_router,
+    live_state_router,
 )
 from app.routers.vessels import router as vessels_router
 from app.routers.port import router as port_router
@@ -49,6 +50,7 @@ app.include_router(routes_router)
 app.include_router(operations_router)
 app.include_router(simulation_router)
 app.include_router(emergency_router)
+app.include_router(live_state_router)
 
 # Register ML & Data Routers
 app.include_router(vessels_router)

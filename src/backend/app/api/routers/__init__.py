@@ -8,6 +8,7 @@ from .emergency import router as emergency_router
 from .operations import router as operations_router
 from .routes import router as routes_router
 from .simulation import router as simulation_router
+from .live_state import router as live_state_router
 
 __all__ = [
     "berths_router",
@@ -16,4 +17,5 @@ __all__ = [
     "routes_router",
     "operations_router",
     "simulation_router",
+    "live_state_router",
 ]

@@ -6,10 +6,12 @@ import { Table, Column } from '@/components/ui/Table';
 import { MOCK_VESSELS, VesselTimelineItem } from '@/features/vessels/mockVessels';
 import { VesselDetailModal } from './components/VesselDetailModal';
 import { WhatIfSimulatorModal } from './components/WhatIfSimulatorModal';
+import { useLiveOperations } from '@/hooks/useLiveOperations';
 
 type FilterStatus = 'All' | 'Arriving' | 'At Berth' | 'Delayed';
 
 export const VesselsPage: React.FC = () => {
+  const { state } = useLiveOperations();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterStatus>('All');
   const [selectedVessel, setSelectedVessel] = useState<VesselTimelineItem | null>(null);
@@ -23,9 +25,34 @@ export const VesselsPage: React.FC = () => {
     { title: 'High Risk', value: '2', badge: 'Action Needed', variant: 'critical' as const },
   ];
 
+  const liveVessels = useMemo<VesselTimelineItem[] | null>(() => {
+    if (!state) return null;
+    return state.vessels.map((vessel) => {
+      const berth = state.berths.find((candidate) => candidate.currentVesselId === vessel.id);
+      const status = vessel.status === 'HANDLING' ? 'At Berth' : vessel.status === 'WAITING' ? 'Delayed' : vessel.status === 'SCHEDULED' ? 'Scheduled' : 'At Berth';
+      return {
+        id: vessel.id,
+        name: vessel.name,
+        imo: vessel.imo,
+        eta: new Date(vessel.eta).toLocaleString(),
+        etd: new Date(vessel.etd).toLocaleString(),
+        assignedBerth: berth?.code ?? 'Queue',
+        status,
+        statusVariant: status === 'Delayed' ? 'warning' : status === 'At Berth' ? 'success' : 'cyan',
+        filterStatus: status === 'At Berth' ? 'At Berth' : status === 'Delayed' ? 'Delayed' : 'Arriving',
+        delayText: vessel.status === 'WAITING' ? 'Waiting' : '0h',
+        teuCapacity: 0,
+        cargoType: vessel.type,
+        congestionRisk: status === 'Delayed' ? 70 : status === 'At Berth' ? 25 : 10,
+      };
+    });
+  }, [state]);
+
+  const vessels = liveVessels ?? MOCK_VESSELS;
+
   // Filtered vessel list
   const filteredVessels = useMemo(() => {
-    return MOCK_VESSELS.filter((vessel) => {
+    return vessels.filter((vessel) => {
       const query = searchQuery.toLowerCase().trim();
       const matchesSearch =
         !query ||
@@ -38,7 +65,7 @@ export const VesselsPage: React.FC = () => {
 
       return matchesSearch && matchesStatus;
     });
-  }, [searchQuery, activeFilter]);
+  }, [searchQuery, activeFilter, vessels]);
 
   // Vessel Table Column Definitions
   const columns: Column<VesselTimelineItem>[] = [

@@ -31,6 +31,7 @@ from app.services.optimization.models import (
     Priority,
     VesselStatus,
 )
+from app.services.operational_state import live_state
 
 logger = logging.getLogger(__name__)
 
@@ -108,20 +109,21 @@ def predict_port_congestion(
     Predict congestion for a single vessel (if vessel_id is provided) or
     for the current operational snapshot computed from loader data.
     """
-    vessels = get_vessel_models()
+    snapshot = live_state.snapshot()
+    vessels = snapshot["vessels"]
     vessels_by_id = {v.id: v for v in vessels}
     df = get_historical_metrics()
     latest_metrics = df.iloc[-1].to_dict() if not df.empty else {}
 
     now = datetime.utcnow()
-    waiting_count = float(sum(1 for v in vessels if v.status == VesselStatus.WAITING))
+    waiting_count = float(snapshot["waitingVessels"])
 
     # Base current state snapshot
     state = {
         "vessel_arrivals": float(latest_metrics.get("vessel_arrivals", 3.0)),
         "waiting_vessels": waiting_count,
-        "berth_utilization_pct": float(latest_metrics.get("berth_utilization_pct", 55.0)),
-        "crane_utilization_pct": float(latest_metrics.get("crane_utilization_pct", 60.0)),
+        "berth_utilization_pct": float(snapshot["occupiedBerths"] / max(1, len(snapshot["berths"])) * 100),
+        "crane_utilization_pct": float(sum(1 for c in snapshot["cranes"] if c.status == CraneStatus.IDLE) / max(1, len(snapshot["cranes"])) * 100),
         "yard_occupancy_pct": float(latest_metrics.get("yard_occupancy_pct", 68.0)),
         "avg_service_time_hours": float(latest_metrics.get("avg_service_time_hours", 12.0)),
         "hour_of_day": now.hour,

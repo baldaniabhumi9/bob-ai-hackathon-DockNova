@@ -2,13 +2,14 @@ import React from 'react';
 import { colors, radius, spacing } from '@/design-system';
 import { Badge } from '@/components/ui/Badge';
 import { MOCK_CONGESTION_SUMMARY } from '@/features/congestion/mockForecastData';
+import { CongestionForecast } from '@/services';
 
-export const CongestionSummaryCards: React.FC = () => {
+export const CongestionSummaryCards: React.FC<{ congestion?: CongestionForecast | null }> = ({ congestion }) => {
   const cards = [
     {
       title: 'Congestion Risk',
-      value: MOCK_CONGESTION_SUMMARY.currentRisk,
-      status: MOCK_CONGESTION_SUMMARY.currentRiskStatus,
+      value: congestion ? `${Math.round(congestion.congestionProbability * 100)}%` : MOCK_CONGESTION_SUMMARY.currentRisk,
+      status: congestion?.riskLevel ?? MOCK_CONGESTION_SUMMARY.currentRiskStatus,
       variant: 'warning' as const,
     },
     {
@@ -19,8 +20,8 @@ export const CongestionSummaryCards: React.FC = () => {
     },
     {
       title: 'Most At-Risk Berth',
-      value: MOCK_CONGESTION_SUMMARY.atRiskBerth,
-      status: MOCK_CONGESTION_SUMMARY.atRiskStatus,
+      value: congestion?.hotspot?.berthId ?? MOCK_CONGESTION_SUMMARY.atRiskBerth,
+      status: congestion?.hotspot ? `${Math.round(congestion.hotspot.predictedUtilizationPct)}% utilised` : MOCK_CONGESTION_SUMMARY.atRiskStatus,
       variant: 'critical' as const,
     },
   ];

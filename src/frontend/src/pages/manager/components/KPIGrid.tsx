@@ -38,13 +38,16 @@ export interface KPIGridProps {
   onKPIClick?: (kpi: KPIData) => void;
 }
 
-export const KPIGrid: React.FC<KPIGridProps> = ({ onKPIClick }) => {
+export const KPIGrid: React.FC<KPIGridProps & { liveValues?: Partial<Record<KPIData['id'], { value: string; status: string; variant: KPIData['variant'] }>> }> = ({ onKPIClick, liveValues }) => {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: spacing.md, width: '100%' }}>
-      {THREE_KPIS.map((kpi) => (
+      {THREE_KPIS.map((kpi) => {
+        const live = liveValues?.[kpi.id];
+        const displayKpi = live ? { ...kpi, ...live } : kpi;
+        return (
         <div
-          key={kpi.id}
-          onClick={() => onKPIClick && onKPIClick(kpi)}
+          key={displayKpi.id}
+          onClick={() => onKPIClick && onKPIClick(displayKpi)}
           style={{
             backgroundColor: colors.surface,
             borderRadius: radius.md,
@@ -61,16 +64,17 @@ export const KPIGrid: React.FC<KPIGridProps> = ({ onKPIClick }) => {
         >
           <div>
             <div style={{ fontSize: '0.8125rem', color: colors.secondaryText, fontWeight: 500, marginBottom: '4px' }}>
-              {kpi.title}
+              {displayKpi.title}
             </div>
             <div style={{ fontSize: '2rem', fontWeight: 700, color: colors.primaryText, letterSpacing: '-0.02em' }}>
-              {kpi.value}
+              {displayKpi.value}
             </div>
           </div>
 
-          <Badge variant={kpi.variant}>{kpi.status}</Badge>
+          <Badge variant={displayKpi.variant}>{displayKpi.status}</Badge>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

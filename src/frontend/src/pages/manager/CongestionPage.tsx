@@ -10,10 +10,12 @@ import { RecommendationCard } from './components/RecommendationCard';
 import { WhatIfSimulatorModal } from './components/WhatIfSimulatorModal';
 import { VesselDetailModal } from './components/VesselDetailModal';
 import { MOCK_VESSELS } from '@/features/vessels/mockVessels';
+import { useLiveOperations } from '@/hooks/useLiveOperations';
 
 export const CongestionPage: React.FC = () => {
   const [isWhatIfOpen, setIsWhatIfOpen] = useState(false);
   const [isVesselOpen, setIsVesselOpen] = useState(false);
+  const { congestion } = useLiveOperations();
 
   // Default vessel for MV Ocean Star details
   const oceanStarVessel = MOCK_VESSELS[0];
@@ -24,7 +26,7 @@ export const CongestionPage: React.FC = () => {
       <CongestionHeader />
 
       {/* 3 Top Summary Cards */}
-      <CongestionSummaryCards />
+      <CongestionSummaryCards congestion={congestion} />
 
       {/* Main 72-Hour Forecast & At-Risk Analysis Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: spacing.lg, alignItems: 'start' }}>
