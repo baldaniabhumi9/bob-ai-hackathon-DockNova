@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { spacing } from '@/design-system';
+import { colors, radius, spacing } from '@/design-system';
+import { Badge } from '@/components/ui/Badge';
 import { PortStatusHeader } from './components/PortStatusHeader';
 import { KPIGrid } from './components/KPIGrid';
 import { PortMap } from './components/PortMap';
@@ -16,7 +17,6 @@ import { VesselTimelineItem } from '@/features/vessels/mockVessels';
 import { useLiveOperations } from '@/hooks/useLiveOperations';
 import { api } from '@/services';
 import { Button } from '@/components/ui/Button';
-import { colors } from '@/design-system';
 
 export const ManagerDashboard: React.FC = () => {
   const { state, portStatus, congestion, refresh } = useLiveOperations();
@@ -66,6 +66,28 @@ export const ManagerDashboard: React.FC = () => {
 
       {/* Small Upcoming Vessels Section */}
       <VesselTimeline onSelectVessel={(vessel) => setSelectedVessel(vessel)} />
+
+      {/* Live Event Feed */}
+      {state && state.events.length > 0 && (
+        <div style={{ backgroundColor: colors.surface, borderRadius: radius.md, border: `1px solid ${colors.surfaceBorder}`, padding: spacing.md }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm }}>
+            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: colors.primaryText }}>
+              ⚡ Live Operations Events
+            </span>
+            <Badge variant="success">LIVE</Badge>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '180px', overflowY: 'auto' }}>
+            {state.events.slice(0, 8).map((evt, idx) => (
+              <div key={idx} style={{ display: 'flex', gap: spacing.sm, fontSize: '0.8125rem', borderBottom: `1px solid ${colors.surfaceBorder}`, paddingBottom: '4px' }}>
+                <span style={{ color: colors.secondaryText, fontFamily: 'monospace', minWidth: '80px', fontSize: '0.75rem' }}>
+                  {new Date(evt.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+                <span style={{ color: colors.primaryText }}>{evt.message}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Modals for Advanced Details on Click */}
       <BerthDetailModal

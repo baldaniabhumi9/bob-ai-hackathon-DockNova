@@ -3,7 +3,16 @@ import { colors, radius, spacing } from '@/design-system';
 import { Badge } from '@/components/ui/Badge';
 import { MOCK_RIPPLE_EXPLANATION } from '@/features/congestion/mockRippleData';
 
-export const RippleExplanationCard: React.FC = () => {
+interface RippleExplanationCardProps {
+  congestionPct?: number;
+  waitingVessels?: number;
+}
+
+export const RippleExplanationCard: React.FC<RippleExplanationCardProps> = ({ congestionPct, waitingVessels }) => {
+  const summary = congestionPct !== undefined
+    ? `Current port congestion risk is ${congestionPct}%${waitingVessels !== undefined ? ` with ${waitingVessels} vessel${waitingVessels !== 1 ? 's' : ''} waiting for berth assignment` : ''}. High berth utilisation reduces crane availability and increases yard and gate pressure, propagating delays across all operations.`
+    : MOCK_RIPPLE_EXPLANATION.summary;
+
   return (
     <div
       style={{
@@ -24,7 +33,7 @@ export const RippleExplanationCard: React.FC = () => {
       </div>
 
       <p style={{ margin: 0, fontSize: '0.875rem', color: colors.primaryText, lineHeight: 1.6 }}>
-        {MOCK_RIPPLE_EXPLANATION.summary}
+        {summary}
       </p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.sm }}>

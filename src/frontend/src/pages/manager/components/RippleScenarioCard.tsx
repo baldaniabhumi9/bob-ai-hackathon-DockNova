@@ -1,10 +1,14 @@
 import React from 'react';
 import { colors, radius, spacing } from '@/design-system';
 import { Badge } from '@/components/ui/Badge';
-import { MOCK_RIPPLE_SCENARIO } from '@/features/congestion/mockRippleData';
+import { MOCK_RIPPLE_SCENARIO, RippleScenarioData } from '@/features/congestion/mockRippleData';
 
-export const RippleScenarioCard: React.FC = () => {
-  const scenario = MOCK_RIPPLE_SCENARIO;
+interface RippleScenarioCardProps {
+  scenario?: RippleScenarioData;
+}
+
+export const RippleScenarioCard: React.FC<RippleScenarioCardProps> = ({ scenario: scenarioProp }) => {
+  const scenario = scenarioProp ?? MOCK_RIPPLE_SCENARIO;
 
   return (
     <div

@@ -1,13 +1,15 @@
 import React from 'react';
 import { colors, radius, spacing } from '@/design-system';
 import { Button } from '@/components/ui/Button';
-import { MOCK_RIPPLE_ACTIONS } from '@/features/congestion/mockRippleData';
+import { MOCK_RIPPLE_ACTIONS, RippleMitigationAction } from '@/features/congestion/mockRippleData';
 
 export interface RippleMitigationActionsProps {
   onSimulate: (actionId: string) => void;
+  actions?: RippleMitigationAction[];
 }
 
-export const RippleMitigationActions: React.FC<RippleMitigationActionsProps> = ({ onSimulate }) => {
+export const RippleMitigationActions: React.FC<RippleMitigationActionsProps> = ({ onSimulate, actions: actionsProp }) => {
+  const actions = actionsProp ?? MOCK_RIPPLE_ACTIONS;
   return (
     <div
       style={{
@@ -30,7 +32,7 @@ export const RippleMitigationActions: React.FC<RippleMitigationActionsProps> = (
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: spacing.md }}>
-        {MOCK_RIPPLE_ACTIONS.map((action) => (
+        {actions.map((action) => (
           <div
             key={action.id}
             style={{

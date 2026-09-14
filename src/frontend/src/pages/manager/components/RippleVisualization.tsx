@@ -1,7 +1,11 @@
 import React from 'react';
 import { colors, radius, spacing } from '@/design-system';
 import { Badge } from '@/components/ui/Badge';
-import { MOCK_RIPPLE_NODES, RippleStatus } from '@/features/congestion/mockRippleData';
+import { MOCK_RIPPLE_NODES, RippleNodeData, RippleStatus } from '@/features/congestion/mockRippleData';
+
+interface RippleVisualizationProps {
+  nodes?: RippleNodeData[];
+}
 
 const getStatusVariant = (status: RippleStatus): 'critical' | 'warning' | 'success' => status;
 
@@ -17,7 +21,8 @@ const getStatusColor = (status: RippleStatus): string => {
   }
 };
 
-export const RippleVisualization: React.FC = () => {
+export const RippleVisualization: React.FC<RippleVisualizationProps> = ({ nodes: nodesProp }) => {
+  const MOCK_RIPPLE_NODES_LOCAL = nodesProp ?? MOCK_RIPPLE_NODES;
   return (
     <div
       style={{
@@ -48,7 +53,7 @@ export const RippleVisualization: React.FC = () => {
           paddingBottom: spacing.xs,
         }}
       >
-        {MOCK_RIPPLE_NODES.map((node, idx) => (
+        {MOCK_RIPPLE_NODES_LOCAL.map((node, idx) => (
           <React.Fragment key={node.id}>
             <div
               style={{
@@ -82,7 +87,7 @@ export const RippleVisualization: React.FC = () => {
               </div>
             </div>
 
-            {idx < MOCK_RIPPLE_NODES.length - 1 && (
+            {idx < MOCK_RIPPLE_NODES_LOCAL.length - 1 && (
               <div
                 style={{
                   display: 'flex',

@@ -17,13 +17,27 @@ export const VesselsPage: React.FC = () => {
   const [selectedVessel, setSelectedVessel] = useState<VesselTimelineItem | null>(null);
   const [isWhatIfOpen, setIsWhatIfOpen] = useState(false);
 
-  // 4 KPI Card Metrics
-  const kpiData = [
-    { title: 'Vessels in Port', value: '24', badge: 'Active', variant: 'cyan' as const },
-    { title: 'Arriving < 24h', value: '8', badge: 'Expected', variant: 'cyan' as const },
-    { title: 'Delayed', value: '3', badge: 'Delayed', variant: 'warning' as const },
-    { title: 'High Risk', value: '2', badge: 'Action Needed', variant: 'critical' as const },
-  ];
+  // Live KPI metrics derived from state when available
+  const kpiData = useMemo(() => {
+    if (state) {
+      const total = state.vessels.length;
+      const arriving = state.vessels.filter((v) => v.status === 'SCHEDULED').length;
+      const delayed = state.vessels.filter((v) => v.status === 'WAITING').length;
+      const handling = state.vessels.filter((v) => v.status === 'HANDLING').length;
+      return [
+        { title: 'Vessels in Port', value: String(total), badge: 'Active', variant: 'cyan' as const },
+        { title: 'Arriving < 24h', value: String(arriving), badge: 'Expected', variant: 'cyan' as const },
+        { title: 'In Queue', value: String(delayed), badge: 'Waiting', variant: 'warning' as const },
+        { title: 'At Berth', value: String(handling), badge: 'Handling', variant: 'success' as const },
+      ];
+    }
+    return [
+      { title: 'Vessels in Port', value: '24', badge: 'Active', variant: 'cyan' as const },
+      { title: 'Arriving < 24h', value: '8', badge: 'Expected', variant: 'cyan' as const },
+      { title: 'Delayed', value: '3', badge: 'Delayed', variant: 'warning' as const },
+      { title: 'High Risk', value: '2', badge: 'Action Needed', variant: 'critical' as const },
+    ];
+  }, [state]);
 
   const liveVessels = useMemo<VesselTimelineItem[] | null>(() => {
     if (!state) return null;

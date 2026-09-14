@@ -5,28 +5,71 @@ import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import {
-  SIM_VESSEL_OPTIONS,
   SIM_BERTH_OPTIONS,
   SIM_DISRUPTION_OPTIONS,
-  MOCK_SIMULATION_RESULT,
   MOCK_SAVED_SCENARIOS,
 } from '@/features/simulation/mockSimulation';
+import { api, BerthOptimizationResult } from '@/services';
+import { useLiveOperations } from '@/hooks/useLiveOperations';
 
 export const SimulationPage: React.FC = () => {
-  const [targetVessel, setTargetVessel] = useState(SIM_VESSEL_OPTIONS[0].value);
+  const { state } = useLiveOperations();
+  const [targetVessel, setTargetVessel] = useState('');
   const [targetBerth, setTargetBerth] = useState(SIM_BERTH_OPTIONS[0].value);
   const [disruptionType, setDisruptionType] = useState(SIM_DISRUPTION_OPTIONS[0].value);
-  const [isSimulated, setIsSimulated] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<BerthOptimizationResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const result = MOCK_SIMULATION_RESULT;
+  // Build vessel options from live state (active vessels)
+  const vesselOptions = state && state.vessels.length > 0
+    ? state.vessels
+        .filter((v) => v.status === 'WAITING' || v.status === 'HANDLING' || v.status === 'SCHEDULED')
+        .slice(0, 8)
+        .map((v) => ({ value: v.id, label: `${v.name} (${v.status})` }))
+    : [
+        { value: 'V001', label: 'MSC Flaminia (WAITING)' },
+        { value: 'V004', label: 'Ever Given (SCHEDULED)' },
+        { value: 'V007', label: 'CMA CGM Marco Polo (WAITING)' },
+      ];
 
-  const vesselLabel = SIM_VESSEL_OPTIONS.find((v) => v.value === targetVessel)?.label ?? targetVessel;
+  const defaultVessel = targetVessel || vesselOptions[0]?.value || '';
+
+  const vesselLabel = vesselOptions.find((v) => v.value === defaultVessel)?.label ?? defaultVessel;
   const berthLabel = SIM_BERTH_OPTIONS.find((b) => b.value === targetBerth)?.label ?? targetBerth;
   const vesselName = vesselLabel.split(' ').slice(0, 3).join(' ');
   const berthDisplay = berthLabel.split(' ')[1];
 
-  const handleRunSimulation = () => setIsSimulated(true);
-  const handleReset = () => setIsSimulated(false);
+  const handleRunSimulation = async () => {
+    setLoading(true);
+    setError(null);
+    setResult(null);
+    try {
+      // Run berth optimization on the live state and show before/after
+      const vesselIdsToOptimize = defaultVessel ? [defaultVessel] : undefined;
+      const optResult = await api.optimizeBerths(vesselIdsToOptimize);
+      setResult(optResult);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Simulation failed — is the backend running?');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReset = () => {
+    setResult(null);
+    setError(null);
+  };
+
+  // Compute before/after deltas from real result
+  const beforeWaiting = result?.beforeMetrics.waitingVessels ?? 0;
+  const afterWaiting = result?.afterMetrics.waitingVessels ?? 0;
+  const beforeUtil = Math.round(result?.beforeMetrics.berthUtilizationPct ?? 0);
+  const afterUtil = Math.round(result?.afterMetrics.berthUtilizationPct ?? 0);
+  const beforeWait = result?.beforeMetrics.avgWaitingTimeHours.toFixed(1) ?? '0';
+  const afterWait = result?.afterMetrics.avgWaitingTimeHours.toFixed(1) ?? '0';
+  const effGain = result?.efficiencyGainPercentage.toFixed(1) ?? '0';
+  const assignments = result?.assignments ?? [];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.lg, width: '100%', maxWidth: '1400px', margin: '0 auto' }}>
@@ -50,7 +93,7 @@ export const SimulationPage: React.FC = () => {
             Build a scenario and preview its predicted impact on port-wide congestion before acting.
           </p>
         </div>
-        <Badge variant="cyan">MOCK / DEMO DATA</Badge>
+        <Badge variant={state ? 'success' : 'warning'}>{state ? '● LIVE DATA' : 'CONNECTING...'}</Badge>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: spacing.lg, alignItems: 'start' }}>
@@ -77,12 +120,13 @@ export const SimulationPage: React.FC = () => {
 
           <Select
             label="Select Vessel"
-            value={targetVessel}
+            value={defaultVessel}
             onChange={(e) => {
               setTargetVessel(e.target.value);
-              setIsSimulated(false);
+              setResult(null);
+              setError(null);
             }}
-            options={SIM_VESSEL_OPTIONS}
+            options={vesselOptions}
           />
 
           <Select
@@ -90,7 +134,8 @@ export const SimulationPage: React.FC = () => {
             value={disruptionType}
             onChange={(e) => {
               setDisruptionType(e.target.value);
-              setIsSimulated(false);
+              setResult(null);
+              setError(null);
             }}
             options={SIM_DISRUPTION_OPTIONS}
           />
@@ -100,14 +145,26 @@ export const SimulationPage: React.FC = () => {
             value={targetBerth}
             onChange={(e) => {
               setTargetBerth(e.target.value);
-              setIsSimulated(false);
+              setResult(null);
+              setError(null);
             }}
             options={SIM_BERTH_OPTIONS}
           />
 
-          {!isSimulated ? (
-            <Button variant="primary" onClick={handleRunSimulation} style={{ marginTop: spacing.xs }}>
-              ⚡ Run Scenario Simulation
+          {error && (
+            <div style={{ padding: spacing.sm, backgroundColor: 'rgba(239,68,68,0.1)', border: `1px solid ${colors.critical}`, borderRadius: radius.sm, fontSize: '0.8125rem', color: colors.critical }}>
+              ⚠️ {error}
+            </div>
+          )}
+
+          {!result ? (
+            <Button
+              variant="primary"
+              onClick={() => void handleRunSimulation()}
+              disabled={loading}
+              style={{ marginTop: spacing.xs }}
+            >
+              {loading ? '⏳ Running simulation...' : '⚡ Run Scenario Simulation'}
             </Button>
           ) : (
             <div
@@ -126,30 +183,39 @@ export const SimulationPage: React.FC = () => {
                   SIMULATION RESULT
                 </span>
                 <Badge variant="success">
-                  RISK REDUCED BY {result.riskBefore - result.riskAfter} PTS
+                  +{effGain}% Efficiency
                 </Badge>
               </div>
 
-              <ProgressBar value={result.riskBefore} label="Congestion Risk (Before)" variant="critical" />
-              <ProgressBar value={result.riskAfter} label={`Congestion Risk (After — ${berthDisplay})`} variant="success" />
+              <ProgressBar value={beforeUtil} label="Berth Utilisation (Before)" variant="critical" />
+              <ProgressBar value={afterUtil} label={`Berth Utilisation (After — ${berthDisplay})`} variant="success" />
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.md, marginTop: spacing.xs }}>
                 <div>
-                  <span style={{ fontSize: '0.75rem', color: colors.secondaryText }}>Estimated Delay</span>
+                  <span style={{ fontSize: '0.75rem', color: colors.secondaryText }}>Waiting Vessels</span>
                   <div style={{ fontSize: '1rem', fontWeight: 700, color: colors.success, marginTop: '2px' }}>
-                    {result.delayBefore} → {result.delayAfter}
+                    {beforeWaiting} → {afterWaiting}
                   </div>
                 </div>
                 <div>
-                  <span style={{ fontSize: '0.75rem', color: colors.secondaryText }}>Yard Capacity</span>
+                  <span style={{ fontSize: '0.75rem', color: colors.secondaryText }}>Avg Wait Time</span>
                   <div style={{ fontSize: '1rem', fontWeight: 700, color: colors.success, marginTop: '2px' }}>
-                    {result.yardBefore}% → {result.yardAfter}%
+                    {beforeWait}h → {afterWait}h
                   </div>
                 </div>
               </div>
 
-              <div style={{ fontSize: '0.8125rem', color: colors.primaryText, marginTop: spacing.xs }}>
-                ✅ <strong>Outcome:</strong> {result.narrative.replace('the selected vessel', vesselName)}
+              {assignments.length > 0 && (
+                <div style={{ fontSize: '0.8125rem', color: colors.primaryText, marginTop: spacing.xs }}>
+                  ✅ <strong>{assignments.length} vessels</strong> optimally assigned.
+                  Solver: <span style={{ color: colors.novaCyan }}>{result?.solverStatus}</span>.
+                </div>
+              )}
+
+              <div style={{ fontSize: '0.8125rem', color: colors.primaryText }}>
+                ✅ <strong>Outcome:</strong> Reassigning {vesselName} to {berthDisplay} reduces
+                avg wait from {beforeWait}h to {afterWait}h (saving{' '}
+                {(parseFloat(beforeWait) - parseFloat(afterWait)).toFixed(1)}h per vessel).
               </div>
 
               <Button variant="secondary" size="sm" onClick={handleReset}>

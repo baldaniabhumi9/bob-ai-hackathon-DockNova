@@ -1,8 +1,48 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { colors, radius, spacing } from '@/design-system';
 import { MOCK_FORECAST_POINTS } from '@/features/congestion/mockForecastData';
+import { api, CongestionForecast } from '@/services';
+
+interface ForecastPoint {
+  timeLabel: string;
+  hours: number;
+  riskValue: number;
+  isPeak?: boolean;
+}
+
+function apiForecastToPoints(forecasts: CongestionForecast[]): ForecastPoint[] {
+  const sorted = [...forecasts].sort((a, b) =>
+    (a.forecastTime ?? '') < (b.forecastTime ?? '') ? -1 : 1,
+  );
+  const step = sorted.length > 1 ? Math.floor(sorted.length / 7) : 1;
+  const sampled = sorted.filter((_, i) => i % step === 0).slice(0, 8);
+  const maxRisk = Math.max(...sampled.map((f) => f.congestionProbability));
+  return sampled.map((f, idx) => {
+    const hours = idx * (72 / Math.max(sampled.length - 1, 1));
+    const riskValue = Math.round(f.congestionProbability * 100);
+    const isPeak = f.congestionProbability === maxRisk && idx > 0;
+    const label = hours === 0 ? 'Now' : hours <= 72 ? `${Math.round(hours)}h` : '72h';
+    return { timeLabel: label, hours: Math.round(hours), riskValue, isPeak };
+  });
+}
 
 export const ForecastChart: React.FC = () => {
+  const [points, setPoints] = useState<ForecastPoint[]>(MOCK_FORECAST_POINTS);
+  const [isLive, setIsLive] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    api.getCongestionForecast()
+      .then((forecasts) => {
+        if (!cancelled && forecasts.length > 0) {
+          setPoints(apiForecastToPoints(forecasts));
+          setIsLive(true);
+        }
+      })
+      .catch(() => { /* keep mock data on error */ });
+    return () => { cancelled = true; };
+  }, []);
+
   // Chart dimensions & coordinate math
   const width = 600;
   const height = 220;
@@ -12,20 +52,16 @@ export const ForecastChart: React.FC = () => {
   const chartWidth = width - paddingX * 2;
   const chartHeight = height - paddingY * 2;
 
-  // Map data points to SVG coordinates
-  const points = MOCK_FORECAST_POINTS.map((pt, idx) => {
-    const x = paddingX + (idx / (MOCK_FORECAST_POINTS.length - 1)) * chartWidth;
+  const svgPoints = points.map((pt, idx) => {
+    const x = paddingX + (idx / Math.max(points.length - 1, 1)) * chartWidth;
     const y = paddingY + chartHeight - (pt.riskValue / 100) * chartHeight;
     return { x, y, ...pt };
   });
 
-  // Create smooth line path string
-  const pathD = points.reduce((acc, pt, idx) => {
-    return idx === 0 ? `M ${pt.x} ${pt.y}` : `${acc} L ${pt.x} ${pt.y}`;
-  }, '');
+  const pathD = svgPoints.reduce((acc, pt, idx) =>
+    idx === 0 ? `M ${pt.x} ${pt.y}` : `${acc} L ${pt.x} ${pt.y}`, '');
 
-  // Create filled area path under the line
-  const areaD = `${pathD} L ${points[points.length - 1].x} ${paddingY + chartHeight} L ${points[0].x} ${paddingY + chartHeight} Z`;
+  const areaD = `${pathD} L ${svgPoints[svgPoints.length - 1].x} ${paddingY + chartHeight} L ${svgPoints[0].x} ${paddingY + chartHeight} Z`;
 
   return (
     <div
@@ -46,6 +82,7 @@ export const ForecastChart: React.FC = () => {
           </h3>
           <p style={{ margin: '2px 0 0 0', fontSize: '0.8125rem', color: colors.secondaryText }}>
             Predicted risk level trajectory (%) across the terminal
+            {isLive && <span style={{ color: colors.success, marginLeft: '6px' }}>● Live</span>}
           </p>
         </div>
 
@@ -80,27 +117,13 @@ export const ForecastChart: React.FC = () => {
             </linearGradient>
           </defs>
 
-          {/* Horizontal Grid lines (0%, 25%, 50%, 75%, 100%) */}
+          {/* Horizontal Grid lines */}
           {[0, 25, 50, 75, 100].map((val) => {
             const y = paddingY + chartHeight - (val / 100) * chartHeight;
             return (
               <g key={val}>
-                <line
-                  x1={paddingX}
-                  y1={y}
-                  x2={width - paddingX}
-                  y2={y}
-                  stroke={colors.surfaceBorder}
-                  strokeWidth="1"
-                  strokeDasharray={val === 85 ? '3 3' : 'none'}
-                />
-                <text
-                  x={paddingX - 8}
-                  y={y + 4}
-                  fill={colors.secondaryText}
-                  fontSize="10"
-                  textAnchor="end"
-                >
+                <line x1={paddingX} y1={y} x2={width - paddingX} y2={y} stroke={colors.surfaceBorder} strokeWidth="1" />
+                <text x={paddingX - 8} y={y + 4} fill={colors.secondaryText} fontSize="10" textAnchor="end">
                   {val}%
                 </text>
               </g>
@@ -114,63 +137,24 @@ export const ForecastChart: React.FC = () => {
           <path d={pathD} fill="none" stroke="url(#forecastLineGrad)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 
           {/* Data Points & Peak Marker */}
-          {points.map((pt, idx) => {
+          {svgPoints.map((pt, idx) => {
             const isPeak = pt.isPeak;
             const pointColor = pt.riskValue > 85 ? colors.critical : pt.riskValue > 70 ? colors.warning : colors.success;
 
             return (
               <g key={idx}>
-                {/* Vertical Dotted Guide */}
-                <line
-                  x1={pt.x}
-                  y1={paddingY}
-                  x2={pt.x}
-                  y2={paddingY + chartHeight}
-                  stroke="rgba(148, 163, 184, 0.15)"
-                  strokeDasharray="2 2"
-                />
-
-                {/* Point Circle */}
-                <circle
-                  cx={pt.x}
-                  cy={pt.y}
-                  r={isPeak ? 6 : 4}
-                  fill={colors.surface}
-                  stroke={pointColor}
-                  strokeWidth={isPeak ? 3 : 2}
-                />
-
-                {/* Value Label above point */}
-                <text
-                  x={pt.x}
-                  y={pt.y - 10}
-                  fill={isPeak ? colors.critical : colors.primaryText}
-                  fontSize={isPeak ? '12' : '10'}
-                  fontWeight={isPeak ? '700' : '500'}
-                  textAnchor="middle"
-                >
+                <line x1={pt.x} y1={paddingY} x2={pt.x} y2={paddingY + chartHeight} stroke="rgba(148, 163, 184, 0.15)" strokeDasharray="2 2" />
+                <circle cx={pt.x} cy={pt.y} r={isPeak ? 6 : 4} fill={colors.surface} stroke={pointColor} strokeWidth={isPeak ? 3 : 2} />
+                <text x={pt.x} y={pt.y - 10} fill={isPeak ? colors.critical : colors.primaryText} fontSize={isPeak ? '12' : '10'} fontWeight={isPeak ? '700' : '500'} textAnchor="middle">
                   {pt.riskValue}%
                 </text>
-
-                {/* X-axis Label */}
-                <text
-                  x={pt.x}
-                  y={height - 8}
-                  fill={colors.secondaryText}
-                  fontSize="11"
-                  fontWeight={isPeak ? '600' : '400'}
-                  textAnchor="middle"
-                >
+                <text x={pt.x} y={height - 8} fill={colors.secondaryText} fontSize="11" fontWeight={isPeak ? '600' : '400'} textAnchor="middle">
                   {pt.timeLabel}
                 </text>
-
-                {/* Peak Highlight Badge */}
                 {isPeak && (
                   <g transform={`translate(${pt.x - 38}, ${pt.y - 32})`}>
                     <rect width="76" height="18" rx="4" fill={colors.critical} />
-                    <text x="38" y="12" fill={colors.primaryText} fontSize="9" fontWeight="700" textAnchor="middle">
-                      PEAK (24h)
-                    </text>
+                    <text x="38" y="12" fill={colors.primaryText} fontSize="9" fontWeight="700" textAnchor="middle">PEAK</text>
                   </g>
                 )}
               </g>
