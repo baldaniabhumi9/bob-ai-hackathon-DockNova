@@ -1,37 +1,89 @@
 import React from 'react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { NavItem } from '@/components/layout/Sidebar';
+import {
+  LayoutDashboard,
+  Ship,
+  Route,
+  MessageSquare,
+  Bell,
+} from 'lucide-react';
+import {
+  BaseSidebarLayout,
+  SidebarNavSection,
+} from './BaseSidebarLayout';
 
 export interface UserLayoutProps {
   children: React.ReactNode;
   activeNavItemId?: string;
   onNavItemSelect?: (id: string) => void;
   pageTitle?: string;
+  breadcrumbs?: string[];
+  unreadNotificationCount?: number;
 }
 
-const USER_NAV_ITEMS: NavItem[] = [
-  { id: 'vessels', label: 'Vessel Schedule' },
-  { id: 'status', label: 'Port Status' },
-  { id: 'reports', label: 'Shift Logs' },
+export const USER_NAV_SECTIONS: SidebarNavSection[] = [
+  {
+    header: 'Fleet Operations',
+    items: [
+      {
+        id: 'dashboard',
+        label: 'Dashboard',
+        icon: <LayoutDashboard className="w-5 h-5" />,
+        path: '/user',
+      },
+      {
+        id: 'fleet',
+        label: 'My Fleet',
+        icon: <Ship className="w-5 h-5" />,
+        path: '/user/fleet',
+        badge: '14 Active',
+      },
+      {
+        id: 'routes',
+        label: 'Route Advisor',
+        icon: <Route className="w-5 h-5" />,
+        path: '/user/routes',
+      },
+      {
+        id: 'copilot',
+        label: 'AI Copilot',
+        icon: <MessageSquare className="w-5 h-5" />,
+        path: '/user/copilot',
+        badge: 'IBM Bob',
+      },
+      {
+        id: 'notifications',
+        label: 'Notifications',
+        icon: <Bell className="w-5 h-5" />,
+        path: '/user/notifications',
+        hasUnread: true,
+      },
+    ],
+  },
 ];
 
 export const UserLayout: React.FC<UserLayoutProps> = ({
   children,
-  activeNavItemId = 'vessels',
+  activeNavItemId = 'dashboard',
   onNavItemSelect,
-  pageTitle = 'Port Terminal Operations',
+  pageTitle,
+  breadcrumbs,
+  unreadNotificationCount = 2,
 }) => {
   return (
-    <DashboardLayout
-      roleTitle="Operator"
-      userRole="Terminal Operator"
-      userName="Shift Operator"
-      navItems={USER_NAV_ITEMS}
-      activeNavItemId={activeNavItemId}
-      onNavItemSelect={onNavItemSelect}
+    <BaseSidebarLayout
+      roleTitle="Vessel Operator"
+      roleBadge="Vessel Operator"
+      accentColor="secondary"
+      navSections={USER_NAV_SECTIONS}
+      activeItemId={activeNavItemId}
+      onItemSelect={onNavItemSelect}
       pageTitle={pageTitle}
+      breadcrumbs={breadcrumbs}
+      unreadNotificationCount={unreadNotificationCount}
     >
       {children}
-    </DashboardLayout>
+    </BaseSidebarLayout>
   );
 };
+
+export default UserLayout;

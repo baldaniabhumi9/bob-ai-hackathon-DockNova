@@ -1,38 +1,88 @@
 import React from 'react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { NavItem } from '@/components/layout/Sidebar';
+import {
+  LayoutDashboard,
+  Users,
+  Settings2,
+  Plug,
+  ClipboardList,
+} from 'lucide-react';
+import {
+  BaseSidebarLayout,
+  SidebarNavSection,
+} from './BaseSidebarLayout';
 
 export interface AdminLayoutProps {
   children: React.ReactNode;
   activeNavItemId?: string;
   onNavItemSelect?: (id: string) => void;
   pageTitle?: string;
+  breadcrumbs?: string[];
+  unreadNotificationCount?: number;
 }
 
-const ADMIN_NAV_ITEMS: NavItem[] = [
-  { id: 'overview', label: 'System Overview' },
-  { id: 'users', label: 'User Management' },
-  { id: 'config', label: 'Port Configuration' },
-  { id: 'audit', label: 'Audit Logs' },
+export const ADMIN_NAV_SECTIONS: SidebarNavSection[] = [
+  {
+    header: 'System Administration',
+    items: [
+      {
+        id: 'dashboard',
+        label: 'Dashboard',
+        icon: <LayoutDashboard className="w-5 h-5" />,
+        path: '/admin',
+      },
+      {
+        id: 'users',
+        label: 'User Management',
+        icon: <Users className="w-5 h-5" />,
+        path: '/admin/users',
+        badge: '18 Active',
+      },
+      {
+        id: 'config',
+        label: 'Port Configuration',
+        icon: <Settings2 className="w-5 h-5" />,
+        path: '/admin/config',
+      },
+      {
+        id: 'integrations',
+        label: 'Integrations',
+        icon: <Plug className="w-5 h-5" />,
+        path: '/admin/integrations',
+        badge: 'IBM Bob',
+      },
+      {
+        id: 'audit',
+        label: 'Audit Logs',
+        icon: <ClipboardList className="w-5 h-5" />,
+        path: '/admin/audit',
+      },
+    ],
+  },
 ];
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({
   children,
-  activeNavItemId = 'overview',
+  activeNavItemId = 'dashboard',
   onNavItemSelect,
-  pageTitle = 'Admin Operations Console',
+  pageTitle,
+  breadcrumbs,
+  unreadNotificationCount = 1,
 }) => {
   return (
-    <DashboardLayout
-      roleTitle="Administrator"
-      userRole="System Admin"
-      userName="Admin Control"
-      navItems={ADMIN_NAV_ITEMS}
-      activeNavItemId={activeNavItemId}
-      onNavItemSelect={onNavItemSelect}
+    <BaseSidebarLayout
+      roleTitle="System Administrator"
+      roleBadge="System Admin"
+      accentColor="accent"
+      navSections={ADMIN_NAV_SECTIONS}
+      activeItemId={activeNavItemId}
+      onItemSelect={onNavItemSelect}
       pageTitle={pageTitle}
+      breadcrumbs={breadcrumbs}
+      unreadNotificationCount={unreadNotificationCount}
     >
       {children}
-    </DashboardLayout>
+    </BaseSidebarLayout>
   );
 };
+
+export default AdminLayout;
