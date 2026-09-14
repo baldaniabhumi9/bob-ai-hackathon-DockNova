@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Sparkles,
@@ -35,6 +35,10 @@ export const IbmBobSection: React.FC<IbmBobSectionProps> = ({
   const [testState, setTestState] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
   const [isSliderActive, setIsSliderActive] = useState<boolean>(false);
 
+  useEffect(() => {
+    setFormData(config);
+  }, [config]);
+
   const handleInputChange = (field: keyof IbmBobConfig, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -68,7 +72,7 @@ export const IbmBobSection: React.FC<IbmBobSectionProps> = ({
   };
 
   return (
-    <div className="bg-surface-1 rounded-2xl p-6 sm:p-7 border border-primary/40 shadow-glow-primary relative overflow-hidden space-y-6">
+    <div className="bg-surface-1 rounded-2xl p-6 sm:p-7 border border-primary/30 shadow-glow-primary relative overflow-hidden space-y-6">
       {/* Background Accent Mesh Gradient */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
 
@@ -227,9 +231,10 @@ export const IbmBobSection: React.FC<IbmBobSectionProps> = ({
                 onTouchStart={() => setIsSliderActive(true)}
                 onTouchEnd={() => setIsSliderActive(false)}
                 onChange={(e) => handleInputChange('temperature', parseFloat(e.target.value))}
-                className="w-full h-2 bg-surface-3 rounded-lg appearance-none cursor-pointer accent-primary"
+                className="w-full h-2.5 bg-surface-3 rounded-lg appearance-none cursor-pointer accent-primary"
                 style={{
-                  transform: isSliderActive ? 'scaleY(1.15)' : 'scaleY(1)',
+                  background: `linear-gradient(to right, #38BDF8 0%, #38BDF8 ${formData.temperature * 100}%, #1C2840 ${formData.temperature * 100}%, #1C2840 100%)`,
+                  transform: isSliderActive ? 'scaleY(1.2)' : 'scaleY(1)',
                   transition: 'transform 0.15s ease',
                 }}
               />
