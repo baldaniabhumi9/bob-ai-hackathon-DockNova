@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { UserLayout } from '@/layouts/UserLayout';
 import { UserDashboard } from '@/features/dashboard';
 import { AlternateRoutingAdvisor } from '@/features/routes';
+import { NotificationsCenter } from '@/features/notifications';
 import {
   Ship,
   Compass,
@@ -152,35 +153,7 @@ export const UserPage: React.FC = () => {
       )}
 
       {/* 5. NOTIFICATIONS VIEW */}
-      {activeNav === 'notifications' && (
-        <div className="space-y-3">
-          {[
-            {
-              title: 'Berth B-02 Allocation Confirmed',
-              time: '12 mins ago',
-              desc: 'Port Authority confirmed berthing clearance for MV Nova Horizon at Quay B-02.',
-              priority: 'success',
-            },
-            {
-              title: 'Weather Warning: Strait Squall Corridor',
-              time: '45 mins ago',
-              desc: 'Wind gusts up to 34 knots reported in Malacca Strait Sector 2. Advisory issued.',
-              priority: 'warning',
-            },
-          ].map((note, i) => (
-            <div key={i} className="p-4 rounded-xl bg-surface-1 border border-border flex items-start gap-3">
-              <Bell className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-semibold text-text-primary">{note.title}</span>
-                  <span className="text-text-muted font-mono">{note.time}</span>
-                </div>
-                <p className="text-xs text-text-secondary">{note.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      {activeNav === 'notifications' && <NotificationsCenter />}
     </UserLayout>
   );
 };
