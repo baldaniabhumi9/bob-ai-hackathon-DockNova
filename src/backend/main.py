@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routers import (
     berths_router,
     cranes_router,
+    emergency_router,
     operations_router,
     routes_router,
     simulation_router,
@@ -47,6 +48,7 @@ app.include_router(cranes_router)
 app.include_router(routes_router)
 app.include_router(operations_router)
 app.include_router(simulation_router)
+app.include_router(emergency_router)
 
 # Register ML & Data Routers
 app.include_router(vessels_router)

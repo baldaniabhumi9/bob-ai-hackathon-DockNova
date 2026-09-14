@@ -5,6 +5,7 @@ import {
   Settings2,
   Plug,
   ClipboardList,
+  ShieldAlert,
 } from 'lucide-react';
 import {
   BaseSidebarLayout,
@@ -55,6 +56,13 @@ export const ADMIN_NAV_SECTIONS: SidebarNavSection[] = [
         label: 'Audit Logs',
         icon: <ClipboardList className="w-5 h-5" />,
         path: '/admin/audit',
+      },
+      {
+        id: 'emergency',
+        label: 'Emergency Mode',
+        icon: <ShieldAlert className="w-5 h-5" />,
+        path: '/admin/emergency',
+        badge: 'SIM',
       },
     ],
   },

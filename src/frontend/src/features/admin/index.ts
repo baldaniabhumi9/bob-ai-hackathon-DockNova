@@ -2,6 +2,7 @@
 export * from './mockAdminData';
 export * from './AdminDashboard';
 export * from './components/AdminKpiRow';
+export * from './components/EmergencySimulator';
 export * from './components/ModelAccuracyChart';
 export * from './components/PredictionVolumeChart';
 export * from './components/UserGrowthChart';

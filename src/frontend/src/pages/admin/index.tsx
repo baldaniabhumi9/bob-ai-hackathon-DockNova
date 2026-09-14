@@ -4,6 +4,7 @@ import { AdminLayout } from '@/layouts/AdminLayout';
 import { AdminDashboard } from '@/features/admin';
 import { UserManagementView } from '@/features/users';
 import { PortConfigurationView } from '@/features/portConfig';
+import { EmergencySimulator } from '@/features/admin/components/EmergencySimulator';
 import {
   Users,
   Settings2,
@@ -26,6 +27,7 @@ export const AdminPage: React.FC = () => {
     if (location.pathname.includes('config')) return 'config';
     if (location.pathname.includes('integrations')) return 'integrations';
     if (location.pathname.includes('audit')) return 'audit';
+    if (location.pathname.includes('emergency')) return 'emergency';
     return 'dashboard';
   };
 
@@ -49,6 +51,8 @@ export const AdminPage: React.FC = () => {
           ? 'External Feeds & IBM Bob AI Integration'
           : activeNav === 'audit'
           ? 'Cryptographic System Audit Logs'
+          : activeNav === 'emergency'
+          ? 'Emergency Disruption Simulator'
           : 'System Administration Console'
       }
     >
@@ -93,7 +97,10 @@ export const AdminPage: React.FC = () => {
         </div>
       )}
 
-      {/* 5. AUDIT LOGS VIEW */}
+      {/* 5. EMERGENCY MODE VIEW */}
+      {activeNav === 'emergency' && <EmergencySimulator />}
+
+      {/* 6. AUDIT LOGS VIEW */}
       {activeNav === 'audit' && (
         <div className="p-5 rounded-xl bg-surface-1 border border-border space-y-4">
           <div className="flex items-center justify-between">
