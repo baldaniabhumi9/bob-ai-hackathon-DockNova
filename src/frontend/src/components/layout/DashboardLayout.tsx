@@ -14,6 +14,10 @@ export interface DashboardLayoutProps {
   pageTitle: string;
   headerSlot?: React.ReactNode;
   children: React.ReactNode;
+  /** Called when the sidebar's bottom profile section is clicked. */
+  onProfileClick?: () => void;
+  /** Optional popover content rendered anchored above the sidebar profile section. */
+  profilePopover?: React.ReactNode;
 }
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
@@ -27,6 +31,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   pageTitle,
   headerSlot,
   children,
+  onProfileClick,
+  profilePopover,
 }) => {
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
@@ -38,6 +44,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         onItemSelect={onNavItemSelect}
         userProfileName={userName}
         userProfileRole={userRole}
+        onProfileClick={onProfileClick}
+        profilePopover={profilePopover}
       />
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
         {headerSlot || <Header title={pageTitle} userRole={userRole} userName={userName} />}

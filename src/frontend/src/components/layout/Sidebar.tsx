@@ -16,6 +16,10 @@ export interface SidebarProps {
   onItemSelect?: (id: string) => void;
   userProfileName?: string;
   userProfileRole?: string;
+  /** Called when the bottom profile section is clicked. If omitted, the section is not interactive. */
+  onProfileClick?: () => void;
+  /** Optional content (e.g. a popover menu) rendered anchored above the profile section. */
+  profilePopover?: React.ReactNode;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -25,6 +29,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   activeItemId,
   onItemSelect,
   userProfileName = 'Port Manager',
+  onProfileClick,
+  profilePopover,
 }) => {
   const sidebarStyle: React.CSSProperties = {
     width: '220px',
@@ -102,13 +108,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       )}
 
-      <div style={{ borderTop: `1px solid ${colors.surfaceBorder}`, paddingTop: spacing.md, marginTop: spacing.xs, display: 'flex', alignItems: 'center', gap: spacing.sm }}>
-        <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: colors.surfaceHover, border: `1px solid ${colors.surfaceBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 600, color: colors.primaryText }}>
-          {userProfileName.charAt(0)}
-        </div>
-        <div style={{ fontSize: '0.8125rem', fontWeight: 500, color: colors.primaryText, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {userProfileName}
-        </div>
+      <div style={{ position: 'relative' }}>
+        {profilePopover}
+        <button
+          type="button"
+          onClick={onProfileClick}
+          style={{
+            borderTop: `1px solid ${colors.surfaceBorder}`,
+            display: 'flex',
+            alignItems: 'center',
+            gap: spacing.sm,
+            width: '100%',
+            background: 'none',
+            borderLeft: 'none',
+            borderRight: 'none',
+            borderBottom: 'none',
+            padding: `${spacing.md} 0 0 0`,
+            marginTop: spacing.xs,
+            cursor: onProfileClick ? 'pointer' : 'default',
+            textAlign: 'left',
+            fontFamily: 'inherit',
+          }}
+        >
+          <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: colors.surfaceHover, border: `1px solid ${colors.surfaceBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 600, color: colors.primaryText, flexShrink: 0 }}>
+            {userProfileName.charAt(0)}
+          </div>
+          <div style={{ fontSize: '0.8125rem', fontWeight: 500, color: colors.primaryText, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {userProfileName}
+          </div>
+        </button>
       </div>
     </aside>
   );
