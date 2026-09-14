@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { UserLayout } from '@/layouts/UserLayout';
+import { UserDashboard } from '@/features/dashboard';
 import {
   Ship,
   Compass,
@@ -46,118 +47,9 @@ export const UserPage: React.FC = () => {
           : 'Carrier Operations Dashboard'
       }
     >
-      {/* 1. DASHBOARD VIEW */}
-      {activeNav === 'dashboard' && (
-        <div className="space-y-6">
-          {/* Key Metrics */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-4 rounded-xl bg-surface-1 border border-border">
-              <div className="flex items-center justify-between text-xs text-text-muted mb-2">
-                <span>Active Fleet at Sea</span>
-                <Ship className="w-4 h-4 text-secondary" />
-              </div>
-              <div className="font-mono text-2xl font-bold text-text-primary">14 Vessels</div>
-              <div className="flex items-center gap-1.5 text-xs text-success mt-2">
-                <TrendingUp className="w-3.5 h-3.5" />
-                <span>All within AIS schedule</span>
-              </div>
-            </div>
+      {/* 1. DASHBOARD VIEW (UserDashboard command center) */}
+      {activeNav === 'dashboard' && <UserDashboard />}
 
-            <div className="p-4 rounded-xl bg-surface-1 border border-border">
-              <div className="flex items-center justify-between text-xs text-text-muted mb-2">
-                <span>Allocated Berths</span>
-                <Anchor className="w-4 h-4 text-primary" />
-              </div>
-              <div className="font-mono text-2xl font-bold text-text-primary">3 Assigned</div>
-              <div className="text-xs text-text-muted mt-2">Quays B-02, B-07, C-04</div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-surface-1 border border-border">
-              <div className="flex items-center justify-between text-xs text-text-muted mb-2">
-                <span>Avg. Berth Wait Time</span>
-                <Clock className="w-4 h-4 text-accent" />
-              </div>
-              <div className="font-mono text-2xl font-bold text-text-primary">1.2 hrs</div>
-              <div className="text-xs text-success mt-2">-42% vs regional baseline</div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-surface-1 border border-border">
-              <div className="flex items-center justify-between text-xs text-text-muted mb-2">
-                <span>Route Congestion Index</span>
-                <Compass className="w-4 h-4 text-warning" />
-              </div>
-              <div className="font-mono text-2xl font-bold text-text-primary">Low (2.1)</div>
-              <div className="text-xs text-text-muted mt-2">Strait sector green</div>
-            </div>
-          </div>
-
-          {/* Incoming Port Calls Table */}
-          <div className="p-5 rounded-xl bg-surface-1 border border-border space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-heading font-semibold text-base text-text-primary">
-                  Live Port Call Nominations
-                </h3>
-                <p className="text-xs text-text-secondary">
-                  Real-time AIS updates and berth assignments for approaching vessels.
-                </p>
-              </div>
-              <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-secondary/15 text-secondary border border-secondary/30">
-                AIS Feed Active
-              </span>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-border/80 text-text-muted uppercase font-mono">
-                    <th className="py-2.5 px-3">Vessel</th>
-                    <th className="py-2.5 px-3">IMO Number</th>
-                    <th className="py-2.5 px-3">ETA (Singapore)</th>
-                    <th className="py-2.5 px-3">Assigned Quay</th>
-                    <th className="py-2.5 px-3">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/40 font-mono">
-                  <tr className="hover:bg-surface-2/40 transition-colors">
-                    <td className="py-3 px-3 font-semibold text-text-primary">MV Nova Horizon</td>
-                    <td className="py-3 px-3 text-text-secondary">9845123</td>
-                    <td className="py-3 px-3 text-primary">Today 16:45</td>
-                    <td className="py-3 px-3">Berth B-02</td>
-                    <td className="py-3 px-3">
-                      <span className="inline-flex items-center gap-1 text-success">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Berthing Cleared
-                      </span>
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-surface-2/40 transition-colors">
-                    <td className="py-3 px-3 font-semibold text-text-primary">MSC Marina Blue</td>
-                    <td className="py-3 px-3 text-text-secondary">9784321</td>
-                    <td className="py-3 px-3 text-primary">Tomorrow 04:30</td>
-                    <td className="py-3 px-3">Berth C-04</td>
-                    <td className="py-3 px-3">
-                      <span className="inline-flex items-center gap-1 text-warning">
-                        <Clock className="w-3.5 h-3.5" /> Pilot Requested
-                      </span>
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-surface-2/40 transition-colors">
-                    <td className="py-3 px-3 font-semibold text-text-primary">Maersk Polaris</td>
-                    <td className="py-3 px-3 text-text-secondary">9921004</td>
-                    <td className="py-3 px-3 text-primary">Tomorrow 11:15</td>
-                    <td className="py-3 px-3">Berth B-07</td>
-                    <td className="py-3 px-3">
-                      <span className="inline-flex items-center gap-1 text-secondary">
-                        <Navigation className="w-3.5 h-3.5" /> Steaming 18.4 kt
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* 2. MY FLEET VIEW */}
       {activeNav === 'fleet' && (
