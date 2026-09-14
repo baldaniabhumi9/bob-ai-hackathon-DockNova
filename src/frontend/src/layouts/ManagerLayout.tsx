@@ -12,6 +12,7 @@ export interface ManagerLayoutProps {
 const MANAGER_NAV_ITEMS: NavItem[] = [
   { id: 'overview', label: 'Overview' },
   { id: 'congestion', label: 'Congestion' },
+  { id: 'ripple', label: 'Ripple Effect' },
   { id: 'vessels', label: 'Vessels' },
   { id: 'berths', label: 'Berths' },
   { id: 'cranes', label: 'Cranes' },

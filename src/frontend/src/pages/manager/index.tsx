@@ -2,7 +2,12 @@ import React, { useState } from 'react';
 import { ManagerLayout } from '@/layouts/ManagerLayout';
 import { ManagerDashboard } from './ManagerDashboard';
 import { CongestionPage } from './CongestionPage';
+import { CongestionRipplePage } from './CongestionRipplePage';
 import { VesselsPage } from './VesselsPage';
+import { BerthsPage } from './BerthsPage';
+import { CranesPage } from './CranesPage';
+import { OptimisationPage } from './OptimisationPage';
+import { SimulationPage } from './SimulationPage';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { colors } from '@/design-system';
@@ -14,6 +19,7 @@ export const ManagerPage: React.FC = () => {
     switch (id) {
       case 'overview': return 'Port Control Tower Overview';
       case 'congestion': return '72-Hour Congestion Prediction Engine';
+      case 'ripple': return 'Congestion Ripple Effect';
       case 'vessels': return 'Vessel Schedule & Traffic Control';
       case 'berths': return 'Berth Allocation & Utilisation';
       case 'cranes': return 'Crane & Quay Equipment Operations';
@@ -34,8 +40,20 @@ export const ManagerPage: React.FC = () => {
     >
       {activeNav === 'overview' && <ManagerDashboard />}
       {activeNav === 'congestion' && <CongestionPage />}
+      {activeNav === 'ripple' && <CongestionRipplePage />}
       {activeNav === 'vessels' && <VesselsPage />}
-      {activeNav !== 'overview' && activeNav !== 'congestion' && activeNav !== 'vessels' && (
+      {activeNav === 'berths' && <BerthsPage />}
+      {activeNav === 'cranes' && <CranesPage />}
+      {activeNav === 'optimisation' && <OptimisationPage />}
+      {activeNav === 'simulation' && <SimulationPage />}
+      {activeNav !== 'overview' &&
+        activeNav !== 'congestion' &&
+        activeNav !== 'ripple' &&
+        activeNav !== 'vessels' &&
+        activeNav !== 'berths' &&
+        activeNav !== 'cranes' &&
+        activeNav !== 'optimisation' &&
+        activeNav !== 'simulation' && (
         <Card title={getNavTitle(activeNav)} subtitle="Module Under Active Development">
           <div style={{ padding: '32px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
             <div style={{ fontSize: '3rem' }}>⚓</div>
