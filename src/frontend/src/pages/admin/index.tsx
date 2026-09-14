@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { AdminDashboard } from '@/features/admin';
+import { UserManagementView } from '@/features/users';
 import {
   Users,
   Settings2,
@@ -49,54 +50,7 @@ export const AdminPage: React.FC = () => {
       {activeNav === 'dashboard' && <AdminDashboard />}
 
       {/* 2. USER MANAGEMENT VIEW */}
-      {activeNav === 'users' && (
-        <div className="p-5 rounded-xl bg-surface-1 border border-border space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-heading font-semibold text-base text-text-primary">
-              Active Terminal Accounts & Roles
-            </h3>
-            <button className="px-3 py-1.5 rounded-lg bg-accent text-base text-xs font-semibold hover:opacity-90 transition-opacity">
-              + Provision Operator
-            </button>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-border/80 text-text-muted uppercase font-mono">
-                  <th className="py-2.5 px-3">Name</th>
-                  <th className="py-2.5 px-3">Email</th>
-                  <th className="py-2.5 px-3">Assigned Role</th>
-                  <th className="py-2.5 px-3">MFA Status</th>
-                  <th className="py-2.5 px-3">Last Active</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/40 font-mono">
-                <tr className="hover:bg-surface-2/40">
-                  <td className="py-3 px-3 font-semibold text-text-primary">Capt. Vance Alexander</td>
-                  <td className="py-3 px-3 text-text-muted">captain@docknova.com</td>
-                  <td className="py-3 px-3 text-primary">Port Operations Manager</td>
-                  <td className="py-3 px-3 text-success">Hardware Token (YubiKey)</td>
-                  <td className="py-3 px-3 text-text-secondary">2 mins ago</td>
-                </tr>
-                <tr className="hover:bg-surface-2/40">
-                  <td className="py-3 px-3 font-semibold text-text-primary">Elena Rostova</td>
-                  <td className="py-3 px-3 text-text-muted">operator.maersk@docknova.com</td>
-                  <td className="py-3 px-3 text-secondary">Vessel Operator (Carrier)</td>
-                  <td className="py-3 px-3 text-success">Authenticator App</td>
-                  <td className="py-3 px-3 text-text-secondary">15 mins ago</td>
-                </tr>
-                <tr className="hover:bg-surface-2/40">
-                  <td className="py-3 px-3 font-semibold text-text-primary">Marcus Drake</td>
-                  <td className="py-3 px-3 text-text-muted">admin.ops@docknova.com</td>
-                  <td className="py-3 px-3 text-accent">System Administrator</td>
-                  <td className="py-3 px-3 text-success">Enforced FIDO2</td>
-                  <td className="py-3 px-3 text-text-secondary">Just now</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+      {activeNav === 'users' && <UserManagementView />}
 
       {/* 3. PORT CONFIGURATION VIEW */}
       {activeNav === 'config' && (
