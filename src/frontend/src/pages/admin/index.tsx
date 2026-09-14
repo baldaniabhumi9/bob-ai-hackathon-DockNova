@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { AdminLayout } from '@/layouts/AdminLayout';
+import { AdminDashboard } from '@/features/admin';
 import {
   Users,
   Settings2,
@@ -44,106 +45,8 @@ export const AdminPage: React.FC = () => {
           : 'System Administration Console'
       }
     >
-      {/* 1. DASHBOARD VIEW */}
-      {activeNav === 'dashboard' && (
-        <div className="space-y-6">
-          {/* Key Infrastructure Health Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-4 rounded-xl bg-surface-1 border border-border">
-              <div className="flex items-center justify-between text-xs text-text-muted mb-2">
-                <span>Cluster Health</span>
-                <Server className="w-4 h-4 text-accent" />
-              </div>
-              <div className="font-mono text-2xl font-bold text-text-primary">100% Online</div>
-              <div className="text-xs text-success mt-2 flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-success animate-ping" />
-                <span>6 of 6 Worker Nodes Active</span>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-surface-1 border border-border">
-              <div className="flex items-center justify-between text-xs text-text-muted mb-2">
-                <span>API Telemetry Latency</span>
-                <Activity className="w-4 h-4 text-primary" />
-              </div>
-              <div className="font-mono text-2xl font-bold text-text-primary">18 ms</div>
-              <div className="text-xs text-success mt-2">Nominal AIS throughput</div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-surface-1 border border-border">
-              <div className="flex items-center justify-between text-xs text-text-muted mb-2">
-                <span>Active Operator Seats</span>
-                <Users className="w-4 h-4 text-secondary" />
-              </div>
-              <div className="font-mono text-2xl font-bold text-text-primary">18 Sessions</div>
-              <div className="text-xs text-text-muted mt-2">Max concurrency 50</div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-surface-1 border border-border">
-              <div className="flex items-center justify-between text-xs text-text-muted mb-2">
-                <span>Security Integrity</span>
-                <ShieldCheck className="w-4 h-4 text-success" />
-              </div>
-              <div className="font-mono text-2xl font-bold text-text-primary">Zero Breach</div>
-              <div className="text-xs text-text-muted mt-2">AES-256 TLS 1.3 Active</div>
-            </div>
-          </div>
-
-          {/* Infrastructure Nodes Table */}
-          <div className="p-5 rounded-xl bg-surface-1 border border-border space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-heading font-semibold text-base text-text-primary">
-                  Node Cluster Telemetry & Microservices
-                </h3>
-                <p className="text-xs text-text-secondary">
-                  Real-time status of DockNova distributed cluster services.
-                </p>
-              </div>
-              <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-accent/15 text-accent border border-accent/30">
-                Kubernetes Mesh Healthy
-              </span>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-border/80 text-text-muted uppercase font-mono">
-                    <th className="py-2.5 px-3">Service Name</th>
-                    <th className="py-2.5 px-3">Instances</th>
-                    <th className="py-2.5 px-3">CPU Usage</th>
-                    <th className="py-2.5 px-3">Memory</th>
-                    <th className="py-2.5 px-3">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/40 font-mono">
-                  <tr className="hover:bg-surface-2/40 transition-colors">
-                    <td className="py-3 px-3 font-semibold text-text-primary">docknova-ais-gateway</td>
-                    <td className="py-3 px-3 text-text-secondary">3 Pods</td>
-                    <td className="py-3 px-3 text-primary">12.4%</td>
-                    <td className="py-3 px-3 text-text-secondary">420 MB</td>
-                    <td className="py-3 px-3 text-success">Healthy</td>
-                  </tr>
-                  <tr className="hover:bg-surface-2/40 transition-colors">
-                    <td className="py-3 px-3 font-semibold text-text-primary">docknova-congestion-engine</td>
-                    <td className="py-3 px-3 text-text-secondary">2 Pods</td>
-                    <td className="py-3 px-3 text-primary">28.1%</td>
-                    <td className="py-3 px-3 text-text-secondary">1.2 GB</td>
-                    <td className="py-3 px-3 text-success">Healthy</td>
-                  </tr>
-                  <tr className="hover:bg-surface-2/40 transition-colors">
-                    <td className="py-3 px-3 font-semibold text-text-primary">docknova-ibm-watsonx-copilot</td>
-                    <td className="py-3 px-3 text-text-secondary">2 Pods</td>
-                    <td className="py-3 px-3 text-primary">16.7%</td>
-                    <td className="py-3 px-3 text-text-secondary">850 MB</td>
-                    <td className="py-3 px-3 text-success">Healthy</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* 1. MISSION CONTROL DASHBOARD VIEW */}
+      {activeNav === 'dashboard' && <AdminDashboard />}
 
       {/* 2. USER MANAGEMENT VIEW */}
       {activeNav === 'users' && (
