@@ -8,6 +8,9 @@ import { BerthsPage } from './BerthsPage';
 import { CranesPage } from './CranesPage';
 import { OptimisationPage } from './OptimisationPage';
 import { SimulationPage } from './SimulationPage';
+import { Plan72hPage } from './Plan72hPage';
+import { CopilotPage } from './CopilotPage';
+import { SettingsPage } from './SettingsPage';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { colors } from '@/design-system';
@@ -46,6 +49,9 @@ export const ManagerPage: React.FC = () => {
       {activeNav === 'cranes' && <CranesPage />}
       {activeNav === 'optimisation' && <OptimisationPage />}
       {activeNav === 'simulation' && <SimulationPage />}
+      {activeNav === 'plan72h' && <Plan72hPage onNavigate={(id) => setActiveNav(id)} />}
+      {activeNav === 'copilot' && <CopilotPage onNavigate={(id) => setActiveNav(id)} />}
+      {activeNav === 'settings' && <SettingsPage />}
       {activeNav !== 'overview' &&
         activeNav !== 'congestion' &&
         activeNav !== 'ripple' &&
@@ -53,7 +59,10 @@ export const ManagerPage: React.FC = () => {
         activeNav !== 'berths' &&
         activeNav !== 'cranes' &&
         activeNav !== 'optimisation' &&
-        activeNav !== 'simulation' && (
+        activeNav !== 'simulation' &&
+        activeNav !== 'plan72h' &&
+        activeNav !== 'copilot' &&
+        activeNav !== 'settings' && (
         <Card title={getNavTitle(activeNav)} subtitle="Module Under Active Development">
           <div style={{ padding: '32px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
             <div style={{ fontSize: '3rem' }}>⚓</div>

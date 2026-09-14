@@ -1,2 +1,2 @@
 // AI Copilot feature module
-export {};
+export * from './mockCopilot';
