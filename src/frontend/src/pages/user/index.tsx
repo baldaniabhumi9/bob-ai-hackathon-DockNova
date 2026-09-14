@@ -4,6 +4,7 @@ import { UserLayout } from '@/layouts/UserLayout';
 import { UserDashboard } from '@/features/dashboard';
 import { AlternateRoutingAdvisor } from '@/features/routes';
 import { NotificationsCenter } from '@/features/notifications';
+import { CopilotChatInterface } from '@/features/copilot';
 import {
   Ship,
   Compass,
@@ -131,26 +132,7 @@ export const UserPage: React.FC = () => {
       {activeNav === 'routes' && <AlternateRoutingAdvisor />}
 
       {/* 4. COPILOT VIEW */}
-      {activeNav === 'copilot' && (
-        <div className="p-6 rounded-xl bg-surface-1 border border-border space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-secondary/20 text-secondary">
-              <MessageSquare className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-heading font-semibold text-lg text-text-primary">
-                IBM Bob Maritime Copilot
-              </h3>
-              <p className="text-xs text-text-muted">
-                Watsonx-powered conversational agent for vessel berthing & turnaround intelligence.
-              </p>
-            </div>
-          </div>
-          <div className="p-4 rounded-lg bg-surface-2 border border-border/80 text-xs text-text-secondary font-mono">
-            Copilot standby: Ask about ETA adjustments, quay crane availability, or fairway weather conditions.
-          </div>
-        </div>
-      )}
+      {activeNav === 'copilot' && <CopilotChatInterface />}
 
       {/* 5. NOTIFICATIONS VIEW */}
       {activeNav === 'notifications' && <NotificationsCenter />}

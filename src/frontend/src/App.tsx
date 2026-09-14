@@ -9,6 +9,7 @@ import { UserPage } from './pages/user';
 import { VesselDetailPage } from './pages/user/VesselDetailPage';
 import { AlternateRoutingPage } from './pages/user/AlternateRoutingPage';
 import { NotificationsPage } from './pages/user/NotificationsPage';
+import { CopilotPage } from './pages/user/CopilotPage';
 
 // Root redirect component based on authentication state
 const RootRedirect: React.FC = () => {
@@ -96,6 +97,24 @@ export const App: React.FC = () => {
             element={
               <ProtectedRoute allowedRoles={['user', 'manager', 'admin']}>
                 <NotificationsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* AI Copilot (IBM Bob) Routes */}
+          <Route
+            path="/user/copilot"
+            element={
+              <ProtectedRoute allowedRoles={['user', 'manager', 'admin']}>
+                <CopilotPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/copilot"
+            element={
+              <ProtectedRoute allowedRoles={['user', 'manager', 'admin']}>
+                <CopilotPage />
               </ProtectedRoute>
             }
           />
