@@ -9,7 +9,7 @@
 
 | Role | Name | Email |
 | :--- | :--- | :--- |
-| Team Name | **[YOUR TEAM NAME]** | — |
+| Team Name | **DockNova** | — |
 | Track | **AI** | — |
 | Lead | Bhumi Baldania | 24dcs003@charusat.edu.in |
 | Member | Krina Patel | 24dit041@charusat.edu.in |
@@ -20,7 +20,7 @@
 
 ## Problem Statement
 
-Global container ports face catastrophic berth congestion, uncoordinated vessel queues, and inefficient manual quay allocation. When vessel arrivals surge beyond quayside berth capacity, or unexpected bottlenecks (crane breakdowns, yard saturation, bad weather) slow throughput, Ultra-Large Container Vessels can incur **$15,000–$35,000 USD per day** in demurrage and charter penalties while idling at anchorage — burning auxiliary fuel and emitting thousands of metric tons of excess CO₂ and SOₓ annually per terminal.
+Global container ports face catastrophic berth congestion, uncoordinated vessel queues, and inefficient manual quay allocation. When vessel arrivals surge beyond quayside berth capacity, or unexpected bottlenecks (crane breakdowns, yard saturation, bad weather) slow throughput, Ultra-Large Container Vessels can incur **15,000–1.2L INR per day** in demurrage and charter penalties while idling at anchorage — burning auxiliary fuel and emitting thousands of metric tons of excess CO₂ and SOₓ annually per terminal.
 
 Port Managers, Vessel Operators, and System Administrators — the people who actually run this process — are underserved by today's tools: static spreadsheets and whiteboards can't re-optimize when an ETA shifts, and legacy Terminal Operating Systems track quayside movement but have no predictive engine to see congestion coming 24–72 hours ahead.
 
@@ -51,36 +51,136 @@ Together these turn a reactive, manual dispatch process into a proactive, mathem
 
 | Layer | Technology |
 | :--- | :--- |
-| Frontend Framework | React 18 + Vite |
-| Type Safety | TypeScript 5.3 |
-| Styling | Tailwind CSS 3.4 |
-| Animation | Framer Motion 13 |
-| Data Visualization | Recharts 3.10 |
-| Backend Framework | FastAPI 0.104 (Python 3.11+) |
-| Optimization Solver | Google OR-Tools 9.12 (CP-SAT) |
-| ML Inference | XGBoost 2.0 / Scikit-Learn 1.3 |
-| Data Manipulation | Pandas 2.0 + NumPy 1.24 |
-| IBM Technology | IBM Bob AI Copilot (simulated watsonx.ai Granite-13B Maritime / Prescriptive Planner v3 inference) |
+| Frontend | React 18.2, Vite 5.0, TypeScript 5.3, React Router 6.30, Tailwind CSS 3.4, Framer Motion 13, Recharts 3.10 |
+| Backend | Python 3.13, FastAPI, Uvicorn |
+| Database | PostgreSQL, Neon PostgreSQL, SQLAlchemy 2.x, psycopg 3, Alembic |
+| ML / Data | XGBoost, Scikit-learn 1.6.1, Pandas, NumPy, Joblib |
+| Optimization | Google OR-Tools 9.12 CP-SAT |
+| AI Copilot | IBM Bob AI Copilot with simulated IBM watsonx.ai inference in the current frontend implementation |
+| Testing | Pytest |
+| CI/CD | GitHub Actions submission validation workflow |
 
 Full details: [`docs/architecture.md`](docs/architecture.md)
 
+## Database
+
+DockNova now uses **Neon PostgreSQL** for persistent backend data. The FastAPI backend connects through **SQLAlchemy 2.x** using the **psycopg 3** PostgreSQL driver, and **Alembic** manages database schema migrations.
+
+The current migration creates these PostgreSQL tables:
+
+| Table | Purpose |
+| :--- | :--- |
+| `vessels` | Vessel schedule and operational metadata |
+| `berths` | Berth capacity, compatibility, and status data |
+| `cranes` | Crane inventory and berth assignments |
+| `vessel_workloads` | TEU workload values used by crane optimization |
+| `historical_metrics` | Time-series metrics used by congestion forecasting |
+| `alternative_ports` | Alternate port data used by route recommendations |
+| `alembic_version` | Alembic migration tracking |
+
+Do not commit real database credentials. Use `src/.env.example` as the safe template and keep real Neon connection strings in `src/.env` or environment-specific secret storage only.
+
+## Project Structure
+
+```text
+.
+├── src/
+│   ├── frontend/       # React + Vite + TypeScript web client
+│   ├── backend/        # FastAPI backend, ML services, optimization services, API routers
+│   ├── database/       # Alembic config, migrations, schema/seed/script folders
+│   ├── ai/             # AI/ML workspace folders for models, prediction, optimisation, simulation, notebooks
+│   └── shared/         # Shared TypeScript constants, schemas, and types
+├── docs/               # Architecture, setup, solution, and problem documentation
+├── demo/               # Demo links and screenshots
+├── presentation/       # Presentation artifacts
+└── .github/workflows/  # GitHub Actions validation workflow
+```
+
 ## How to Run
 
+DockNova currently targets **Python 3.13** for the backend.
+
+### 1. Backend Setup
+
 ```bash
-# 1. Backend
 cd src/backend
-python3 -m venv .venv
+python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
+```
 
-# 2. Frontend (in a new terminal)
+### 2. Environment
+
+Create `src/.env` from the safe template:
+
+```bash
+cp ../.env.example ../.env
+```
+
+Set `DATABASE_URL` using the Neon PostgreSQL connection string from your Neon dashboard:
+
+```env
+DATABASE_URL=postgresql+psycopg://YOUR_USERNAME:YOUR_PASSWORD@YOUR_HOST/YOUR_DATABASE?sslmode=require
+```
+
+Never put the real Neon connection string, username, password, or secret values in the README or committed files.
+
+### 3. Database Migration
+
+From `src/backend`, run:
+
+```bash
+PYTHONPATH=. python -m alembic -c ../database/config/alembic.ini upgrade head
+```
+
+This creates or updates the PostgreSQL schema managed by Alembic.
+
+### 4. Database Seed
+
+From `src/backend`, run:
+
+```bash
+PYTHONPATH=. python -m app.data.seed_postgres
+```
+
+This loads DockNova demo/seed data into PostgreSQL without duplicating existing seed records.
+
+### 5. Start Backend
+
+From `src/backend`, run:
+
+```bash
+python -m uvicorn main:app --reload --port 8000
+```
+
+### 6. Frontend
+
+In a new terminal:
+
+```bash
 cd src/frontend
 npm install
 npm run dev
 ```
 
-The app runs at `http://localhost:5173`. Full step-by-step instructions, demo accounts, and troubleshooting: [`docs/setup-guide.md`](docs/setup-guide.md)
+The frontend runs on the Vite development server. By default, Vite serves the app at `http://localhost:5173` unless the local environment selects another available port.
+
+## Verification
+
+After starting the backend, verify these URLs return HTTP `200`:
+
+- `http://localhost:8000/health`
+- `http://localhost:8000/docs`
+- `http://localhost:8000/api/vessels`
+
+Then start the frontend and open the Vite URL shown in the terminal.
+
+## Security
+
+- Never commit `src/.env`.
+- Never expose the Neon `DATABASE_URL`.
+- Use `src/.env.example` as the safe template for environment variables.
+- Keep real credentials local or in environment-specific secret storage.
 
 ## Demo
 
