@@ -345,9 +345,9 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
          ========================================================================= */}
       <div className="flex-1 flex flex-col min-w-0 ml-0 md:ml-20 lg:ml-64">
         {/* =======================================================================
-            TOPBAR (Fixed top-0, h-16, with glassmorphism)
+            TOPBAR (Fixed top-0, h-20, with glassmorphism)
            ======================================================================= */}
-        <header className="fixed top-0 right-0 left-0 md:left-20 lg:left-64 h-16 bg-surface-1/80 backdrop-blur-md border-b border-border z-40 px-4 sm:px-6 pt-4 flex items-center justify-between gap-4">
+        <header className="fixed top-0 right-0 left-0 md:left-20 lg:left-64 h-20 bg-surface-1/80 backdrop-blur-md border-b border-border z-40 px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
           {/* Topbar Left: Hamburger Toggle + Title + Breadcrumbs */}
           <div className="flex items-center gap-3 min-w-0">
             <button
@@ -378,7 +378,7 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
                   </React.Fragment>
                 ))}
               </div>
-              <h1 className="mt-4 font-heading text-lg sm:text-xl font-bold text-text-primary truncate">
+              <h1 className="mt-2 font-heading text-lg sm:text-xl font-bold text-text-primary truncate">
                 {effectivePageTitle}
               </h1>
             </div>
@@ -510,9 +510,9 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
         </header>
 
         {/* =======================================================================
-            4. MAIN CONTENT AREA (ml offset + mt-16 + p-6 + min-h-[calc(100vh-4rem)])
+            4. MAIN CONTENT AREA (ml offset + mt-20 + p-6 + min-h-[calc(100vh-5rem)])
            ======================================================================= */}
-        <main className="mt-16 p-4 sm:p-6 min-h-[calc(100vh-4rem)] bg-base">
+        <main className="mt-20 p-4 sm:p-6 min-h-[calc(100vh-5rem)] bg-base">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentActiveItem?.id || location.pathname}
