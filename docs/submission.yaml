@@ -1,0 +1,50 @@
+team:
+  name: "[YOUR TEAM NAME]"          # REQUIRED — not present in project handbook, fill in before submitting
+  track: "AI"                        # AI | DevOps | Sustainability | Open
+  lead:
+    name: "[LEAD NAME]"              # REQUIRED — not present in project handbook, fill in before submitting
+    email: "[lead.email@example.com]" # REQUIRED
+  members:
+    - name: "[MEMBER 2 NAME]"        # REQUIRED — add/remove rows to match your team
+      email: "[member2.email@example.com]"
+    - name: "[MEMBER 3 NAME]"
+      email: "[member3.email@example.com]"
+
+submission:
+  title: "DockNova — Port Operations Control Tower & AI Congestion Predictor"
+
+  problem_statement: >
+    Global container ports face catastrophic berth congestion, uncoordinated
+    vessel queues, and inefficient manual quay allocation. Terminal
+    dispatchers still assign berths using static spreadsheets or whiteboards
+    that cannot dynamically re-optimize when a vessel's ETA shifts, while
+    traditional Terminal Operating Systems manage quayside movement locally
+    but lack predictive engines to forecast congestion 24-72 hours in
+    advance. The result is tens of thousands of dollars per vessel in daily
+    demurrage liabilities, thousands of metric tons of excess CO2 and SOx
+    emissions from vessels idling at anchorage, and cascading disruption to
+    hinterland rail and trucking schedules.
+
+  solution_summary: >
+    DockNova is a real-time Port Operations Control Tower and Predictive
+    Congestion Platform that unifies three engines into a single role-gated
+    control room: an XGBoost/Scikit-Learn machine learning pipeline that
+    forecasts congestion risk and expected wait time 24-72 hours ahead; a
+    Google OR-Tools CP-SAT constraint-programming solver that computes
+    mathematically optimal berth and crane allocations under real physical
+    constraints (draft, length, cargo-type compatibility, and priority
+    weighting); and an IBM Bob AI Copilot that lets Port Managers, Vessel
+    Operators, and System Administrators query live quayside state in
+    natural language and receive explainable, action-ready recommendations.
+
+  key_features:
+    - "Port Control Tower Overview — real-time summary of total vessels, waiting queue, berth availability, and yard occupancy (GET /api/port/status)"
+    - "72-Hour ML Congestion Forecast Engine — XGBoost classifier + Gradient Boosting regressor predicting hourly congestion risk (LOW/MEDIUM/HIGH/CRITICAL) and expected wait time (GET /api/congestion/forecast, POST /api/congestion/predict)"
+    - "Per-Berth Risk Matrix — deterministic 0-100 risk score per berth combining occupancy, vessel priority, and crane status (GET /api/port/berth-risk)"
+    - "AI 72-Hour Operations Planner — Google OR-Tools CP-SAT solver generating optimal vessel-to-berth and crane allocation schedules (POST /api/optimization/berths, POST /api/optimization/cranes, GET /api/operations/72-hour)"
+    - "Optimal Route Advisor — STAY vs REROUTE recommendation comparing destination port congestion against alternate terminals with cost-benefit calculation (POST /api/routes/recommend)"
+    - "Emergency Disruption Simulator — injects crane failure, berth closure, weather delay, staff shortage, or equipment breakdown scenarios and recalculates terminal impact (POST /api/emergency/simulate)"
+    - "IBM Bob AI Copilot — natural-language conversational assistant with contextual intent resolution, Explainable AI (XAI) confidence/model-source cards, and actionable navigation chips"
+    - "Role-Based Access Control — signed mock JWT authentication with protected routes for Manager, Vessel Operator, and Administrator roles"
+    - "Cryptographic Audit Log Explorer — SHA-256 signed log of user actions, logins, and solver triggers"
+    - "Integrations & AI Config Panel — management view for external connectors (MPA, TOS Portnet, NOAA Weather, TradeNet) and ML hyperparameters"
