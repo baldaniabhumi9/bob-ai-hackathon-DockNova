@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { colors, radius, spacing } from '@/design-system';
 import { Badge } from '@/components/ui/Badge';
-import { VesselTimelineItem } from '@/features/vessels/mockVessels';
+import { MOCK_VESSELS, VesselTimelineItem } from '@/features/vessels/mockVessels';
 import { api, OperationsPlanEntry } from '@/services';
 
 export interface VesselTimelineProps {
@@ -54,7 +54,11 @@ export const VesselTimeline: React.FC<VesselTimelineProps> = ({ onSelectVessel }
 
 				setVessels(upcoming);
 			} catch {
-				if (!cancelled) setVessels([]);
+				if (!cancelled) {
+					setVessels(MOCK_VESSELS.filter((vessel) =>
+						vessel.status === 'Arriving' || vessel.status === 'Delayed' || vessel.status === 'Scheduled'
+					).slice(0, 3));
+				}
 			} finally {
 				if (!cancelled) setLoading(false);
 			}

@@ -15,16 +15,11 @@ import { WhatIfSimulatorModal } from './components/WhatIfSimulatorModal';
 import { BerthData } from '@/features/berths/mockBerths';
 import { VesselTimelineItem } from '@/features/vessels/mockVessels';
 import { useLiveOperations } from '@/hooks/useLiveOperations';
-import { api } from '@/services';
 import { Button } from '@/components/ui/Button';
 
 export const ManagerDashboard: React.FC = () => {
-  const { state, portStatus, congestion, refresh } = useLiveOperations();
+  const { state, portStatus, congestion, start, pause, reset, setSpeed } = useLiveOperations();
 
-  const runControl = async (action: () => Promise<unknown>) => {
-    await action();
-    await refresh();
-  };
   const [selectedBerth, setSelectedBerth] = useState<BerthData | null>(null);
   const [selectedVessel, setSelectedVessel] = useState<VesselTimelineItem | null>(null);
   const [isPredictionOpen, setIsPredictionOpen] = useState(false);
@@ -37,11 +32,11 @@ export const ManagerDashboard: React.FC = () => {
 
       <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, color: colors.secondaryText, fontSize: '0.8125rem' }}>
         <span>Live clock: {state ? new Date(state.currentTime).toLocaleString() : 'Connecting...'}</span>
-        <Button size="sm" variant="primary" onClick={() => void runControl(() => api.start(state?.speed ?? 1))}>Start</Button>
-        <Button size="sm" variant="secondary" onClick={() => void runControl(api.pause)}>Pause</Button>
-        <Button size="sm" variant="ghost" onClick={() => void runControl(api.reset)}>Reset</Button>
+        <Button size="sm" variant="primary" onClick={() => void start()}>Start</Button>
+        <Button size="sm" variant="secondary" onClick={() => void pause()}>Pause</Button>
+        <Button size="sm" variant="ghost" onClick={() => void reset()}>Reset</Button>
         {[1, 5, 10].map((speed) => (
-          <Button key={speed} size="sm" variant={state?.speed === speed ? 'primary' : 'ghost'} onClick={() => void runControl(() => api.setSpeed(speed))}>{speed}x</Button>
+          <Button key={speed} size="sm" variant={state?.speed === speed ? 'primary' : 'ghost'} onClick={() => void setSpeed(speed)}>{speed}x</Button>
         ))}
       </div>
 
