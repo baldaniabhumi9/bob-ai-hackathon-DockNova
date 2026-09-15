@@ -61,6 +61,7 @@ const createFallbackSimulation = (targetVessel: string, targetBerth: string): Wh
     solverStatus: 'LOCAL DEMO OPTIMIZATION',
   },
 };
+};
 
 function applyScenarioSelection(
   simulation: WhatIfSimulationResult,
@@ -88,7 +89,6 @@ function applyScenarioSelection(
     },
   };
 }
-};
 
 export const WhatIfSimulatorModal: React.FC<WhatIfSimulatorModalProps> = ({
   isOpen,

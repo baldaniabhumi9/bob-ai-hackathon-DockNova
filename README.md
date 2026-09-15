@@ -185,7 +185,7 @@ Then start the frontend and open the Vite URL shown in the terminal.
 ## Demo
 
 - Demo video: see [`demo/demo-video-link.txt`](https://drive.google.com/file/d/1d04yppDCy8qrJYb_3_tmmrrd-Z5RcxJ9/view?usp=sharing)
-- Live demo URL: see [`demo/live-demo-url.txt`](https://bob-ai-hackathon-docknova.onrender.com/)
+- Live demo URL: [https://docknova.vercel.app](https://docknova.vercel.app)
 - Screenshots: see [`demo/screenshots/`](demo/screenshots/)
 - Suggested 3-minute judge walkthrough: [`docs/setup-guide.md#judge-demo-script`](docs/setup-guide.md)
 
