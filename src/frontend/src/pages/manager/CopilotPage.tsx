@@ -13,6 +13,7 @@ import {
   CopilotActionId,
 } from '@/features/copilot';
 import { WhatIfSimulatorModal } from './components/WhatIfSimulatorModal';
+import { useLiveOperations } from '@/hooks/useLiveOperations';
 
 export interface CopilotPageProps {
   onNavigate?: (id: string) => void;
@@ -25,13 +26,20 @@ const nextMessageId = () => {
 };
 
 export const CopilotPage: React.FC<CopilotPageProps> = ({ onNavigate }) => {
+  const { state, congestion } = useLiveOperations();
   const [messages, setMessages] = useState<CopilotMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isThinking, setIsThinking] = useState(false);
   const [isWhatIfOpen, setIsWhatIfOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const context = MOCK_COPILOT_CONTEXT;
+  const context = {
+    currentCongestion: congestion ? `${Math.round(congestion.congestionProbability * 100)}% (${congestion.riskLevel})` : MOCK_COPILOT_CONTEXT.currentCongestion,
+    criticalBerth: congestion?.hotspot?.berthName ? `Berth ${congestion.hotspot.berthName}` : MOCK_COPILOT_CONTEXT.criticalBerth,
+    vesselsAtRisk: state ? state.vessels.filter((v) => v.status === 'WAITING').length : MOCK_COPILOT_CONTEXT.vesselsAtRisk,
+    craneAvailability: state ? `${state.cranes.filter((c) => c.status === 'IDLE').length}/${state.cranes.length} Active` : MOCK_COPILOT_CONTEXT.craneAvailability,
+    planningHorizon: MOCK_COPILOT_CONTEXT.planningHorizon,
+  };
 
   const scrollToBottom = () => {
     window.setTimeout(() => {
@@ -295,9 +303,14 @@ export const CopilotPage: React.FC<CopilotPageProps> = ({ onNavigate }) => {
             gap: spacing.md,
           }}
         >
-          <span style={{ fontSize: '0.9375rem', fontWeight: 700, color: colors.primaryText }}>
-            Operational Context
-          </span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.9375rem', fontWeight: 700, color: colors.primaryText }}>
+              Operational Context
+            </span>
+            <Badge variant={state || congestion ? 'success' : 'warning'}>
+              {state || congestion ? 'LIVE API' : 'Simulated'}
+            </Badge>
+          </div>
 
           {[
             { label: 'Current Congestion', value: context.currentCongestion, variant: 'warning' as const },

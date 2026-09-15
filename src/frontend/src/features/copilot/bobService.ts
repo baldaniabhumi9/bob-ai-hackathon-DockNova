@@ -8,7 +8,9 @@ export interface BobServiceResult {
 
 /**
  * Mock IBM Bob AI Service
- * Simulates watsonx.ai inference with 1500ms delay and contextual keyword reasoning
+ * Simulates watsonx.ai inference with 1500ms delay and contextual keyword reasoning.
+ * Note: `modelName` fields in explanations are decorative UI strings for simulated XAI breakdown cards,
+ * not active live API call configurations.
  */
 export const queryIbmBob = async (prompt: string): Promise<BobServiceResult> => {
   // Simulate API delay of 1500ms

@@ -138,7 +138,7 @@ export const VisualMapPreview: React.FC<VisualMapPreviewProps> = ({
             onClick={() => setSelectedTerminalId('all')}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
               selectedTerminalId === 'all'
-                ? 'bg-primary text-base font-semibold shadow-glow-primary'
+                ? 'bg-primary text-white font-semibold shadow-glow-primary'
                 : 'bg-surface-2 text-text-secondary hover:text-text-primary border border-border'
             }`}
           >
@@ -150,7 +150,7 @@ export const VisualMapPreview: React.FC<VisualMapPreviewProps> = ({
               onClick={() => setSelectedTerminalId(t.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
                 selectedTerminalId === t.id
-                  ? 'bg-primary text-base font-semibold shadow-glow-primary'
+                  ? 'bg-primary text-white font-semibold shadow-glow-primary'
                   : 'bg-surface-2 text-text-secondary hover:text-text-primary border border-border'
               }`}
             >

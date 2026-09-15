@@ -101,7 +101,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                 Operational Alerts
               </h3>
               {unreadCount > 0 && (
-                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary text-base">
+                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary text-white">
                   {unreadCount} new
                 </span>
               )}
@@ -175,7 +175,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
               <span>{tab.label}</span>
               <span
                 className={`text-[9px] px-1 rounded-full ${
-                  isActive ? 'bg-primary text-base font-bold' : 'bg-surface-3 text-text-muted'
+                  isActive ? 'bg-primary text-white font-bold' : 'bg-surface-3 text-text-muted'
                 }`}
               >
                 {count}

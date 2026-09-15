@@ -170,7 +170,7 @@ export const CranesTab: React.FC<CranesTabProps> = ({
               onClick={() => setTypeFilter(type)}
               className={`px-3 py-1 rounded-lg text-xs font-mono font-semibold transition-all ${
                 typeFilter === type
-                  ? 'bg-secondary text-base shadow-sm'
+                  ? 'bg-secondary text-white shadow-sm'
                   : 'bg-surface-2 text-text-secondary hover:text-text-primary border border-border'
               }`}
             >
@@ -188,7 +188,7 @@ export const CranesTab: React.FC<CranesTabProps> = ({
               onClick={() => setStatusFilter(status)}
               className={`px-3 py-1 rounded-lg text-xs font-mono font-semibold transition-all ${
                 statusFilter === status
-                  ? 'bg-primary text-base shadow-glow-primary'
+                  ? 'bg-primary text-white shadow-glow-primary'
                   : 'bg-surface-2 text-text-secondary hover:text-text-primary border border-border'
               }`}
             >

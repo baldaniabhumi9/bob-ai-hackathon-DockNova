@@ -10,8 +10,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY_USER);
-      return stored ? JSON.parse(stored) : null;
+      const storedToken = localStorage.getItem(STORAGE_KEY_TOKEN);
+      const storedUser = localStorage.getItem(STORAGE_KEY_USER);
+      if (storedToken && authService.verifyToken(storedToken) && storedUser) {
+        return JSON.parse(storedUser);
+      }
+      return null;
     } catch {
       return null;
     }
@@ -19,7 +23,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [token, setToken] = useState<string | null>(() => {
     try {
-      return localStorage.getItem(STORAGE_KEY_TOKEN);
+      const storedToken = localStorage.getItem(STORAGE_KEY_TOKEN);
+      if (storedToken && authService.verifyToken(storedToken)) {
+        return storedToken;
+      }
+      return null;
     } catch {
       return null;
     }
@@ -34,11 +42,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const storedUser = localStorage.getItem(STORAGE_KEY_USER);
         const storedToken = localStorage.getItem(STORAGE_KEY_TOKEN);
 
-        if (storedUser && storedToken) {
+        if (storedToken && authService.verifyToken(storedToken) && storedUser) {
           const parsedUser: User = JSON.parse(storedUser);
           setUser(parsedUser);
           setToken(storedToken);
         } else {
+          // If no valid token exists, do NOT hydrate role from localStorage
+          localStorage.removeItem(STORAGE_KEY_USER);
+          localStorage.removeItem(STORAGE_KEY_TOKEN);
           setUser(null);
           setToken(null);
         }
@@ -49,7 +60,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(null);
         setToken(null);
       } finally {
-        // Small delay to prevent flash of content
         setTimeout(() => {
           setIsLoading(false);
         }, 150);
@@ -59,15 +69,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initAuth();
   }, []);
 
-  const updateRole = (newRole: UserRole) => {
-    if (!user) return;
-    const updatedUser: User = { ...user, role: newRole };
+  /**
+   * Explicit Switch Role Action:
+   * Clears the active session (treated as logout + re-selection on RoleSelectionPage).
+   */
+  const switchRole = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem(STORAGE_KEY_USER);
+    localStorage.removeItem(STORAGE_KEY_TOKEN);
+  };
+
+  /**
+   * Select & provision role during initial login or on RoleSelectionPage
+   */
+  const selectRole = (newRole: UserRole) => {
+    const baseUser: User = user || {
+      id: `usr_${Date.now()}`,
+      name: newRole === 'admin' ? 'Marcus Drake' : newRole === 'user' ? 'Elena Rostova' : 'Capt. Vance Alexander',
+      email: newRole === 'admin' ? 'admin@docknova.com' : newRole === 'user' ? 'operator@docknova.com' : 'captain@docknova.com',
+      role: newRole,
+      company: newRole === 'admin' ? 'DockNova Systems Admin' : newRole === 'user' ? 'Carrier Operations' : 'Port Authority',
+    };
+    const updatedUser: User = { ...baseUser, role: newRole };
     const newToken = generateMockJWT(updatedUser);
 
     setUser(updatedUser);
     setToken(newToken);
     localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(updatedUser));
     localStorage.setItem(STORAGE_KEY_TOKEN, newToken);
+  };
+
+  /**
+   * Gate in-place role mutation on active authenticated sessions.
+   * Role can only change via explicit switchRole -> RoleSelectionPage flow.
+   */
+  const updateRole = (newRole: UserRole) => {
+    if (user && token) {
+      console.warn(
+        '[AuthContext] In-place role mutation blocked while authenticated. Perform explicit switchRole() to re-select role via RoleSelectionPage.'
+      );
+      return;
+    }
+    selectRole(newRole);
   };
 
   const login = async (
@@ -132,8 +176,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         signup,
         logout,
+        switchRole,
+        selectRole,
         updateRole,
-        setRole: updateRole, // Alias for backward compatibility
+        setRole: updateRole,
       }}
     >
       {children}

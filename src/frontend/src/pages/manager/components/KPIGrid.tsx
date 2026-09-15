@@ -43,6 +43,7 @@ export const KPIGrid: React.FC<KPIGridProps & { liveValues?: Partial<Record<KPID
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: spacing.md, width: '100%' }}>
       {THREE_KPIS.map((kpi) => {
         const live = liveValues?.[kpi.id];
+        const isSimulated = !live;
         const displayKpi = live ? { ...kpi, ...live } : kpi;
         return (
         <div
@@ -63,8 +64,13 @@ export const KPIGrid: React.FC<KPIGridProps & { liveValues?: Partial<Record<KPID
           onMouseLeave={(e) => (e.currentTarget.style.borderColor = colors.surfaceBorder)}
         >
           <div>
-            <div style={{ fontSize: '0.8125rem', color: colors.secondaryText, fontWeight: 500, marginBottom: '4px' }}>
-              {displayKpi.title}
+            <div style={{ fontSize: '0.8125rem', color: colors.secondaryText, fontWeight: 500, marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span>{displayKpi.title}</span>
+              {isSimulated && (
+                <span style={{ fontSize: '0.6875rem', color: colors.warning, backgroundColor: colors.warningGlow, padding: '1px 6px', borderRadius: radius.sm, border: '1px solid rgba(245, 158, 11, 0.3)', fontWeight: 600 }}>
+                  Simulated
+                </span>
+              )}
             </div>
             <div style={{ fontSize: '2rem', fontWeight: 700, color: colors.primaryText, letterSpacing: '-0.02em' }}>
               {displayKpi.value}

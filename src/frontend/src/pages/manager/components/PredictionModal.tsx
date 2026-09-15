@@ -25,8 +25,9 @@ export const PredictionModal: React.FC<PredictionModalProps> = ({
         </div>
 
         <div style={{ backgroundColor: colors.background, padding: spacing.md, borderRadius: radius.md, border: `1px solid ${colors.surfaceBorder}`, display: 'flex', flexDirection: 'column', gap: spacing.sm }}>
-          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: colors.novaCyan, textTransform: 'uppercase' }}>
-            Predictive Model Drivers & Weights
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: colors.novaCyan, textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span>Predictive Model Drivers & Weights</span>
+            <Badge variant="warning">Simulated</Badge>
           </span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.8125rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>

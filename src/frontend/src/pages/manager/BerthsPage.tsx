@@ -32,6 +32,7 @@ export const BerthsPage: React.FC = () => {
   }, [state]);
 
   const displayedBerths = berths ?? MOCK_BERTHS;
+  const isSimulatedFallback = berths === null;
 
   // Summary KPI metrics derived from the live or fallback berth data
   const kpiData = useMemo(() => {
@@ -73,7 +74,7 @@ export const BerthsPage: React.FC = () => {
             Monitor real-time berth occupancy, crane deployment, and AI congestion predictions across the terminal.
           </p>
         </div>
-        <Badge variant="cyan">SYSTEM LIVE</Badge>
+        <Badge variant={isSimulatedFallback ? "warning" : "cyan"}>{isSimulatedFallback ? "Simulated Data" : "SYSTEM LIVE"}</Badge>
       </div>
 
       {/* 4 KPI Cards */}

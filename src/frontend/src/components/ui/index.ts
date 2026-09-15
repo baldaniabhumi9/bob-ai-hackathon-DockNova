@@ -7,3 +7,8 @@ export * from './Modal';
 export * from './Table';
 export * from './Tabs';
 export * from './ProgressBar';
+export * from './HarborCanvas';
+export * from './GlassCard';
+export * from './AnimatedInput';
+export * from './GradientButton';
+

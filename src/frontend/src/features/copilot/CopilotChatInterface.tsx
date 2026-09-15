@@ -289,7 +289,7 @@ export const CopilotChatInterface: React.FC = () => {
                 />
                 <button
                   onClick={handleSaveTitle}
-                  className="p-1 rounded bg-primary text-base hover:opacity-90"
+                  className="p-1 rounded bg-primary text-white hover:opacity-90"
                 >
                   <Check className="w-4 h-4" />
                 </button>

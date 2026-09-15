@@ -142,16 +142,71 @@ export const vesselsPassportDatabase = {
   },
 };
 
-export const getVesselById = (id) => {
-  if (vesselsPassportDatabase[id]) return vesselsPassportDatabase[id];
-  return null;
-};
-
 export const upcomingArrivals = [
   { id: 'vsl_01', name: 'MV Nova Horizon', imo: '9845123', eta: '2026-09-14 16:45', etaFormatted: 'Today, 16:45', berth: 'B-02', status: 'On Time', risk: 18, carrier: 'Nova Maritime', origin: 'Rotterdam', teu: 24000, speed: '19.2 kts' },
   { id: 'vsl_02', name: 'MSC Marina Blue', imo: '9784321', eta: '2026-09-14 18:20', etaFormatted: 'Today, 18:20', berth: 'TBD', status: 'Delayed', risk: 76, carrier: 'MSC Mediterranean', origin: 'Shanghai', teu: 16500, speed: '14.1 kts' },
   { id: 'vsl_03', name: 'Maersk Polaris', imo: '9921004', eta: '2026-09-14 21:00', etaFormatted: 'Today, 21:00', berth: 'B-07', status: 'Arriving', risk: 34, carrier: 'Maersk Line', origin: 'Antwerp', teu: 18200, speed: '18.4 kts' },
+  { id: 'vsl_04', name: 'CMA CGM Fort St. Louis', imo: '9642211', eta: '2026-09-15 02:30', etaFormatted: 'Tomorrow, 02:30', berth: 'C-04', status: 'On Time', risk: 12, carrier: 'CMA CGM Group', origin: 'Busan', teu: 15000, speed: '17.6 kts' },
+  { id: 'vsl_05', name: 'Ever Given Alpha', imo: '9811000', eta: '2026-09-15 06:15', etaFormatted: 'Tomorrow, 06:15', berth: 'TBD', status: 'Delayed', risk: 88, carrier: 'Evergreen Marine', origin: 'Hong Kong', teu: 20124, speed: '12.8 kts' },
+  { id: 'vsl_06', name: 'Hapag-Lloyd Express', imo: '9723419', eta: '2026-09-15 09:45', etaFormatted: 'Tomorrow, 09:45', berth: 'A-01', status: 'On Time', risk: 22, carrier: 'Hapag-Lloyd', origin: 'Hamburg', teu: 14000, speed: '19.0 kts' },
+  { id: 'vsl_07', name: 'ONE Apus Horizon', imo: '9934128', eta: '2026-09-15 13:00', etaFormatted: 'Tomorrow, 13:00', berth: 'B-05', status: 'Arriving', risk: 28, carrier: 'Ocean Network Express', origin: 'Yokohama', teu: 14052, speed: '18.1 kts' },
+  { id: 'vsl_08', name: 'COSCO Shipping Taurus', imo: '9753112', eta: '2026-09-15 17:30', etaFormatted: 'Tomorrow, 17:30', berth: 'TBD', status: 'Delayed', risk: 64, carrier: 'COSCO Shipping', origin: 'Ningbo', teu: 20000, speed: '15.4 kts' },
 ];
+
+export const getVesselById = (id) => {
+  if (vesselsPassportDatabase[id]) return vesselsPassportDatabase[id];
+  const found = upcomingArrivals.find((v) => v.id === id);
+  if (!found) return null;
+  return {
+    id: found.id,
+    name: found.name,
+    imo: found.imo,
+    eta: found.eta,
+    etaFormatted: found.etaFormatted,
+    etdFormatted: 'Next day, 18:00',
+    berth: found.berth === 'TBD' ? 'Berth B4, Terminal 2' : `Berth ${found.berth}`,
+    terminal: 'Terminal 2 (Tuas Mega)',
+    location: found.berth === 'TBD' ? 'Outer Anchorage Sector 4' : `Berth ${found.berth}, Terminal 2`,
+    status: found.status === 'Delayed' ? 'DELAYED' : found.status === 'Arriving' ? 'ARRIVING' : 'AT BERTH',
+    risk: found.risk,
+    carrier: found.carrier,
+    origin: found.origin,
+    destination: 'Singapore Port',
+    type: 'Commercial Container Vessel',
+    length: '365.0 m',
+    teu: found.teu,
+    flag: 'Panama (PAN)',
+    builtYear: 2020,
+    draft: '15.2 m',
+    speed: found.speed,
+    healthScore: found.status === 'Delayed' ? 58 : 86,
+    carbonEstimate: '154t CO₂',
+    delayFormatted: found.status === 'Delayed' ? '+4.6h' : null,
+    isDelayed: found.status === 'Delayed',
+    craneAssignment: {
+      count: 3,
+      cranes: ['C1', 'C3', 'C7'],
+      productivity: '28 moves/hr per crane',
+    },
+    yardUtilization: 76,
+    aiInsight: {
+      header: 'AI Operational Insight',
+      body: `${found.name} is operating under optimal maritime dispatch rules.`,
+      confidence: '92% confidence',
+      recommendation: 'Maintain current fairway corridor.',
+    },
+    timelineEvents: [
+      { id: 'evt_1', time: 'Sep 11, 09:00', title: `Departed ${found.origin}`, description: 'Vessel commenced sailing.', status: 'past' },
+      { id: 'evt_3', time: found.etaFormatted, title: 'At Berth', description: 'Moored safely.', status: 'current' },
+    ],
+    impactAnalysis: {
+      cascadeSteps: [
+        { name: 'Initial Delay', value: found.status === 'Delayed' ? 4.6 : 0.2, unit: 'h', metric: found.status === 'Delayed' ? '+4.6h' : '+0.2h', impactColor: found.status === 'Delayed' ? '#F87171' : '#34D399' },
+      ],
+      aiSummary: 'Cascading impact summary: Nominal operations.',
+    },
+  };
+};
 
 export default {
   kpiMetrics,
@@ -161,3 +216,4 @@ export default {
   vesselsPassportDatabase,
   getVesselById,
 };
+

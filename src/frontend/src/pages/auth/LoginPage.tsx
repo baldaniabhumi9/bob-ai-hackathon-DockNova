@@ -1,23 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion, type Variants } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Shield, Anchor } from 'lucide-react';
+import { motion, Variants } from 'framer-motion';
+import { Mail, Lock, ArrowRight, Shield, ArrowLeft } from 'lucide-react';
 import { AuthLayout } from '@/features/auth/components/AuthLayout';
 import { Toast, ToastType } from '@/features/auth/components/Toast';
 import { useAuth } from '@/features/auth/AuthContext';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { AnimatedInput } from '@/components/ui/AnimatedInput';
+import { GradientButton } from '@/components/ui/GradientButton';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { login, isLoading } = useAuth();
+  const { login, isLoading, isAuthenticated, user } = useAuth();
+
+  // If already authenticated, redirect
+  React.useEffect(() => {
+    if (isAuthenticated && user) {
+      const targetRoute =
+        user.role === 'admin' ? '/admin' : user.role === 'user' ? '/user' : '/manager';
+      navigate(targetRoute, { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(true);
+  const [highlightEmail, setHighlightEmail] = useState<boolean>(false);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
-  // Validation errors
+  // Validation errors & Shake state
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [shake, setShake] = useState<boolean>(false);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
   // Toast state
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
@@ -34,7 +48,6 @@ export const LoginPage: React.FC = () => {
   const validate = (): boolean => {
     const newErrors: { email?: string; password?: string } = {};
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim()) {
       newErrors.email = 'Email address is required.';
@@ -42,7 +55,6 @@ export const LoginPage: React.FC = () => {
       newErrors.email = 'Please enter a valid maritime email format.';
     }
 
-    // Password validation: min 8 chars, 1 uppercase, 1 number
     if (!password) {
       newErrors.password = 'Password is required.';
     } else if (password.length < 8) {
@@ -77,6 +89,7 @@ export const LoginPage: React.FC = () => {
         const targetRoute =
           userRole === 'admin' ? '/admin' : userRole === 'user' ? '/user' : '/manager';
 
+        setIsSuccess(true);
         setToast({
           isVisible: true,
           message: `Authentication authorized as ${userRole.toUpperCase()}. Launching Console...`,
@@ -84,7 +97,7 @@ export const LoginPage: React.FC = () => {
         });
         setTimeout(() => {
           navigate(targetRoute, { replace: true });
-        }, 600);
+        }, 800);
       } else {
         triggerShake();
         setToast({
@@ -103,18 +116,29 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  // Demo helper for quick testing
+  // Quick Demo fill pill handler
   const fillDemo = (roleEmail: string) => {
     setEmail(roleEmail);
     setPassword('Maritime2026!');
     setErrors({});
+
+    // Soft highlight flash on email field
+    setHighlightEmail(true);
+    setTimeout(() => setHighlightEmail(false), 600);
+
+    // Auto focus password field
+    setTimeout(() => {
+      const passInput = document.getElementById('input-access-password');
+      if (passInput) (passInput as HTMLInputElement).focus();
+    }, 100);
   };
 
   const containerVariants: Variants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 30, filter: 'blur(8px)' },
     visible: {
       opacity: 1,
       y: 0,
+      filter: 'blur(0px)',
       transition: {
         duration: 0.6,
         ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
@@ -138,213 +162,196 @@ export const LoginPage: React.FC = () => {
       />
 
       <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate={shake ? { x: [-10, 10, -10, 10, 0] } : 'visible'}
+        animate={shake ? { x: [-10, 10, -10, 10, 0] } : undefined}
         transition={shake ? { duration: 0.4 } : undefined}
-        className="w-full bg-surface-1 border border-border rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-md relative"
       >
-        {/* Top security badge */}
-        <motion.div variants={itemVariants} className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2 text-xs font-mono text-primary bg-primary/10 border border-primary/25 px-2.5 py-1 rounded-md">
-            <Shield className="w-3.5 h-3.5" />
-            <span>PORT GATEWAY AUTH</span>
-          </div>
-          <span className="text-[11px] font-mono text-text-muted">PORT ID: SGSIN-01</span>
-        </motion.div>
-
-        {/* Heading */}
-        <motion.div variants={itemVariants} className="space-y-1 mb-6">
-          <h1 className="font-heading text-2xl sm:text-3xl font-bold text-text-primary tracking-tight">
-            Control Room Login
-          </h1>
-          <p className="text-sm text-text-secondary">
-            Enter credentials to access DockNova operations terminal.
-          </p>
-        </motion.div>
-
-        {/* Quick Demo Fill Pills */}
-        <motion.div variants={itemVariants} className="mb-6 p-2.5 rounded-lg bg-surface-2/60 border border-border/80">
-          <div className="text-[11px] font-mono text-text-muted mb-1.5 flex items-center justify-between">
-            <span>QUICK DEMO PRESETS:</span>
-            <span className="text-primary font-sans">Pass: Maritime2026!</span>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            <button
-              type="button"
-              onClick={() => fillDemo('captain@docknova.com')}
-              className="text-xs px-2.5 py-1 rounded bg-surface-3 hover:bg-primary/20 hover:text-primary transition-colors text-text-secondary border border-border/60"
-            >
-              Manager
-            </button>
-            <button
-              type="button"
-              onClick={() => fillDemo('operator@docknova.com')}
-              className="text-xs px-2.5 py-1 rounded bg-surface-3 hover:bg-primary/20 hover:text-primary transition-colors text-text-secondary border border-border/60"
-            >
-              Vessel Operator
-            </button>
-            <button
-              type="button"
-              onClick={() => fillDemo('admin@docknova.com')}
-              className="text-xs px-2.5 py-1 rounded bg-surface-3 hover:bg-primary/20 hover:text-primary transition-colors text-text-secondary border border-border/60"
-            >
-              SysAdmin
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} noValidate className="space-y-4">
-          {/* Email Field */}
-          <motion.div variants={itemVariants} className="space-y-1.5">
-            <label htmlFor="login-email" className="block text-xs font-medium text-text-secondary">
-              Maritime Email Address
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-text-muted">
-                <Mail className="w-4 h-4" />
-              </div>
-              <input
-                id="login-email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
-                }}
-                placeholder="captain@docknova.com"
-                aria-label="Maritime Email Address"
-                aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? 'email-error' : undefined}
-                className={`w-full pl-10 pr-4 py-2.5 rounded-lg bg-surface-2 border text-sm text-text-primary placeholder:text-text-muted/60 transition-all outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-[#050B14] ${
-                  errors.email ? 'border-danger focus:ring-danger/50' : 'border-border focus:border-primary'
-                }`}
-              />
-            </div>
-            {errors.email && (
-              <p id="email-error" className="text-xs text-danger mt-1">
-                {errors.email}
-              </p>
-            )}
-          </motion.div>
-
-          {/* Password Field */}
-          <motion.div variants={itemVariants} className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label htmlFor="login-password" className="block text-xs font-medium text-text-secondary">
-                Access Password
-              </label>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-text-muted">
-                <Lock className="w-4 h-4" />
-              </div>
-              <input
-                id="login-password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  if (errors.password) setErrors((prev) => ({ ...prev, password: undefined }));
-                }}
-                placeholder="••••••••••••"
-                aria-label="Access Password"
-                aria-invalid={!!errors.password}
-                aria-describedby={errors.password ? 'password-error' : undefined}
-                className={`w-full pl-10 pr-11 py-2.5 rounded-lg bg-surface-2 border text-sm text-text-primary placeholder:text-text-muted/60 transition-all outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-[#050B14] ${
-                  errors.password ? 'border-danger focus:ring-danger/50' : 'border-border focus:border-primary'
-                }`}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-text-muted hover:text-text-primary transition-colors"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-            {errors.password && (
-              <p id="password-error" className="text-xs text-danger mt-1">
-                {errors.password}
-              </p>
-            )}
-          </motion.div>
-
-          {/* Remember Me Checkbox */}
-          <motion.div variants={itemVariants} className="flex items-center justify-between pt-1">
-            <label className="flex items-center gap-2.5 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="sr-only"
-                aria-label="Remember this console terminal"
-              />
-              <div
-                className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
-                  rememberMe
-                    ? 'bg-primary border-primary text-base'
-                    : 'bg-surface-2 border-border hover:border-text-muted'
-                }`}
-              >
-                {rememberMe && (
-                  <svg className="w-3 h-3 text-base" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M2.5 6L5 8.5L9.5 3.5" />
-                  </svg>
-                )}
-              </div>
-              <span className="text-xs text-text-secondary">Remember this terminal</span>
-            </label>
-
-            <span className="text-xs text-text-muted hover:text-primary transition-colors cursor-pointer">
-              Forgot access key?
-            </span>
-          </motion.div>
-
-          {/* Submit Button */}
-          <motion.div variants={itemVariants} className="pt-2">
-            <motion.button
-              type="submit"
-              disabled={isLoading}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full bg-gradient-primary text-base font-semibold py-3 px-4 rounded-lg shadow-glow-primary transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed group relative overflow-hidden"
-            >
-              {isLoading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-base border-t-transparent rounded-full animate-spin" />
-                  <span>Verifying Maritime Clearance...</span>
-                </>
-              ) : (
-                <>
-                  <span>Authorize & Enter Terminal</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </>
-              )}
-            </motion.button>
-          </motion.div>
-
-          {/* Footer Link */}
-          <motion.div variants={itemVariants} className="pt-3 text-center">
-            <p className="text-xs text-text-secondary">
-              Don't have an account?{' '}
+        <GlassCard spotlight={true} hoverLift={false} className="p-6 sm:p-8">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="space-y-6"
+          >
+            {/* Back to Home Link with Arrow Hover Slide */}
+            <motion.div variants={itemVariants}>
               <Link
-                to="/signup"
-                className="text-primary hover:text-primary font-medium inline-block relative group"
+                to="/"
+                className="inline-flex items-center gap-2 text-xs font-mono text-[#94A3B8] hover:text-[#38BDF8] transition-colors group"
               >
-                Sign up
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
+                <ArrowLeft className="w-3.5 h-3.5 text-[#38BDF8] group-hover:-translate-x-1 transition-transform" />
+                <span>Back to home</span>
               </Link>
-            </p>
+            </motion.div>
+
+            {/* Top Shield Badge & Port ID */}
+            <motion.div variants={itemVariants} className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-mono text-[#38BDF8] bg-[#38BDF8]/10 border border-[#38BDF8]/30 px-3 py-1 rounded-md">
+                <Shield className="w-3.5 h-3.5" />
+                <span>PORT GATEWAY AUTH</span>
+              </div>
+              <span className="text-[11px] font-mono text-[#94A3B8]">PORT ID: SGSIN-01</span>
+            </motion.div>
+
+            {/* Blur-Rise Heading Entrance */}
+            <motion.div variants={itemVariants} className="space-y-1">
+              <h1 className="font-heading text-2xl sm:text-3xl font-bold text-[#E2E8F0] tracking-tight">
+                Control Room Login
+              </h1>
+              <p className="text-sm text-[#94A3B8]">
+                Enter credentials to access DockNova operations terminal.
+              </p>
+            </motion.div>
+
+            {/* Quick Demo Presets Row */}
+            <motion.div
+              variants={itemVariants}
+              className="p-3 rounded-xl bg-[#1A2A3E]/70 border border-[rgba(56,189,248,0.2)] select-none"
+            >
+              <div className="text-[11px] font-mono text-[#94A3B8] mb-2 flex items-center justify-between">
+                <span>QUICK DEMO PRESETS:</span>
+                <span className="text-[#38BDF8] font-sans font-medium">Pass: Maritime2026!</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => fillDemo('captain@docknova.com')}
+                  className="text-xs font-mono px-3 py-1 rounded-lg bg-[#111E2E] hover:bg-[#38BDF8]/20 hover:text-[#38BDF8] hover:border-[#38BDF8]/50 transition-all text-[#94A3B8] border border-[rgba(56,189,248,0.15)]"
+                >
+                  Manager
+                </button>
+                <button
+                  type="button"
+                  onClick={() => fillDemo('operator@docknova.com')}
+                  className="text-xs font-mono px-3 py-1 rounded-lg bg-[#111E2E] hover:bg-[#38BDF8]/20 hover:text-[#38BDF8] hover:border-[#38BDF8]/50 transition-all text-[#94A3B8] border border-[rgba(56,189,248,0.15)]"
+                >
+                  Vessel Operator
+                </button>
+                <button
+                  type="button"
+                  onClick={() => fillDemo('admin@docknova.com')}
+                  className="text-xs font-mono px-3 py-1 rounded-lg bg-[#111E2E] hover:bg-[#38BDF8]/20 hover:text-[#38BDF8] hover:border-[#38BDF8]/50 transition-all text-[#94A3B8] border border-[rgba(56,189,248,0.15)]"
+                >
+                  SysAdmin
+                </button>
+              </div>
+            </motion.div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
+              {/* Email Field with Highlight Flash */}
+              <motion.div variants={itemVariants}>
+                <div className={highlightEmail ? 'ring-2 ring-[#38BDF8] rounded-xl transition-all duration-300' : ''}>
+                  <AnimatedInput
+                    label="Maritime Email Address"
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
+                    }}
+                    placeholder="captain@docknova.com"
+                    icon={<Mail className="w-4 h-4" />}
+                    error={errors.email}
+                  />
+                </div>
+              </motion.div>
+
+              {/* Password Field */}
+              <motion.div variants={itemVariants}>
+                <AnimatedInput
+                  ref={passwordRef as any}
+                  label="Access Password"
+                  isPassword={true}
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (errors.password) setErrors((prev) => ({ ...prev, password: undefined }));
+                  }}
+                  placeholder="••••••••••••"
+                  icon={<Lock className="w-4 h-4" />}
+                  error={errors.password}
+                />
+              </motion.div>
+
+              {/* Custom Animated Checkbox "Remember this terminal" & Forgot Access Key */}
+              <motion.div variants={itemVariants} className="flex items-center justify-between pt-1">
+                <label className="flex items-center gap-2.5 cursor-pointer select-none group">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="sr-only"
+                    aria-label="Remember this terminal"
+                  />
+                  <div
+                    className={`w-4 h-4 rounded-md border flex items-center justify-center transition-all ${
+                      rememberMe
+                        ? 'bg-[#38BDF8] border-[#38BDF8] text-[#0A1420]'
+                        : 'bg-[#111E2E] border-[rgba(56,189,248,0.25)] group-hover:border-[#38BDF8]'
+                    }`}
+                  >
+                    {rememberMe && (
+                      <motion.svg
+                        initial={{ scale: 0, pathLength: 0 }}
+                        animate={{ scale: 1, pathLength: 1 }}
+                        transition={{ duration: 0.2 }}
+                        className="w-3 h-3 text-[#0A1420]"
+                        viewBox="0 0 12 12"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M2.5 6L5 8.5L9.5 3.5" />
+                      </motion.svg>
+                    )}
+                  </div>
+                  <span className="text-xs text-[#94A3B8] font-mono group-hover:text-[#E2E8F0] transition-colors">
+                    Remember this terminal
+                  </span>
+                </label>
+
+                <span className="text-xs font-mono text-[#94A3B8] hover:text-[#38BDF8] transition-colors cursor-pointer">
+                  Forgot access key?
+                </span>
+              </motion.div>
+
+              {/* Submit Button with Loading Radar & Success Flash */}
+              <motion.div variants={itemVariants} className="pt-2">
+                <GradientButton
+                  type="submit"
+                  variant="gradient"
+                  pulseRing
+                  isLoading={isLoading}
+                  loadingText="Verifying Maritime Clearance..."
+                  isSuccess={isSuccess}
+                  successText="Terminal Clearance Granted!"
+                  className="w-full !py-3.5 text-base"
+                >
+                  <span>Authorize & Enter Terminal</span>
+                  <ArrowRight className="w-4 h-4" />
+                </GradientButton>
+              </motion.div>
+
+              {/* Footer Link */}
+              <motion.div variants={itemVariants} className="pt-2 text-center">
+                <p className="text-xs text-[#94A3B8]">
+                  Don't have an account?{' '}
+                  <Link
+                    to="/signup"
+                    className="text-[#38BDF8] hover:underline font-semibold font-mono"
+                  >
+                    Sign up
+                  </Link>
+                </p>
+              </motion.div>
+            </form>
           </motion.div>
-        </form>
+        </GlassCard>
       </motion.div>
     </AuthLayout>
   );
 };
+
+export default LoginPage;

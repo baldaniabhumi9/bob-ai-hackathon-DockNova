@@ -62,9 +62,9 @@ export const CostBenefitSummary: React.FC<CostBenefitSummaryProps> = ({
             <button
               type="button"
               onClick={onConfirmReroute}
-              className="px-8 py-4 rounded-xl font-heading font-bold text-sm text-base bg-gradient-to-r from-success to-primary hover:opacity-95 transition-all shadow-glow-success flex items-center gap-3 cursor-pointer hover:scale-[1.02]"
+              className="px-8 py-4 rounded-xl font-heading font-bold text-sm text-white bg-gradient-to-r from-success to-primary hover:opacity-95 transition-all shadow-glow-success flex items-center gap-3 cursor-pointer hover:scale-[1.02]"
             >
-              <Check className="w-5 h-5 text-base stroke-[2.5]" />
+              <Check className="w-5 h-5 text-white stroke-[2.5]" />
               <span>Confirm Reroute Request</span>
             </button>
           </div>

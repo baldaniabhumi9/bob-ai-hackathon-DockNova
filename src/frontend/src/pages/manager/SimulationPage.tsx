@@ -237,9 +237,12 @@ export const SimulationPage: React.FC = () => {
             gap: spacing.md,
           }}
         >
-          <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: colors.primaryText }}>
-            Recent Scenarios
-          </h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: colors.primaryText }}>
+              Recent Scenarios
+            </h3>
+            <Badge variant="warning">Simulated</Badge>
+          </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.sm }}>
             {MOCK_SAVED_SCENARIOS.map((scenario) => (

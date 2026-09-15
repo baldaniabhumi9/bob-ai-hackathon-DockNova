@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './features/auth/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { ProtectedRoute } from './features/auth/components/ProtectedRoute';
+import { LandingPage } from './pages/landing';
 import { LoginPage, SignupPage, RoleSelectionPage, UnauthorizedPage } from './pages/auth';
 import { ManagerPage } from './pages/manager';
 import { AdminPage } from './pages/admin';
@@ -13,22 +14,6 @@ import { AlternateRoutingPage } from './pages/user/AlternateRoutingPage';
 import { NotificationsPage } from './pages/user/NotificationsPage';
 import { CopilotPage } from './pages/user/CopilotPage';
 
-// Root redirect component based on authentication state
-const RootRedirect: React.FC = () => {
-  const { isAuthenticated, role, isLoading } = useAuth();
-
-  if (isLoading) {
-    return null; // ProtectedRoute or AuthLoadingScreen handles loading
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  const targetDashboard = role === 'admin' ? '/admin' : role === 'user' ? '/user' : '/manager';
-  return <Navigate to={targetDashboard} replace />;
-};
-
 export const App: React.FC = () => {
   return (
     <ThemeProvider>
@@ -36,20 +21,12 @@ export const App: React.FC = () => {
         <AuthProvider>
           <BrowserRouter>
             <Routes>
-              {/* Public Auth Routes */}
+              {/* Public Entry Landing & Auth Routes */}
+              <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/unauthorized" element={<UnauthorizedPage />} />
-
-              {/* Role Selection (Requires any authenticated user) */}
-              <Route
-                path="/select-role"
-                element={
-                  <ProtectedRoute allowedRoles={['manager', 'user', 'admin']}>
-                    <RoleSelectionPage />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/select-role" element={<RoleSelectionPage />} />
 
               {/* Vessel Passport Detail Routes (Specific routes before wildcards) */}
               <Route
@@ -154,8 +131,7 @@ export const App: React.FC = () => {
                 }
               />
 
-              {/* Root & Fallback */}
-              <Route path="/" element={<RootRedirect />} />
+              {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>

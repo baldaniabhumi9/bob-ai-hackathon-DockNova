@@ -151,7 +151,7 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message, o
         <div
           className={`p-4 rounded-2xl shadow-sm text-sm transition-all duration-200 ${
             isUser
-              ? 'bg-primary text-base font-medium rounded-tr-sm text-text-primary shadow-glow-primary/20'
+              ? 'bg-primary text-white font-medium rounded-tr-sm text-text-primary shadow-glow-primary/20'
               : 'bg-surface-2 text-text-primary rounded-tl-sm border border-subtle'
           }`}
         >

@@ -66,7 +66,7 @@ export const UnauthorizedPage: React.FC = () => {
           <button
             type="button"
             onClick={handleReturnToDashboard}
-            className="px-5 py-3 rounded-lg bg-gradient-primary text-base font-semibold text-sm shadow-glow-primary hover:opacity-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="px-5 py-3 rounded-lg bg-gradient-primary text-white font-semibold text-sm shadow-glow-primary hover:opacity-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <Anchor className="w-4 h-4" />
             <span>Return to My Console</span>

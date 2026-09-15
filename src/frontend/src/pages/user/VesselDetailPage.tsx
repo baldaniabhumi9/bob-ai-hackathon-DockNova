@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
 import {
@@ -25,14 +25,97 @@ import { getVesselById } from '@/features/dashboard/mockData';
 import { VesselHealthRing } from '@/features/vessels/components/VesselHealthRing';
 import { PredictiveTimeline } from '@/features/vessels/components/PredictiveTimeline';
 import { CascadingImpactChart } from '@/features/vessels/components/CascadingImpactChart';
+import { api, type LiveVessel, type BerthRisk } from '@/services';
 
 export const VesselDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const vessel = id ? getVesselById(id) : null;
   const [liveTracking, setLiveTracking] = useState<boolean>(false);
   const [contactModalOpen, setContactModalOpen] = useState<boolean>(false);
+  const [liveVesselData, setLiveVesselData] = useState<LiveVessel | null>(null);
+  const [liveBerthRisk, setLiveBerthRisk] = useState<BerthRisk | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isLiveApiConnected, setIsLiveApiConnected] = useState<boolean>(false);
+
+  const fallbackVessel = id ? getVesselById(id) : null;
+
+  useEffect(() => {
+    let active = true;
+    const fetchLiveData = async () => {
+      setLoading(true);
+      try {
+        const [vessels, risks] = await Promise.all([
+          api.getVessels().catch(() => []),
+          api.getBerthRisk().catch(() => []),
+        ]);
+        if (!active) return;
+        if (vessels.length > 0 || risks.length > 0) {
+          setIsLiveApiConnected(true);
+        }
+        const matchedV = vessels.find((v) => v.id === id || v.name.toLowerCase() === fallbackVessel?.name.toLowerCase());
+        if (matchedV) setLiveVesselData(matchedV);
+
+        const matchedR = risks.find((r) => r.vesselId === id || (matchedV && r.vesselId === matchedV.id));
+        if (matchedR) setLiveBerthRisk(matchedR);
+      } catch {
+        if (active) setIsLiveApiConnected(false);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    fetchLiveData();
+    return () => {
+      active = false;
+    };
+  }, [id, fallbackVessel]);
+
+  const vessel = liveVesselData
+    ? {
+        id: liveVesselData.id,
+        name: liveVesselData.name,
+        imo: liveVesselData.imo,
+        status: liveVesselData.status,
+        type: liveVesselData.type || fallbackVessel?.type || 'Container Ship',
+        length: fallbackVessel?.length || '366m',
+        teu: fallbackVessel?.teu || 14000,
+        flag: fallbackVessel?.flag || 'Singapore (SGP)',
+        carrier: (liveVesselData as { carrier?: string }).carrier || fallbackVessel?.carrier || 'DockNova Logistics',
+        healthScore: liveBerthRisk ? Math.max(10, 100 - liveBerthRisk.riskScore) : fallbackVessel?.healthScore || 92,
+        carbonEstimate: fallbackVessel?.carbonEstimate || '142.4 tCO2e',
+        location: liveBerthRisk ? `${liveBerthRisk.berthName} (${liveBerthRisk.berthId})` : fallbackVessel?.location || 'Tuas Fairway Anchorage B',
+        terminal: fallbackVessel?.terminal || 'Tuas Mega Terminal',
+        etaFormatted: new Date(liveVesselData.eta).toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit' }),
+        etdFormatted: new Date(liveVesselData.etd).toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit' }),
+        isDelayed: liveVesselData.status === 'WAITING' || (fallbackVessel?.isDelayed ?? false),
+        delayFormatted: liveVesselData.status === 'WAITING' ? '+4.6 hours' : fallbackVessel?.delayFormatted || '+0.0h',
+        craneAssignment: {
+          count: liveBerthRisk ? liveBerthRisk.operationalCranes : fallbackVessel?.craneAssignment?.count || 4,
+          cranes: liveBerthRisk ? Array.from({ length: liveBerthRisk.operationalCranes }, (_, i) => `C${i + 1}`) : fallbackVessel?.craneAssignment?.cranes || ['C1', 'C2', 'C3'],
+          productivity: fallbackVessel?.craneAssignment?.productivity || '34 moves/hr',
+        },
+        yardUtilization: fallbackVessel?.yardUtilization || 84,
+        aiInsight: fallbackVessel?.aiInsight || {
+          confidence: '94% Confidence',
+          body: 'Vessel schedule is currently optimal. No critical bottleneck predicted at current quay assignment.',
+          recommendation: 'Maintain speed at 14.2 knots.',
+        },
+        timelineEvents: fallbackVessel?.timelineEvents || [],
+        impactAnalysis: fallbackVessel?.impactAnalysis || { cascadeSteps: [], aiSummary: 'Nominal operational status.' },
+      }
+    : fallbackVessel;
+
+  // Loading skeleton state
+  if (loading && !vessel) {
+    return (
+      <UserLayout pageTitle="Loading Vessel Passport...">
+        <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center space-y-4">
+          <div className="w-12 h-12 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+          <p className="text-sm text-text-secondary font-mono">Fetching vessel telemetry from /api/vessels...</p>
+        </div>
+      </UserLayout>
+    );
+  }
 
   // 404 Vessel Not Found State
   if (!vessel) {
@@ -52,7 +135,7 @@ export const VesselDetailPage: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/user')}
-              className="px-5 py-2.5 rounded-lg bg-gradient-primary text-base font-semibold text-xs shadow-glow-primary hover:opacity-95 transition-all cursor-pointer flex items-center gap-2"
+              className="px-5 py-2.5 rounded-lg bg-gradient-primary text-white font-semibold text-xs shadow-glow-primary hover:opacity-95 transition-all cursor-pointer flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Return to Fleet Radar</span>
@@ -164,8 +247,8 @@ export const VesselDetailPage: React.FC = () => {
               onClick={() => setLiveTracking((prev) => !prev)}
               className={`px-4 py-2.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
                 liveTracking
-                  ? 'bg-success text-base shadow-[0_0_20px_-2px_rgba(52,211,153,0.4)]'
-                  : 'bg-gradient-primary text-base shadow-glow-primary hover:opacity-95'
+                  ? 'bg-success text-white shadow-[0_0_20px_-2px_rgba(52,211,153,0.4)]'
+                  : 'bg-gradient-primary text-white shadow-glow-primary hover:opacity-95'
               }`}
             >
               <Radio className={`w-4 h-4 ${liveTracking ? 'animate-spin' : 'animate-pulse'}`} />
@@ -244,7 +327,7 @@ export const VesselDetailPage: React.FC = () => {
 
               <div className="w-[1px] h-16 bg-border/60" />
 
-              {/* Carbon Estimate */}
+              {/* Carbon Estimate (Simulated) */}
               <div className="flex flex-col items-center text-center space-y-1">
                 <div className="w-10 h-10 rounded-full bg-success/15 border border-success/30 flex items-center justify-center text-success mb-1">
                   <Leaf className="w-5 h-5" />
@@ -252,7 +335,10 @@ export const VesselDetailPage: React.FC = () => {
                 <div className="font-mono text-lg font-bold text-success">
                   {vessel.carbonEstimate}
                 </div>
-                <span className="text-[11px] font-mono text-text-muted">Voyage Eco Impact</span>
+                <span className="text-[11px] font-mono text-text-muted flex items-center gap-1">
+                  <span>Voyage Eco Impact</span>
+                  <span className="text-[9px] px-1 py-0.2 rounded bg-surface-3 text-text-muted font-normal">(Simulated)</span>
+                </span>
               </div>
             </div>
           </motion.div>
@@ -262,16 +348,21 @@ export const VesselDetailPage: React.FC = () => {
             variants={columnVariants}
             className="flex flex-col justify-between p-6 rounded-2xl bg-surface-1 border border-border shadow-xl space-y-6"
           >
-            {/* Current Location Pill */}
+            {/* Current Location & Live Berth Risk Pill */}
             <div className="p-3.5 rounded-xl bg-surface-2 border border-border flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <MapPin className="w-4 h-4 text-primary animate-bounce" />
                 <div>
-                  <span className="text-[10px] font-mono uppercase text-text-muted block">
-                    CURRENT BERTH COORDINATE
+                  <span className="text-[10px] font-mono uppercase text-text-muted flex items-center gap-1.5">
+                    <span>CURRENT BERTH COORDINATE</span>
+                    {liveBerthRisk && (
+                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-success/20 text-success border border-success/40">
+                        LIVE API ({liveBerthRisk.berthId})
+                      </span>
+                    )}
                   </span>
                   <span className="font-heading font-semibold text-sm text-text-primary">
-                    {vessel.location}
+                    {liveBerthRisk ? `${liveBerthRisk.berthName} (${liveBerthRisk.berthId})` : vessel.location}
                   </span>
                 </div>
               </div>
@@ -280,6 +371,27 @@ export const VesselDetailPage: React.FC = () => {
               </span>
             </div>
 
+            {/* Live Berth Risk Bar if API data present */}
+            {liveBerthRisk && (
+              <div className="p-3.5 rounded-xl bg-surface-2/80 border border-primary/30 space-y-1.5 font-mono">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-text-muted font-sans flex items-center gap-1">
+                    <span>Live Berth Congestion Risk</span>
+                    <span className="text-[9px] px-1 rounded bg-primary/10 text-primary border border-primary/30 font-bold">/api/port/berth-risk</span>
+                  </span>
+                  <span className={`font-bold ${liveBerthRisk.riskScore >= 70 ? 'text-danger' : liveBerthRisk.riskScore >= 40 ? 'text-warning' : 'text-success'}`}>
+                    {liveBerthRisk.riskScore}% ({liveBerthRisk.riskLevel})
+                  </span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-surface-3 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${liveBerthRisk.riskScore >= 70 ? 'bg-danger' : liveBerthRisk.riskScore >= 40 ? 'bg-warning' : 'bg-success'}`}
+                    style={{ width: `${liveBerthRisk.riskScore}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
             {/* ETA / ETD Cards side by side + Delay Indicator */}
             <div className="grid grid-cols-2 gap-3 font-mono">
               <div className="p-3.5 rounded-xl bg-surface-2 border border-border/80">
@@ -287,7 +399,9 @@ export const VesselDetailPage: React.FC = () => {
                   <Clock className="w-3.5 h-3.5 text-primary" />
                   <span>ETA Target</span>
                 </div>
-                <div className="text-base font-bold text-text-primary">{vessel.etaFormatted}</div>
+                <div className="text-base font-bold text-text-primary">
+                  {liveVesselData?.eta ? new Date(liveVesselData.eta).toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit' }) : vessel.etaFormatted}
+                </div>
                 <div className="text-[10px] text-text-muted mt-1">Direct Fairway PBG</div>
               </div>
 
@@ -296,7 +410,9 @@ export const VesselDetailPage: React.FC = () => {
                   <Anchor className="w-3.5 h-3.5 text-secondary" />
                   <span>ETD Projected</span>
                 </div>
-                <div className="text-base font-bold text-text-primary">{vessel.etdFormatted}</div>
+                <div className="text-base font-bold text-text-primary">
+                  {liveVesselData?.etd ? new Date(liveVesselData.etd).toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit' }) : vessel.etdFormatted}
+                </div>
                 <div className="text-[10px] text-text-muted mt-1">Subject to Quay Crane Gang</div>
               </div>
             </div>
@@ -320,7 +436,7 @@ export const VesselDetailPage: React.FC = () => {
               <div className="flex items-center justify-between text-xs">
                 <span className="text-text-muted">Quay Equipment Assigned:</span>
                 <span className="font-mono text-primary font-semibold">
-                  {vessel.craneAssignment.count} cranes assigned ({vessel.craneAssignment.cranes.join(', ')})
+                  {liveBerthRisk ? `${liveBerthRisk.operationalCranes} of ${liveBerthRisk.totalCranes} operational cranes` : `${vessel.craneAssignment.count} cranes assigned (${vessel.craneAssignment.cranes.join(', ')})`}
                 </span>
               </div>
               <div className="flex items-center gap-2 pt-1">
@@ -341,7 +457,10 @@ export const VesselDetailPage: React.FC = () => {
             {/* Yard Space Utilization */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-text-muted font-sans">Terminal Yard Space Utilization:</span>
+                <span className="text-text-muted font-sans flex items-center gap-1">
+                  <span>Terminal Yard Space Utilization:</span>
+                  <span className="text-[9px] px-1 py-0.2 rounded bg-surface-3 text-text-muted font-normal">(Simulated)</span>
+                </span>
                 <span className="font-bold text-text-primary">{vessel.yardUtilization}% Capacity</span>
               </div>
               <div className="w-full h-2 rounded-full bg-surface-3 overflow-hidden">

@@ -18,7 +18,7 @@ interface RoleOption {
 
 export const RoleSelectionPage: React.FC = () => {
   const navigate = useNavigate();
-  const { role: currentRole, setRole, user } = useAuth();
+  const { role: currentRole, selectRole, user } = useAuth();
   const [selectedRole, setSelectedRole] = useState<UserRole>(currentRole || 'manager');
   const [isNavigating, setIsNavigating] = useState<boolean>(false);
 
@@ -54,14 +54,14 @@ export const RoleSelectionPage: React.FC = () => {
 
   const handleSelectRole = (roleId: UserRole) => {
     setSelectedRole(roleId);
-    setRole(roleId);
   };
 
   const handleContinue = () => {
     setIsNavigating(true);
+    selectRole(selectedRole);
     const target = roles.find((r) => r.id === selectedRole);
     setTimeout(() => {
-      navigate(target ? target.route : '/manager');
+      navigate(target ? target.route : '/manager', { replace: true });
     }, 400);
   };
 
@@ -182,11 +182,11 @@ export const RoleSelectionPage: React.FC = () => {
                     <div
                       className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
                         isSelected
-                          ? 'bg-primary border-primary text-base'
+                          ? 'bg-primary border-primary text-white'
                           : 'border-text-muted/60 bg-surface-1'
                       }`}
                     >
-                      {isSelected && <CheckCircle2 className="w-4 h-4 text-base" />}
+                      {isSelected && <CheckCircle2 className="w-4 h-4 text-white" />}
                     </div>
                   </div>
                 </div>
@@ -210,11 +210,11 @@ export const RoleSelectionPage: React.FC = () => {
                 disabled={isNavigating}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full bg-gradient-primary text-base font-semibold py-3 px-4 rounded-lg shadow-glow-primary transition-all flex items-center justify-center gap-2 group cursor-pointer"
+                className="w-full bg-gradient-primary text-white font-semibold py-3 px-4 rounded-lg shadow-glow-primary transition-all flex items-center justify-center gap-2 group cursor-pointer"
               >
                 {isNavigating ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-base border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>Loading Console Dashboard...</span>
                   </>
                 ) : (

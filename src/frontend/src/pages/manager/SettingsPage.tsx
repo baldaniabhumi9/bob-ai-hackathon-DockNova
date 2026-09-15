@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
+import { Badge } from '@/components/ui/Badge';
 import {
   ControlTowerSettings,
   DEFAULT_SETTINGS,
@@ -162,6 +163,9 @@ export const SettingsPage: React.FC = () => {
 
       {/* 3. Port Operations */}
       <Card title="Port Operations">
+        <div style={{ marginBottom: spacing.md, display: 'flex', justifyContent: 'flex-end' }}>
+          <Badge variant="warning">Simulated</Badge>
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: spacing.md }}>
           <div>
             <div style={{ fontSize: '0.75rem', color: colors.secondaryText, marginBottom: '4px' }}>Port</div>

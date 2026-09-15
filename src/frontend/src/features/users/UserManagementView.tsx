@@ -215,6 +215,9 @@ export const UserManagementView: React.FC = () => {
             <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-accent/15 text-accent border border-accent/30">
               Role-Based Access Control (RBAC)
             </span>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-warning/15 text-warning border border-warning/30">
+              Simulated Data
+            </span>
           </div>
           <p className="text-xs text-text-secondary mt-1">
             Provision carrier credentials, revoke access, and configure permissions across Port Manager and Operator seats.

@@ -268,6 +268,9 @@ export const IntegrationsView: React.FC = () => {
             <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-primary/15 text-primary border border-primary/30 shadow-sm">
               watsonx.ai Active
             </span>
+            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-warning/15 text-warning border border-warning/30 shadow-sm">
+              Simulated Data
+            </span>
           </div>
           <p className="text-xs sm:text-sm text-text-secondary">
             Manage IBM Bob foundation model connectivity, upstream AIS & telemetry feeds, inference hyperparameters, and operational telemetry logs.

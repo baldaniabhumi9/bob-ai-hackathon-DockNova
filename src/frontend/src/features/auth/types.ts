@@ -33,6 +33,9 @@ export interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<{ success: boolean; user?: User; error?: string }>;
   signup: (data: SignupData) => Promise<{ success: boolean; user?: User; error?: string }>;
   logout: () => void;
+  switchRole: () => void;
+  selectRole: (role: UserRole) => void;
   updateRole: (role: UserRole) => void;
   setRole: (role: UserRole) => void;
 }
+

@@ -63,6 +63,7 @@ export const VesselsPage: React.FC = () => {
   }, [state]);
 
   const vessels = liveVessels ?? MOCK_VESSELS;
+  const isSimulatedFallback = liveVessels === null;
 
   // Filtered vessel list
   const filteredVessels = useMemo(() => {
@@ -171,7 +172,7 @@ export const VesselsPage: React.FC = () => {
             Monitor real-time vessel traffic, predicted schedule variances, and AI berth optimization recommendations.
           </p>
         </div>
-        <Badge variant="cyan">SYSTEM LIVE</Badge>
+        <Badge variant={isSimulatedFallback ? "warning" : "cyan"}>{isSimulatedFallback ? "Simulated Data" : "SYSTEM LIVE"}</Badge>
       </div>
 
       {/* 4 KPI Cards */}

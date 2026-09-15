@@ -20,7 +20,10 @@ export const AtRiskBerthCard: React.FC = () => {
         <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: colors.primaryText }}>
           B4 — Critical Risk
         </h3>
-        <Badge variant="critical">Hotspot</Badge>
+        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          <Badge variant="warning">Simulated</Badge>
+          <Badge variant="critical">Hotspot</Badge>
+        </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.xs }}>

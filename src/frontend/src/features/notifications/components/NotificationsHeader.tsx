@@ -164,7 +164,7 @@ export const NotificationsHeader: React.FC<NotificationsHeaderProps> = ({
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold ${
                     isActive
-                      ? 'bg-primary text-base'
+                      ? 'bg-primary text-white'
                       : 'bg-surface-3 text-text-secondary border border-border/80'
                   }`}
                 >

@@ -1,5 +1,6 @@
 import React from 'react';
 import { colors, radius, spacing } from '@/design-system';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { MOCK_RIPPLE_ACTIONS, RippleMitigationAction } from '@/features/congestion/mockRippleData';
 
@@ -10,6 +11,7 @@ export interface RippleMitigationActionsProps {
 
 export const RippleMitigationActions: React.FC<RippleMitigationActionsProps> = ({ onSimulate, actions: actionsProp }) => {
   const actions = actionsProp ?? MOCK_RIPPLE_ACTIONS;
+  const isSimulated = !actionsProp;
   return (
     <div
       style={{
@@ -22,13 +24,16 @@ export const RippleMitigationActions: React.FC<RippleMitigationActionsProps> = (
         gap: spacing.md,
       }}
     >
-      <div>
-        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: colors.primaryText }}>
-          How can we stop the ripple?
-        </h3>
-        <p style={{ margin: '2px 0 0 0', fontSize: '0.8125rem', color: colors.secondaryText }}>
-          AI-suggested actions to intercept the ripple before it reaches port-wide congestion.
-        </p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: colors.primaryText }}>
+            How can we stop the ripple?
+          </h3>
+          <p style={{ margin: '2px 0 0 0', fontSize: '0.8125rem', color: colors.secondaryText }}>
+            AI-suggested actions to intercept the ripple before it reaches port-wide congestion.
+          </p>
+        </div>
+        {isSimulated && <Badge variant="warning">Simulated</Badge>}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: spacing.md }}>

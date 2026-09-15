@@ -61,7 +61,7 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { user, logout, switchRole } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const { unreadCount } = useNotifications();
 
@@ -508,6 +508,7 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
                       type="button"
                       onClick={() => {
                         setProfileDropdownOpen(false);
+                        switchRole();
                         navigate('/select-role');
                       }}
                       className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-colors text-left cursor-pointer"

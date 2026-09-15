@@ -1,161 +1,133 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Anchor, Cpu, Compass, Radio, ShieldCheck, Activity } from 'lucide-react';
-import { api, ML_MODEL_ACCURACY_PCT } from '@/services';
+import { Anchor, Compass, Radio, ShieldCheck, Activity } from 'lucide-react';
+import { HarborCanvas } from '@/components/ui/HarborCanvas';
 
 export const AuthHero: React.FC = () => {
-  const [berthCount, setBerthCount] = useState<number>(8);
+  const [quaysCount, setQuaysCount] = useState(0);
+  const [accuracyVal, setAccuracyVal] = useState(0);
 
+  // Animated Count-Up for Stat Chips
   useEffect(() => {
-    let isMounted = true;
-    Promise.all([api.getPortStatus(), api.getLiveState()])
-      .then(([_status, state]) => {
-        if (isMounted && state?.berths) {
-          setBerthCount(state.berths.length);
-        }
-      })
-      .catch((err) => {
-        console.error('Failed to fetch port status for AuthHero:', err);
-      });
+    let qStart = 0;
+    const qTarget = 5;
+    const qTimer = setInterval(() => {
+      qStart += 1;
+      if (qStart >= qTarget) {
+        setQuaysCount(qTarget);
+        clearInterval(qTimer);
+      } else {
+        setQuaysCount(qStart);
+      }
+    }, 150);
+
+    let aStart = 0;
+    const aTarget = 86.4;
+    const aTimer = setInterval(() => {
+      aStart += 2.5;
+      if (aStart >= aTarget) {
+        setAccuracyVal(aTarget);
+        clearInterval(aTimer);
+      } else {
+        setAccuracyVal(parseFloat(aStart.toFixed(1)));
+      }
+    }, 30);
+
     return () => {
-      isMounted = false;
+      clearInterval(qTimer);
+      clearInterval(aTimer);
     };
   }, []);
 
   return (
-    <div className="relative w-full h-full min-h-[220px] md:min-h-full overflow-hidden bg-base flex flex-col justify-between p-6 sm:p-8 lg:p-12 select-none border-b md:border-b-0 md:border-r border-border/60">
-      {/* 1. Animated Gradient Mesh (Primary #38BDF8 + Secondary #818CF8 with low opacity) */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Drifting Radial 1: Primary Cyan/Sky */}
-        <div
-          className="absolute -top-[20%] -left-[15%] w-[130%] h-[130%] opacity-35 animate-mesh-drift"
-          style={{
-            background:
-              'radial-gradient(circle at 35% 40%, rgba(56, 189, 248, 0.28) 0%, rgba(56, 189, 248, 0.08) 35%, transparent 70%)',
-          }}
-        />
-        {/* Drifting Radial 2: Secondary Indigo */}
-        <div
-          className="absolute -bottom-[20%] -right-[15%] w-[120%] h-[120%] opacity-30 animate-mesh-drift"
-          style={{
-            animationDelay: '-10s',
-            background:
-              'radial-gradient(circle at 65% 60%, rgba(129, 140, 248, 0.25) 0%, rgba(129, 140, 248, 0.06) 40%, transparent 75%)',
-          }}
-        />
-        {/* Drifting Radial 3: Subtle Accent Pink Glow */}
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] opacity-20 animate-mesh-drift"
-          style={{
-            animationDelay: '-5s',
-            background:
-              'radial-gradient(circle at 50% 50%, rgba(244, 114, 182, 0.12) 0%, transparent 65%)',
-          }}
-        />
+    <div className="relative w-full h-full min-h-[240px] md:min-h-screen overflow-hidden bg-[#0A1420] flex flex-col justify-between p-6 sm:p-8 lg:p-12 select-none border-b md:border-b-0 md:border-r border-[rgba(56,189,248,0.15)]">
+      {/* 1. Animated Harbor Canvas Background (slower radar speed & low density) */}
+      <HarborCanvas density="low" speed={0.6} interactive={false} />
 
-        {/* Subtle Maritime Radar Rings & Grid */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-primary/10 rounded-full pointer-events-none" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] border border-primary/15 rounded-full pointer-events-none" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] border border-primary/20 rounded-full pointer-events-none" />
-        {/* Sweeping radar arm */}
-        <div className="absolute top-1/2 left-1/2 w-[300px] h-[2px] -translate-y-1/2 origin-left bg-gradient-to-r from-primary/30 to-transparent animate-radar-sweep pointer-events-none" />
+      {/* 2. Radial Scrim Overlay for Readability */}
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_30%,#0A1420_90%)] z-10" />
 
-        {/* Fine background grid */}
-        <div
-          className="absolute inset-0 opacity-[0.07]"
-          style={{
-            backgroundImage:
-              'linear-gradient(to right, #38BDF8 1px, transparent 1px), linear-gradient(to bottom, #38BDF8 1px, transparent 1px)',
-            backgroundSize: '40px 40px',
-          }}
-        />
-      </div>
-
-      {/* 2. Large Faint DockNova Logo Watermark */}
-      <div className="absolute right-4 bottom-4 lg:-bottom-10 lg:-right-10 pointer-events-none opacity-[0.04] text-primary select-none flex items-center justify-center">
-        <Anchor className="w-80 h-80 lg:w-[480px] lg:h-[480px]" strokeWidth={1} />
-      </div>
-
-      {/* 3. Hero Header / Branding */}
-      <div className="relative z-10">
+      {/* 3. Header / Brand Bar */}
+      <div className="relative z-20">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-surface-2 border border-border flex items-center justify-center shadow-glow-primary/40">
-              <Anchor className="w-5 h-5 text-primary animate-pulse" />
+            <div className="w-10 h-10 rounded-xl bg-[#111E2E] border border-[rgba(56,189,248,0.3)] flex items-center justify-center shadow-[0_0_15px_-3px_rgba(56,189,248,0.3)]">
+              <Anchor className="w-5 h-5 text-[#38BDF8] animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-heading font-bold text-lg lg:text-xl tracking-tight text-text-primary">
-                  Dock<span className="text-primary">Nova</span>
+                <span className="font-heading font-bold text-lg lg:text-xl tracking-tight text-[#E2E8F0]">
+                  Dock<span className="text-[#38BDF8]">Nova</span>
                 </span>
-                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30">
+                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-[#38BDF8]/15 text-[#38BDF8] border border-[#38BDF8]/30">
                   v3.4 Control
                 </span>
               </div>
-              <p className="text-xs text-text-muted hidden sm:block">AI Maritime Terminal Operating System</p>
+              <p className="text-xs text-[#94A3B8] hidden sm:block font-mono">AI Maritime Terminal Operating System</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-2/80 border border-border text-xs text-text-secondary font-mono">
-            <span className="w-2 h-2 rounded-full bg-success animate-ping" />
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#111E2E]/80 border border-[rgba(56,189,248,0.2)] text-xs text-[#94A3B8] font-mono">
+            <span className="w-2 h-2 rounded-full bg-[#34D399] animate-ping" />
             <span className="hidden sm:inline">AIS Port Sector 04 • </span>LIVE
           </div>
         </div>
       </div>
 
-      {/* 4. Centerpiece Value Prop & Visual Highlights (Hidden on compact mobile banner to fit 200px) */}
-      <div className="relative z-10 my-auto py-6 hidden md:block">
+      {/* 4. Centerpiece Section (Desktop Only) */}
+      <div className="relative z-20 my-auto py-6 hidden md:block">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="max-w-lg space-y-6"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-2/80 border border-primary/30 text-xs text-primary font-mono backdrop-blur-sm">
-            <Radio className="w-3.5 h-3.5 text-primary animate-pulse" />
+          {/* Blinking Badge */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-[#111E2E]/90 border border-[#38BDF8]/40 text-xs text-[#38BDF8] font-mono backdrop-blur-md shadow-md">
+            <Radio className="w-3.5 h-3.5 text-[#38BDF8] animate-pulse" />
             <span>IBM Bob AI Copilot • 72-Hour Congestion Horizon</span>
           </div>
 
-          <h1 className="font-heading text-3xl lg:text-4xl font-bold tracking-tight text-text-primary leading-tight">
+          <h1 className="font-heading text-3xl lg:text-4xl font-bold tracking-tight text-[#E2E8F0] leading-tight">
             Autonomous Maritime <br />
-            <span className="bg-gradient-to-r from-primary via-[#7DD3FC] to-secondary bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#38BDF8] via-[#60A5FA] to-[#818CF8] bg-clip-text text-transparent">
               Port Operations Center
             </span>
           </h1>
 
-          <p className="text-sm lg:text-base text-text-secondary leading-relaxed">
+          <p className="text-sm lg:text-base text-[#94A3B8] leading-relaxed font-sans">
             Real-time berth scheduling, vessel traffic optimization, and automated crane dispatching powered by predictive intelligence.
           </p>
 
-          {/* Telemetry Indicator Cards */}
+          {/* 2 Glass Stat Chips with Count-Up Animations */}
           <div className="grid grid-cols-2 gap-3 pt-2">
-            <div className="p-3.5 rounded-xl bg-surface-1/90 border border-border backdrop-blur-sm">
-              <div className="flex items-center gap-2 text-xs text-text-muted mb-1">
-                <Compass className="w-3.5 h-3.5 text-primary" />
+            <div className="p-4 rounded-xl bg-[#111E2E]/85 border border-[rgba(56,189,248,0.2)] backdrop-blur-md shadow-lg">
+              <div className="flex items-center gap-2 text-xs text-[#94A3B8] mb-1 font-mono">
+                <Compass className="w-4 h-4 text-[#38BDF8]" />
                 <span>Berth Allocation</span>
               </div>
-              <div className="font-mono text-xl font-semibold text-text-primary">
-                {berthCount} <span className="text-xs font-sans text-success font-normal">Active Quays</span>
+              <div className="font-mono text-2xl font-bold text-[#E2E8F0] font-data">
+                {quaysCount} <span className="text-xs font-sans text-[#34D399] font-normal">Active Quays</span>
               </div>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-surface-1/90 border border-border backdrop-blur-sm">
-              <div className="flex items-center gap-2 text-xs text-text-muted mb-1">
-                <Activity className="w-3.5 h-3.5 text-secondary" />
+            <div className="p-4 rounded-xl bg-[#111E2E]/85 border border-[rgba(56,189,248,0.2)] backdrop-blur-md shadow-lg">
+              <div className="flex items-center gap-2 text-xs text-[#94A3B8] mb-1 font-mono">
+                <Activity className="w-4 h-4 text-[#818CF8]" />
                 <span>Turnaround Precision</span>
               </div>
-              <div className="font-mono text-xl font-semibold text-text-primary">
-                {ML_MODEL_ACCURACY_PCT}% <span className="text-xs font-sans text-primary font-normal">AI Forecast</span>
+              <div className="font-mono text-2xl font-bold text-[#E2E8F0] font-data">
+                {accuracyVal.toFixed(1)}% <span className="text-xs font-sans text-[#38BDF8] font-normal">AI Forecast</span>
               </div>
             </div>
           </div>
         </motion.div>
       </div>
 
-      {/* 5. Footer Telemetry Info */}
-      <div className="relative z-10 flex items-center justify-between text-xs text-text-muted font-mono pt-4 border-t border-border/40">
+      {/* 5. Footer Telemetry Bar */}
+      <div className="relative z-20 flex items-center justify-between text-xs text-[#94A3B8] font-mono pt-4 border-t border-[rgba(56,189,248,0.15)]">
         <div className="flex items-center gap-2">
-          <ShieldCheck className="w-3.5 h-3.5 text-primary/80" />
+          <ShieldCheck className="w-4 h-4 text-[#38BDF8]" />
           <span>AES-256 Encrypted Telemetry</span>
         </div>
         <div className="hidden sm:block">
@@ -165,3 +137,5 @@ export const AuthHero: React.FC = () => {
     </div>
   );
 };
+
+export default AuthHero;

@@ -29,6 +29,9 @@ export const AuditHeader: React.FC<AuditHeaderProps> = ({
             <ShieldCheck className="w-3.5 h-3.5 stroke-[2.5]" />
             Immutable Hash Verified
           </span>
+          <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-warning/15 text-warning border border-warning/30">
+            Simulated Data
+          </span>
           <span className="px-2 py-0.5 rounded-md text-[11px] font-mono bg-surface-2 text-text-muted border border-subtle">
             {totalLogsCount} Records
           </span>

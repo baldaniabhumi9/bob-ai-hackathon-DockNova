@@ -10,6 +10,32 @@ FastAPI server foundation for DockNova Port Congestion Predictor & Operations Op
 - `tests/`: Automated unit and integration test suite.
 - `main.py`: Entry point for the FastAPI application server.
 
-## Purpose & Ownership
+## Setup & Running the Server
 
-Maintained by Backend developers. Manages API routes, data processing, service integration, and business logic.
+### 1. Environment Setup (.venv)
+
+To resolve Python 3.13 OR-Tools + Protobuf compatibility:
+
+```bash
+cd src/backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 2. Start API Server
+
+```bash
+python3 -m uvicorn main:app --port 8000
+```
+
+Verify API endpoints via curl:
+
+```bash
+curl http://localhost:8000/health
+curl http://localhost:8000/api/port/status
+curl http://localhost:8000/api/vessels
+curl http://localhost:8000/api/port/berth-risk
+curl http://localhost:8000/api/congestion/forecast
+```
+

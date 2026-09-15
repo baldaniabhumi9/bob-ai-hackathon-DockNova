@@ -29,7 +29,10 @@ export const RippleExplanationCard: React.FC<RippleExplanationCardProps> = ({ co
         <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: colors.primaryText }}>
           {MOCK_RIPPLE_EXPLANATION.heading}
         </h3>
-        <Badge variant="cyan">AI Confidence 91%</Badge>
+        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          <Badge variant="warning">Simulated</Badge>
+          <Badge variant="cyan">AI Confidence 91%</Badge>
+        </div>
       </div>
 
       <p style={{ margin: 0, fontSize: '0.875rem', color: colors.primaryText, lineHeight: 1.6 }}>

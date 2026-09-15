@@ -123,7 +123,7 @@ export const RerouteConfirmModal: React.FC<RerouteConfirmModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-primary text-base font-semibold text-xs font-mono uppercase tracking-wider shadow-glow-primary hover:opacity-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3 px-4 rounded-xl bg-gradient-primary text-white font-semibold text-xs font-mono uppercase tracking-wider shadow-glow-primary hover:opacity-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <FileDown className="w-4 h-4" />
               <span>Download Digital Voyage Order</span>

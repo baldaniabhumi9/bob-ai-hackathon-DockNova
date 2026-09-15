@@ -52,7 +52,7 @@ export const NotificationsEmptyState: React.FC<NotificationsEmptyStateProps> = (
         <button
           type="button"
           onClick={onSimulateNewNotification}
-          className="px-4 py-2 rounded-xl bg-gradient-primary text-base font-semibold text-xs font-mono shadow-glow-primary hover:opacity-95 transition-all cursor-pointer flex items-center gap-2"
+          className="px-4 py-2 rounded-xl bg-gradient-primary text-white font-semibold text-xs font-mono shadow-glow-primary hover:opacity-95 transition-all cursor-pointer flex items-center gap-2"
         >
           <PlusCircle className="w-3.5 h-3.5" />
           <span>Simulate Incoming Alert</span>

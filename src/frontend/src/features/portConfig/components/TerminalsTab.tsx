@@ -159,34 +159,52 @@ export const TerminalsTab: React.FC<TerminalsTabProps> = ({
 
               {/* Card Bottom: 3 Metrics & Progress Bar */}
               <div className="mt-6 pt-4 border-t border-border/60 space-y-4">
-                {/* 3 Metrics: Total Berths, Active Cranes, Avg Utilization % */}
+                {/* 3 Metrics: Total Berths, Active Cranes, Avg Utilization % with High Contrast */}
                 <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="p-2 rounded-xl bg-surface-2/60 border border-border/40">
-                    <div className="flex items-center justify-center gap-1 text-[11px] text-text-muted mb-0.5">
-                      <Anchor className="w-3 h-3 text-primary" />
+                  <div className="p-2.5 rounded-xl bg-sky-500/10 border border-sky-500/30 shadow-sm">
+                    <div className="flex items-center justify-center gap-1 text-[11px] font-semibold text-sky-600 dark:text-sky-400 mb-1">
+                      <Anchor className="w-3.5 h-3.5 text-sky-500 shrink-0" />
                       <span>Berths</span>
                     </div>
-                    <div className="font-mono font-bold text-sm sm:text-base text-text-primary">
+                    <div className="font-mono font-extrabold text-base sm:text-xl text-sky-600 dark:text-sky-300">
                       {terminalBerths.length || terminal.totalBerths}
                     </div>
                   </div>
 
-                  <div className="p-2 rounded-xl bg-surface-2/60 border border-border/40">
-                    <div className="flex items-center justify-center gap-1 text-[11px] text-text-muted mb-0.5">
-                      <Cpu className="w-3 h-3 text-secondary" />
+                  <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/30 shadow-sm">
+                    <div className="flex items-center justify-center gap-1 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 mb-1">
+                      <Cpu className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
                       <span>Cranes</span>
                     </div>
-                    <div className="font-mono font-bold text-sm sm:text-base text-text-primary">
+                    <div className="font-mono font-extrabold text-base sm:text-xl text-indigo-600 dark:text-indigo-300">
                       {terminalCranes.length || terminal.activeCranes}
                     </div>
                   </div>
 
-                  <div className="p-2 rounded-xl bg-surface-2/60 border border-border/40">
-                    <div className="flex items-center justify-center gap-1 text-[11px] text-text-muted mb-0.5">
-                      <TrendingUp className="w-3 h-3 text-accent" />
+                  <div className={`p-2.5 rounded-xl border shadow-sm ${
+                    terminal.avgUtilization >= 85
+                      ? 'bg-rose-500/10 border-rose-500/30'
+                      : terminal.avgUtilization >= 65
+                      ? 'bg-amber-500/10 border-amber-500/30'
+                      : 'bg-emerald-500/10 border-emerald-500/30'
+                  }`}>
+                    <div className="flex items-center justify-center gap-1 text-[11px] font-semibold text-text-secondary mb-1">
+                      <TrendingUp className={`w-3.5 h-3.5 shrink-0 ${
+                        terminal.avgUtilization >= 85
+                          ? 'text-rose-500'
+                          : terminal.avgUtilization >= 65
+                          ? 'text-amber-500'
+                          : 'text-emerald-500'
+                      }`} />
                       <span>Utilized</span>
                     </div>
-                    <div className="font-mono font-bold text-sm sm:text-base text-text-primary">
+                    <div className={`font-mono font-extrabold text-base sm:text-xl ${
+                      terminal.avgUtilization >= 85
+                        ? 'text-rose-600 dark:text-rose-400'
+                        : terminal.avgUtilization >= 65
+                        ? 'text-amber-600 dark:text-amber-400'
+                        : 'text-emerald-600 dark:text-emerald-400'
+                    }`}>
                       {terminal.avgUtilization}%
                     </div>
                   </div>

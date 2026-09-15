@@ -20,7 +20,10 @@ export const WhyRiskCard: React.FC = () => {
         <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: colors.primaryText }}>
           Why is B4 at risk?
         </h3>
-        <Badge variant="cyan">AI Confidence 91%</Badge>
+        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          <Badge variant="warning">Simulated</Badge>
+          <Badge variant="cyan">AI Confidence 91%</Badge>
+        </div>
       </div>
 
       <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.8125rem', color: colors.secondaryText, display: 'flex', flexDirection: 'column', gap: '6px' }}>

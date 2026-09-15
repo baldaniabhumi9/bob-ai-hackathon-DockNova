@@ -1,5 +1,6 @@
 import React from 'react';
 import { AuthHero } from './AuthHero';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -7,7 +8,12 @@ interface AuthLayoutProps {
 
 export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
   return (
-    <main className="min-h-screen w-full bg-base text-text-primary flex flex-col md:flex-row overflow-x-hidden">
+    <main className="min-h-screen w-full bg-base text-text-primary flex flex-col md:flex-row overflow-x-hidden relative">
+      {/* Top right floating theme toggle */}
+      <div className="absolute top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+
       {/* Left 55% Hero Section (Desktop) / Collapses to ~200px (Mobile) */}
       <section
         className="w-full md:w-[55%] min-h-[200px] md:min-h-screen flex-shrink-0"
@@ -34,3 +40,4 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
     </main>
   );
 };
+

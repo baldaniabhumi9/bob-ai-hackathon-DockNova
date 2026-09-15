@@ -9,7 +9,6 @@ export default {
     extend: {
       colors: {
         // Design Tokens mapped to CSS variables for dynamic Dark/Light theme switching
-        base: 'var(--color-base, #050B14)',
         'background-base': 'var(--color-background-base, #050B14)',
         'surface-1': 'var(--color-surface-1, #0E1525)',
         'surface-2': 'var(--color-surface-2, #141D2E)',

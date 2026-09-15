@@ -51,8 +51,8 @@ export const FleetStatusAreaChart: React.FC = () => {
             <h3 className="font-heading font-bold text-lg text-text-primary tracking-tight">
               Fleet Status Overview
             </h3>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-              Last 7 Days
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-surface-2 text-text-muted border border-border">
+              7-Day Trend (Simulated)
             </span>
           </div>
           <p className="text-xs text-text-muted mt-0.5">
@@ -165,10 +165,13 @@ export const FleetStatusAreaChart: React.FC = () => {
       {/* Chart Footer Telemetry */}
       <div className="pt-4 border-t border-border/50 mt-4 flex items-center justify-between text-xs text-text-muted font-mono">
         <span className="flex items-center gap-1.5">
-          <Info className="w-3.5 h-3.5 text-primary" />
-          <span>72-Hour AI Predictive Model Confidence: 99.4%</span>
+          <Info className="w-3.5 h-3.5 text-text-muted" />
+          <span>Historical trend — no real 7-day API endpoint exists</span>
         </span>
-        <span className="hidden sm:inline">Updated 4 mins ago</span>
+        <span className="inline-flex items-center gap-1 text-text-muted/70 font-mono">
+          <span className="w-1.5 h-1.5 rounded-full bg-text-muted/40" />
+          Simulated
+        </span>
       </div>
     </div>
   );
