@@ -30,6 +30,7 @@ import { DataSourcesSection } from './components/DataSourcesSection';
 import { ModelParametersSection } from './components/ModelParametersSection';
 import { SystemLogsSection } from './components/SystemLogsSection';
 import { Toast, ToastType } from '@/features/auth/components/Toast';
+import { Badge } from '@/components/ui/Badge';
 
 export const IntegrationsView: React.FC = () => {
   // 1. IBM Bob Configuration State (persisted to localStorage)
@@ -110,7 +111,7 @@ export const IntegrationsView: React.FC = () => {
             timestamp,
             service: 'IBM Bob Copilot',
             status: 'Success',
-            message: `watsonx.ai handshake verified for ${bobConfig.modelId}. Latency: 138ms. Ready for maritime inference.`,
+            message: `Simulated watsonx.ai handshake verified for ${bobConfig.modelId}. Latency: 138ms. Ready for demo inference.`,
             latencyMs: 138,
           };
 
@@ -122,7 +123,7 @@ export const IntegrationsView: React.FC = () => {
           }));
 
           showToast(
-            'watsonx.ai link verified: IBM Bob Copilot foundation model is active and responding (138ms latency).',
+            'watsonx.ai link verified (demo): IBM Bob Copilot foundation model is active in simulation mode (138ms latency).',
             'success'
           );
           resolve(true);
@@ -133,7 +134,7 @@ export const IntegrationsView: React.FC = () => {
             timestamp,
             service: 'IBM Bob Copilot',
             status: 'Error',
-            message: 'watsonx.ai authentication failed: Missing or malformed Bearer Token.',
+            message: 'Simulated watsonx.ai authentication failed: Missing or malformed Bearer Token.',
             latencyMs: 940,
           };
           setLogs((prev) => [errorLog, ...prev.slice(0, 24)]);
@@ -156,7 +157,7 @@ export const IntegrationsView: React.FC = () => {
       timestamp,
       service: 'IBM Bob Copilot',
       status: 'Info',
-      message: `Updated copilot hyperparameters: Temp=${newConfig.temperature.toFixed(2)}, MaxTokens=${newConfig.maxTokens}, Model=${newConfig.modelId}.`,
+      message: `Simulated copilot hyperparameter update: Temp=${newConfig.temperature.toFixed(2)}, MaxTokens=${newConfig.maxTokens}, Model=${newConfig.modelId}.`,
       latencyMs: 45,
     };
     setLogs((prev) => [newLog, ...prev.slice(0, 24)]);
@@ -172,11 +173,10 @@ export const IntegrationsView: React.FC = () => {
         setDataSources((prev) =>
           prev.map((src) => {
             if (src.id === sourceId) {
-              // If it had an error, simulate resolving the error upon manual sync
               return {
                 ...src,
-                lastSyncTime: 'Just now',
-                status: 'Connected',
+                lastSyncTime: 'Not connected — demo data',
+                status: 'Simulated',
                 errorMessage: undefined,
               };
             }
@@ -192,12 +192,12 @@ export const IntegrationsView: React.FC = () => {
           timestamp,
           service: targetSource?.type === 'ais' ? 'AIS Stream' : targetSource?.type === 'weather' ? 'Weather API' : targetSource?.type === 'schedule' ? 'Portnet API' : 'Customs API',
           status: 'Success',
-          message: `Manual synchronization completed for [${sourceName}]. 100% frame delivery verified.`,
+          message: `Simulated manual synchronization completed for [${sourceName}]. Demo data frame delivery verified.`,
           latencyMs: 110,
         };
         setLogs((prev) => [newLog, ...prev.slice(0, 24)]);
 
-        showToast(`Synchronized ${sourceName} successfully. Feed is now operational.`, 'success');
+        showToast(`Synchronized ${sourceName} successfully (demo).`, 'success');
         resolve();
       }, 950);
     });
@@ -268,9 +268,7 @@ export const IntegrationsView: React.FC = () => {
             <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-primary/15 text-primary border border-primary/30 shadow-sm">
               watsonx.ai Active
             </span>
-            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-warning/15 text-warning border border-warning/30 shadow-sm">
-              Simulated Data
-            </span>
+            <Badge variant="warning">Simulated Data</Badge>
           </div>
           <p className="text-xs sm:text-sm text-text-secondary">
             Manage IBM Bob foundation model connectivity, upstream AIS & telemetry feeds, inference hyperparameters, and operational telemetry logs.
@@ -291,10 +289,10 @@ export const IntegrationsView: React.FC = () => {
 
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-2 border border-border text-xs font-mono text-text-secondary">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-warning opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-warning" />
             </span>
-            <span>Feeds: 3/4 Connected</span>
+            <span>Demo mode</span>
           </div>
         </div>
       </div>

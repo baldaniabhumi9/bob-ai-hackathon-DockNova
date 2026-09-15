@@ -225,6 +225,7 @@ export const SystemLogsSection: React.FC<SystemLogsSectionProps> = ({
                             >
                               {badge.icon}
                               <span>{log.status}</span>
+                              <span className="text-[9px] font-mono opacity-80">(demo)</span>
                             </span>
                           </td>
 

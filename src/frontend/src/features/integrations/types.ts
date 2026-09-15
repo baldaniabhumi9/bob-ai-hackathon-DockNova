@@ -9,7 +9,7 @@ export interface IbmBobConfig {
   region?: string;
 }
 
-export type DataSourceStatus = 'Connected' | 'Error' | 'Disconnected';
+export type DataSourceStatus = 'Simulated' | 'Connected' | 'Error' | 'Disconnected';
 
 export interface DataSource {
   id: string;

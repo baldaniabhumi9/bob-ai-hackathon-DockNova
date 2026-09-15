@@ -59,36 +59,15 @@ export const DataSourcesSection: React.FC<DataSourcesSectionProps> = ({
     }
   };
 
-  const getStatusBadge = (status: DataSourceStatus) => {
-    switch (status) {
-      case 'Connected':
-        return {
-          label: 'Connected',
-          border: 'border-success/30',
-          bg: 'bg-success/15',
-          text: 'text-success',
-          dot: 'bg-success',
-          isPulsing: true,
-        };
-      case 'Error':
-        return {
-          label: 'Sync Error',
-          border: 'border-danger/40',
-          bg: 'bg-danger/15',
-          text: 'text-danger',
-          dot: 'bg-danger',
-          isPulsing: false,
-        };
-      case 'Disconnected':
-        return {
-          label: 'Disconnected',
-          border: 'border-border',
-          bg: 'bg-surface-2',
-          text: 'text-text-muted',
-          dot: 'bg-text-muted',
-          isPulsing: false,
-        };
-    }
+  const getStatusBadge = (_status: DataSourceStatus) => {
+    return {
+      label: 'Simulated (demo)',
+      border: 'border-warning/30',
+      bg: 'bg-warning/15',
+      text: 'text-warning',
+      dot: 'bg-warning',
+      isPulsing: false,
+    };
   };
 
   return (

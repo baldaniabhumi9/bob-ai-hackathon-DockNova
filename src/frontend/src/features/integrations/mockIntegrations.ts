@@ -7,7 +7,7 @@ export const INITIAL_IBM_BOB_CONFIG: IbmBobConfig = {
   temperature: 0.2,
   maxTokens: 4096,
   isConnected: true,
-  lastTestedAt: '2026-09-14 13:12:45 UTC',
+  lastTestedAt: 'Not validated (demo)',
   region: 'us-south (Dallas Multi-Zone / Watsonx Tier 1)',
 };
 
@@ -17,8 +17,8 @@ export const INITIAL_DATA_SOURCES: DataSource[] = [
     name: 'Singapore MPA AIS Live Feed',
     type: 'ais',
     description: 'Maritime and Port Authority of Singapore Vessel Traffic Information Stream (VTIS CH 87B/88B).',
-    status: 'Connected',
-    lastSyncTime: '3 seconds ago',
+    status: 'Simulated',
+    lastSyncTime: 'Not connected — demo data',
     syncInterval: 'Every 5s (WebSocket Secure Stream)',
     endpointUrl: 'wss://vtis.mpa.gov.sg/v1/stream/ais/singapore-strait',
   },
@@ -27,8 +27,8 @@ export const INITIAL_DATA_SOURCES: DataSource[] = [
     name: 'Portnet Maritime Schedule Gateway',
     type: 'schedule',
     description: 'PSA Portnet berth reservations, pilotage dispatch, and container crane work orders.',
-    status: 'Connected',
-    lastSyncTime: '1 minute ago',
+    status: 'Simulated',
+    lastSyncTime: 'Not connected — demo data',
     syncInterval: 'Every 60s (REST Polling)',
     endpointUrl: 'https://api.portnet.com/v3/maritime/dock-schedules',
   },
@@ -37,19 +37,19 @@ export const INITIAL_DATA_SOURCES: DataSource[] = [
     name: 'NOAA / MSS MetOcean Weather Radar',
     type: 'weather',
     description: 'National Oceanic and Atmospheric Administration & Meteorological Service Singapore tidal and squall radar.',
-    status: 'Error',
-    lastSyncTime: '14 minutes ago',
+    status: 'Simulated',
+    lastSyncTime: 'Not connected — demo data',
     syncInterval: 'Every 5m (REST GeoJSON)',
     endpointUrl: 'https://api.weather.gov.sg/v2/marine/singapore-south/doppler',
-    errorMessage: 'HTTP 503 Service Unavailable: High-resolution doppler satellite feed timeout from Changi station after 15,000ms. Auto-retry pending in 120s.',
+    errorMessage: 'Simulated HTTP 503: High-resolution doppler satellite feed timeout from Changi station after 15,000ms. Auto-retry pending in 120s.',
   },
   {
     id: 'ds-customs',
     name: 'Singapore TradeNet Customs Single Window',
     type: 'customs',
     description: 'Immigration & Checkpoints Authority (ICA) and Singapore Customs manifest clearance permits.',
-    status: 'Connected',
-    lastSyncTime: '4 minutes ago',
+    status: 'Simulated',
+    lastSyncTime: 'Not connected — demo data',
     syncInterval: 'Every 15m (REST Webhooks)',
     endpointUrl: 'https://api.customs.gov.sg/v1/tradenet/vessel-clearances',
   },
@@ -69,7 +69,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 13:12:45 UTC',
     service: 'IBM Bob Copilot',
     status: 'Success',
-    message: 'Healthcheck ping acknowledged by watsonx.ai runtime. Foundation model granite-13b ready.',
+    message: 'Simulated healthcheck ping acknowledged by watsonx.ai runtime. Foundation model granite-13b ready.',
     latencyMs: 142,
   },
   {
@@ -77,7 +77,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 13:11:02 UTC',
     service: 'AIS Stream',
     status: 'Success',
-    message: 'Processed batch: 148 AIS position messages across Pasir Panjang sector. 0 dropped packets.',
+    message: 'Simulated AIS batch: 148 position messages processed across Pasir Panjang sector. 0 dropped packets.',
     latencyMs: 18,
   },
   {
@@ -85,7 +85,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 13:08:19 UTC',
     service: 'Weather API',
     status: 'Error',
-    message: 'HTTP 503 from MSS Doppler upstream: Changi sensor radar packet timeout. Retrying in backoff mode.',
+    message: 'Simulated HTTP 503 from MSS Doppler feed: Changi sensor radar packet timeout. Retrying in backoff mode.',
     latencyMs: 15002,
   },
   {
@@ -93,7 +93,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 13:05:40 UTC',
     service: 'Portnet API',
     status: 'Success',
-    message: 'Synchronized 42 berth booking entries with local operational state store.',
+    message: 'Simulated sync: 42 berth booking entries updated in local state store.',
     latencyMs: 310,
   },
   {
@@ -101,7 +101,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 13:00:15 UTC',
     service: 'AI Scheduler',
     status: 'Success',
-    message: 'Ran 72-hour congestion simulation cycle. Identified 1 potential bottleneck at Berth B4.',
+    message: 'Simulated 72-hour congestion cycle completed. Identified 1 potential bottleneck at Berth B4.',
     latencyMs: 840,
   },
   {
@@ -109,7 +109,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 12:55:22 UTC',
     service: 'Customs API',
     status: 'Success',
-    message: 'Received ICA clearance webhook for MV Ocean Star (IMO 9845123). Quarantine cleared.',
+    message: 'Simulated ICA clearance webhook received for MV Ocean Star (IMO 9845123). Quarantine cleared.',
     latencyMs: 89,
   },
   {
@@ -117,7 +117,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 12:50:00 UTC',
     service: 'IBM Bob Copilot',
     status: 'Info',
-    message: 'Synthesized natural language summary for shift briefing: "Port operating at 78% capacity".',
+    message: 'Simulated natural language synthesis for shift briefing: "Port operating at 78% capacity".',
     latencyMs: 420,
   },
   {
@@ -125,7 +125,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 12:45:11 UTC',
     service: 'AIS Stream',
     status: 'Success',
-    message: 'Vessel MV Horizon (IMO 9823412) geofence entry detected: Jurong Fairway sector.',
+    message: 'Simulated geofence entry for vessel MV Horizon (IMO 9823412): Jurong Fairway sector.',
     latencyMs: 24,
   },
   {
@@ -133,7 +133,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 12:40:55 UTC',
     service: 'Weather API',
     status: 'Warning',
-    message: 'MSS Marine Alert: Wind gusts exceeding 28 knots reported at Tuas South Basin.',
+    message: 'Simulated MSS Marine Alert: Wind gusts exceeding 28 knots reported at Tuas South Basin.',
     latencyMs: 215,
   },
   {
@@ -141,7 +141,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 12:35:10 UTC',
     service: 'Portnet API',
     status: 'Success',
-    message: 'Berth B2 crane assignment updated: Crane CR-103 scheduled for 34 container moves/hour.',
+    message: 'Simulated crane assignment update at Berth B2: Crane CR-103 scheduled for 34 moves/hour.',
     latencyMs: 195,
   },
   {
@@ -149,7 +149,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 12:30:00 UTC',
     service: 'AI Optimizer',
     status: 'Success',
-    message: 'Recomputed alternative routing vectors for 3 incoming carriers to bypass Western anchorage.',
+    message: 'Simulated alternative routing vector recomputation for 3 incoming carriers to bypass Western anchorage.',
     latencyMs: 612,
   },
   {
@@ -157,7 +157,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 12:20:18 UTC',
     service: 'IBM Bob Copilot',
     status: 'Success',
-    message: 'Vector embedding index refreshed. 1,420 maritime safety and SOP documents synchronized.',
+    message: 'Simulated vector embedding index refresh. 1,420 maritime safety documents synchronized.',
     latencyMs: 980,
   },
   {
@@ -165,7 +165,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 12:15:33 UTC',
     service: 'Customs API',
     status: 'Success',
-    message: 'TradeNet e-permit batch #9048-SG verified. 1,840 TEU hazardous materials pre-cleared.',
+    message: 'Simulated TradeNet e-permit verification (batch #9048-SG). 1,840 TEU hazardous materials pre-cleared.',
     latencyMs: 145,
   },
   {
@@ -173,7 +173,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 12:10:04 UTC',
     service: 'AIS Stream',
     status: 'Success',
-    message: 'WebSocket ping-pong keepalive response received from MPA gateway (0.8ms jitter).',
+    message: 'Simulated WebSocket keepalive response from MPA gateway (0.8ms jitter).',
     latencyMs: 12,
   },
   {
@@ -181,7 +181,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 12:00:00 UTC',
     service: 'AI Scheduler',
     status: 'Info',
-    message: 'Scheduled hourly model parameter validation complete. Drift metrics within 0.02 tolerance.',
+    message: 'Simulated model parameter validation complete. Drift metrics within 0.02 tolerance.',
     latencyMs: 340,
   },
   {
@@ -189,7 +189,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 11:50:22 UTC',
     service: 'Weather API',
     status: 'Warning',
-    message: 'High tide peak alert: Predicted water depth +1.4m above Mean Low Water Springs at 14:30.',
+    message: 'Simulated high tide peak alert: Predicted water depth +1.4m above Mean Low Water Springs at 14:30.',
     latencyMs: 175,
   },
   {
@@ -197,7 +197,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 11:40:19 UTC',
     service: 'Portnet API',
     status: 'Success',
-    message: 'Pilot dispatch schedule confirmed for Tugboat PSA Samson at Berth B1.',
+    message: 'Simulated pilot dispatch schedule confirmed for Tugboat PSA Samson at Berth B1.',
     latencyMs: 220,
   },
   {
@@ -205,7 +205,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 11:30:45 UTC',
     service: 'IBM Bob Copilot',
     status: 'Success',
-    message: 'Copilot conversational query fulfilled: "Evaluate queue length at Raffles Anchorage".',
+    message: 'Simulated copilot query fulfilled: "Evaluate queue length at Raffles Anchorage".',
     latencyMs: 380,
   },
   {
@@ -213,7 +213,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 11:15:10 UTC',
     service: 'AIS Stream',
     status: 'Success',
-    message: 'Collision avoidance spatial indexing completed. 240 active vessels mapped.',
+    message: 'Simulated collision avoidance spatial indexing completed. 240 active vessels mapped.',
     latencyMs: 35,
   },
   {
@@ -221,7 +221,7 @@ export const INITIAL_INTEGRATION_LOGS: IntegrationLog[] = [
     timestamp: '2026-09-14 11:00:00 UTC',
     service: 'AI Scheduler',
     status: 'Info',
-    message: 'System initialization: Watsonx neural inference bridge established.',
+    message: 'Simulated system initialization: Watsonx neural inference bridge established.',
     latencyMs: 120,
   },
 ];
@@ -231,3 +231,4 @@ export const INTEGRATION_STORAGE_KEYS = {
   DATA_SOURCES: 'docknova_admin_datasources_v1',
   MODEL_PARAMS: 'docknova_admin_modelparams_v1',
 };
+

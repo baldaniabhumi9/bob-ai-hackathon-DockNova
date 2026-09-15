@@ -177,7 +177,7 @@ export const IbmBobSection: React.FC<IbmBobSectionProps> = ({
               </button>
             </div>
             <div className="text-[11px] text-text-muted">
-              Key is encrypted using AES-256 in local storage.
+              Stored locally for demo purposes.
             </div>
           </div>
 
@@ -282,7 +282,11 @@ export const IbmBobSection: React.FC<IbmBobSectionProps> = ({
         {/* Action Buttons: Test Connection & Save Configuration */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
           <div className="text-xs font-mono text-text-muted">
-            {formData.lastTestedAt ? `Last validated: ${formData.lastTestedAt}` : 'Not tested recently'}
+            {formData.lastTestedAt
+              ? formData.lastTestedAt.startsWith('Not validated')
+                ? formData.lastTestedAt
+                : `Last validated: ${formData.lastTestedAt}`
+              : 'Not validated (demo)'}
           </div>
 
           <div className="flex items-center gap-3">
