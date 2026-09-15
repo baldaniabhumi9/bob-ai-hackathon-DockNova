@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Anchor, ArrowRight, Shield } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthContext';
 import { GradientButton } from '@/components/ui/GradientButton';
-import { ThemeToggle } from '@/components/ThemeToggle';
 
 export const Navbar: React.FC = () => {
   const { isAuthenticated, role } = useAuth();
@@ -33,8 +32,6 @@ export const Navbar: React.FC = () => {
 
         {/* Right Nav Navigation */}
         <nav className="flex items-center gap-3" aria-label="Main Navigation">
-          <ThemeToggle />
-
           {isAuthenticated ? (
             <Link to={dashboardPath}>
               <GradientButton variant="gradient" className="!px-4 !py-2 !text-xs">
@@ -65,4 +62,5 @@ export const Navbar: React.FC = () => {
 };
 
 export default Navbar;
+
 

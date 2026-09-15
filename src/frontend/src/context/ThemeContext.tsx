@@ -6,16 +6,21 @@ interface ThemeContextType {
   theme: ThemeMode;
   isDark: boolean;
   toggleTheme: () => void;
-  setTheme: (theme: ThemeMode) => void;
+  setTheme: (theme: ThemeMode, isExplicitUserAction?: boolean) => void;
 }
 
 const THEME_STORAGE_KEY = 'docknova_theme';
+const THEME_USER_SET_KEY = 'docknova_theme_user_set';
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<ThemeMode>(() => {
     try {
+      const userSet = localStorage.getItem(THEME_USER_SET_KEY);
+      if (userSet === 'light' || userSet === 'dark') {
+        return userSet;
+      }
       const saved = localStorage.getItem(THEME_STORAGE_KEY);
       if (saved === 'light' || saved === 'dark') {
         return saved;
@@ -23,7 +28,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } catch {
       // ignore
     }
-    return 'dark'; // Default to Maritime Dark theme
+    return 'light'; // Default to light theme for all application pages
   });
 
   useEffect(() => {
@@ -48,11 +53,26 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [theme]);
 
   const toggleTheme = () => {
-    setThemeState((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    setThemeState((prev) => {
+      const nextTheme = prev === 'dark' ? 'light' : 'dark';
+      try {
+        localStorage.setItem(THEME_USER_SET_KEY, nextTheme);
+      } catch {
+        // ignore
+      }
+      return nextTheme;
+    });
   };
 
-  const setTheme = (newTheme: ThemeMode) => {
+  const setTheme = (newTheme: ThemeMode, isExplicitUserAction = false) => {
     setThemeState(newTheme);
+    if (isExplicitUserAction) {
+      try {
+        localStorage.setItem(THEME_USER_SET_KEY, newTheme);
+      } catch {
+        // ignore
+      }
+    }
   };
 
   return (
@@ -76,3 +96,4 @@ export const useTheme = (): ThemeContextType => {
   }
   return context;
 };
+

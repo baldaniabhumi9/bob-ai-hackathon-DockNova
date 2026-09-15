@@ -21,9 +21,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <AuthLoadingScreen message="Verifying maritime security token..." />;
   }
 
-  // 2. Unauthenticated check -> forced to role selection page
+  // 2. Unauthenticated check -> forced to login page
   if (!isAuthenticated || !user) {
-    return <Navigate to="/select-role" state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   // 3. Role-based authorization check

@@ -509,12 +509,12 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
                       onClick={() => {
                         setProfileDropdownOpen(false);
                         switchRole();
-                        navigate('/select-role');
+                        navigate('/login');
                       }}
                       className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-colors text-left cursor-pointer"
                     >
                       <UserIcon className="w-3.5 h-3.5" />
-                      <span>Switch Console Role</span>
+                      <span>Switch Account</span>
                     </button>
 
                     <button

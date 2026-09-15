@@ -1,11 +1,11 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './features/auth/AuthContext';
-import { ThemeProvider } from './context/ThemeContext';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { ProtectedRoute } from './features/auth/components/ProtectedRoute';
 import { LandingPage } from './pages/landing';
-import { LoginPage, SignupPage, RoleSelectionPage, UnauthorizedPage } from './pages/auth';
+import { LoginPage, SignupPage, UnauthorizedPage } from './pages/auth';
 import { ManagerPage } from './pages/manager';
 import { AdminPage } from './pages/admin';
 import { UserPage } from './pages/user';
@@ -14,19 +14,40 @@ import { AlternateRoutingPage } from './pages/user/AlternateRoutingPage';
 import { NotificationsPage } from './pages/user/NotificationsPage';
 import { CopilotPage } from './pages/user/CopilotPage';
 
+const RouteThemeSync: React.FC = () => {
+  const location = useLocation();
+  const { setTheme } = useTheme();
+
+  useEffect(() => {
+    if (location.pathname === '/') {
+      setTheme('dark');
+    } else {
+      const explicitPreference = localStorage.getItem('docknova_theme_user_set');
+      if (explicitPreference === 'dark') {
+        setTheme('dark');
+      } else {
+        setTheme('light');
+      }
+    }
+  }, [location.pathname, setTheme]);
+
+  return null;
+};
+
 export const App: React.FC = () => {
   return (
     <ThemeProvider>
       <NotificationProvider>
         <AuthProvider>
           <BrowserRouter>
+            <RouteThemeSync />
             <Routes>
               {/* Public Entry Landing & Auth Routes */}
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/unauthorized" element={<UnauthorizedPage />} />
-              <Route path="/select-role" element={<RoleSelectionPage />} />
+              <Route path="/select-role" element={<Navigate to="/login" replace />} />
 
               {/* Vessel Passport Detail Routes (Specific routes before wildcards) */}
               <Route
