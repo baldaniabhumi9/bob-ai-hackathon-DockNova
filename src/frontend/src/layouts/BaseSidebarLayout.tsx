@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Anchor,
-  Search,
   Bell,
   Moon,
   Sun,
@@ -70,7 +69,6 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState<boolean>(false);
   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -323,7 +321,7 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
 
         {/* Sidebar Bottom: User Profile + Logout */}
         <div className="p-3 lg:p-4 border-t border-border/60 bg-surface-1/50 space-y-3">
-          <div className="flex items-center justify-between gap-2 overflow-hidden">
+          <div className="flex items-center gap-2 overflow-hidden">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-9 h-9 rounded-full bg-surface-2 border border-border flex items-center justify-center text-xs font-semibold text-primary flex-shrink-0">
                 {initials}
@@ -338,16 +336,6 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
               </div>
             </div>
 
-            {/* Logout button */}
-            <button
-              type="button"
-              onClick={handleLogout}
-              title="Logout session"
-              className="p-1.5 rounded-lg text-danger hover:bg-danger/10 transition-colors flex-shrink-0 cursor-pointer"
-              aria-label="Logout"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
           </div>
         </div>
       </aside>
@@ -359,7 +347,7 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
         {/* =======================================================================
             TOPBAR (Fixed top-0, h-16, with glassmorphism)
            ======================================================================= */}
-        <header className="fixed top-0 right-0 left-0 md:left-20 lg:left-64 h-16 bg-surface-1/80 backdrop-blur-md border-b border-border z-40 px-4 sm:px-6 flex items-center justify-between gap-4">
+        <header className="fixed top-0 right-0 left-0 md:left-20 lg:left-64 h-16 bg-surface-1/80 backdrop-blur-md border-b border-border z-40 px-4 sm:px-6 pt-4 flex items-center justify-between gap-4">
           {/* Topbar Left: Hamburger Toggle + Title + Breadcrumbs */}
           <div className="flex items-center gap-3 min-w-0">
             <button
@@ -390,25 +378,9 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
                   </React.Fragment>
                 ))}
               </div>
-              <h1 className="font-heading text-lg sm:text-xl font-bold text-text-primary truncate">
+              <h1 className="mt-4 font-heading text-lg sm:text-xl font-bold text-text-primary truncate">
                 {effectivePageTitle}
               </h1>
-            </div>
-          </div>
-
-          {/* Topbar Center: Global Search Bar */}
-          <div className="hidden md:flex items-center justify-center flex-1 max-w-md mx-4">
-            <div className="relative w-full">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-text-muted">
-                <Search className="w-4 h-4" />
-              </div>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search vessels, berths, or ask AI..."
-                className={`w-full pl-9 pr-4 py-2 rounded-full bg-surface-2 border border-border/80 text-xs sm:text-sm text-text-primary placeholder:text-text-muted/60 outline-none transition-all ${accentStyles.ring} focus:border-transparent`}
-              />
             </div>
           </div>
 
@@ -515,18 +487,6 @@ export const BaseSidebarLayout: React.FC<BaseSidebarLayoutProps> = ({
                     >
                       <UserIcon className="w-3.5 h-3.5" />
                       <span>Switch Account</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setProfileDropdownOpen(false);
-                        toggleTheme();
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-colors text-left cursor-pointer"
-                    >
-                      {isDark ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-sky-500" />}
-                      <span>{isDark ? 'Light Theme Mode' : 'Dark Theme Mode'}</span>
                     </button>
 
                     <div className="my-1 border-t border-border/60" />

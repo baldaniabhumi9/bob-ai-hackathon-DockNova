@@ -303,7 +303,7 @@ export const VesselDetailPage: React.FC = () => {
               </div>
               <div className="flex items-center justify-between pb-2 border-b border-border/50">
                 <span className="text-text-muted font-sans text-sm">TEU Capacity</span>
-                <span className="text-text-primary font-medium font-bold">
+                <span className="text-text-primary font-bold">
                   {vessel.teu.toLocaleString()} TEU
                 </span>
               </div>

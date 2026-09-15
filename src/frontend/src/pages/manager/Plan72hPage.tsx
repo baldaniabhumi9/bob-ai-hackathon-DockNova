@@ -160,7 +160,7 @@ export const Plan72hPage: React.FC<Plan72hPageProps> = ({ onNavigate }) => {
       </div>
 
       {/* Top Summary: 4 KPI Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: spacing.md, width: '100%' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: spacing.md, width: '100%' }}>
         {liveKpis.map((kpi) => (
           <div
             key={kpi.id}

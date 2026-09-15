@@ -27,7 +27,7 @@ export const CongestionSummaryCards: React.FC<{ congestion?: CongestionForecast 
   ];
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: spacing.md, width: '100%' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: spacing.md, width: '100%' }}>
       {cards.map((c, idx) => (
         <div
           key={idx}

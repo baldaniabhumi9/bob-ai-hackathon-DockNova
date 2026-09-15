@@ -96,7 +96,7 @@ export const OptimisationPage: React.FC = () => {
       </div>
 
       {/* 4 Summary Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: spacing.md, width: '100%' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: spacing.md, width: '100%' }}>
         <div style={{ backgroundColor: colors.surface, borderRadius: radius.md, border: `1px solid ${colors.surfaceBorder}`, padding: `${spacing.md} ${spacing.lg}` }}>
           <div style={{ fontSize: '0.8125rem', color: colors.secondaryText, marginBottom: '4px' }}>Recommended Actions</div>
           <div style={{ fontSize: '2rem', fontWeight: 700, color: colors.primaryText }}>{summary.recommendedActions}</div>

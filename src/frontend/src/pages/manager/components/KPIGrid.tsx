@@ -40,7 +40,7 @@ export interface KPIGridProps {
 
 export const KPIGrid: React.FC<KPIGridProps & { liveValues?: Partial<Record<KPIData['id'], { value: string; status: string; variant: KPIData['variant'] }>> }> = ({ onKPIClick, liveValues }) => {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: spacing.md, width: '100%' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: spacing.md, width: '100%' }}>
       {THREE_KPIS.map((kpi) => {
         const live = liveValues?.[kpi.id];
         const isSimulated = !live;

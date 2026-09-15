@@ -14,14 +14,9 @@ export const CongestionHeader: React.FC = () => {
         justifyContent: 'space-between',
       }}
     >
-      <div>
-        <h1 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: colors.primaryText }}>
-          Congestion Prediction
-        </h1>
-        <p style={{ margin: '2px 0 0 0', fontSize: '0.875rem', color: colors.secondaryText }}>
-          AI-powered forecast for the next 72 hours
-        </p>
-      </div>
+      <strong style={{ fontSize: '0.875rem', color: colors.primaryText }}>
+        Port Operations
+      </strong>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md, fontSize: '0.8125rem', color: colors.secondaryText }}>
         <div>

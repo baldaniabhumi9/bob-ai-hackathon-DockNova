@@ -70,7 +70,7 @@ export const LiveOperationsBand: React.FC = () => {
                 <g key={idx}>
                   <rect x="10" y={y - 10} width="90" height="18" rx="4" fill="#1A2A3E" stroke="rgba(56,189,248,0.3)" />
                   <circle cx="20" cy={y - 1} r="3" fill={idx === 1 ? '#F472B6' : '#34D399'} />
-                  <text x="30" y={y + 3} fill="#94A3B8" fontSize="8" fontFamily="JetBrains Mono">
+                  <text x="30" y={y + 3} fill="#94A3B8" fontSize="8" fontFamily="JetBrains Mono" textLength="68" lengthAdjust="spacingAndGlyphs">
                     SLOT 0{idx + 1} {idx === 1 ? '[OCCUPIED]' : '[READY]'}
                   </text>
                 </g>
