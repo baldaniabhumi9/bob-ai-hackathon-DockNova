@@ -84,6 +84,10 @@ demo/*.mkv
 
 # ── Docker volumes / local data ───────────────────────────────────────────────
 data/
+!src/backend/app/data/
+src/backend/app/data/*
+!src/backend/app/data/postgres_repository.py
+!src/backend/app/data/seed_postgres.py
 logs/
 *.log
 
